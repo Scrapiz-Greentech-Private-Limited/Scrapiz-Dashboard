@@ -1,0 +1,178 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+@layer base {
+  :root {
+    /* Green + White Theme */
+    --background: 0 0% 100%; /* Pure white background */
+    --foreground: 140 10% 20%; /* Dark green text */
+    --card: 0 0% 100%; /* White cards */
+    --card-foreground: 140 10% 20%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 140 10% 20%;
+    --primary: 142 76% 36%; /* Rich green primary */
+    --primary-foreground: 0 0% 100%; /* White text on green */
+    --secondary: 138 40% 96%; /* Very light green */
+    --secondary-foreground: 140 10% 20%;
+    --muted: 138 30% 95%; /* Light green muted */
+    --muted-foreground: 140 10% 45%;
+    --accent: 142 76% 36%; /* Green accent */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%; /* Keep red for errors */
+    --destructive-foreground: 0 0% 98%;
+    --border: 138 20% 90%; /* Light green border */
+    --input: 138 20% 90%;
+    --ring: 142 76% 36%; /* Green focus ring */
+    --chart-1: 142 76% 36%; /* Green */
+    --chart-2: 142 60% 50%; /* Light green */
+    --chart-3: 142 50% 60%; /* Lighter green */
+    --chart-4: 138 40% 70%; /* Very light green */
+    --chart-5: 160 50% 50%; /* Teal green */
+    --radius: 0.5rem;
+  }
+  .dark {
+    /* Dark Green Theme (optional) */
+    --background: 140 20% 10%; /* Dark green background */
+    --foreground: 0 0% 98%;
+    --card: 140 15% 15%; /* Dark green cards */
+    --card-foreground: 0 0% 98%;
+    --popover: 140 20% 10%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 142 76% 45%; /* Bright green */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 140 15% 20%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 140 15% 20%;
+    --muted-foreground: 140 10% 65%;
+    --accent: 142 76% 45%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 140 15% 25%;
+    --input: 140 15% 25%;
+    --ring: 142 76% 45%;
+    --chart-1: 142 76% 45%;
+    --chart-2: 142 60% 55%;
+    --chart-3: 142 50% 65%;
+    --chart-4: 138 40% 75%;
+    --chart-5: 160 50% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  
+  /* Improved focus styles for accessibility */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-green-400 ring-offset-2;
+  }
+  
+  /* Ensure sufficient color contrast for links */
+  a {
+    @apply underline-offset-4;
+  }
+  
+  /* Screen reader only utility */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+  
+  /* Screen reader only but visible on focus */
+  .sr-only-focusable:focus,
+  .sr-only-focusable:active {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+}
+
+/* Mobile-friendly responsive utilities */
+@layer utilities {
+  /* Prevent horizontal scroll on mobile */
+  .mobile-container {
+    @apply max-w-full overflow-x-hidden;
+  }
+  
+  /* Better touch targets for mobile */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  /* Responsive text sizes */
+  .text-responsive-xl {
+    @apply text-xl sm:text-2xl md:text-3xl;
+  }
+  
+  .text-responsive-lg {
+    @apply text-lg sm:text-xl md:text-2xl;
+  }
+  
+  /* Mobile-friendly cards */
+  .card-mobile {
+    @apply rounded-lg p-3 sm:p-4 md:p-6;
+  }
+  
+  /* Better spacing on mobile */
+  .space-mobile {
+    @apply space-y-3 sm:space-y-4 md:space-y-6;
+  }
+  
+  /* Responsive grid */
+  .grid-responsive {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6;
+  }
+}
+
+/* Shimmer animation for loading states */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Table responsive improvements */
+@layer components {
+  .table-container {
+    @apply overflow-x-auto -mx-2 sm:mx-0;
+  }
+  
+  .table-container table {
+    @apply min-w-full;
+  }
+  
+  /* Hide less important columns on mobile */
+  @media (max-width: 640px) {
+    .hide-mobile {
+      @apply hidden;
+    }
+  }
+  
+  /* Stack cards vertically on mobile */
+  .card-stack {
+    @apply flex flex-col gap-3 sm:gap-4;
+  }
+}
