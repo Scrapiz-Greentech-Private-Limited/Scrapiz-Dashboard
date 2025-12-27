@@ -1,4 +1,4 @@
-name: Deploy Next.js Admin to Vercel
+name: Deploy Next.js Admin 
 
 on:
   push:
