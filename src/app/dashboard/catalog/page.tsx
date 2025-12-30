@@ -369,59 +369,64 @@ export default function CatalogPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-2 sm:gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h2 className="text-3xl font-bold text-green-900 dark:text-green-100">Catalog Management</h2>
-          <p className="text-muted-foreground mt-1">Manage scrap categories and products in one place</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-green-900 dark:text-green-100">Catalog Management</h2>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">Manage scrap categories and products in one place</p>
         </div>
       </div>
 
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
         <Card className="border-green-200 bg-gradient-to-br from-green-50 to-white dark:from-green-950 dark:to-background">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-green-700 dark:text-green-300 flex items-center gap-2">
-              <Layers className="h-4 w-4" />
-              Total Categories
+          <CardHeader className="pb-2 p-3 sm:p-6 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium text-green-700 dark:text-green-300 flex items-center gap-1 sm:gap-2">
+              <Layers className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Total Categories</span>
+              <span className="sm:hidden">Categories</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-green-900 dark:text-green-100">{categories.length}</div>
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-2xl sm:text-3xl font-bold text-green-900 dark:text-green-100">{categories.length}</div>
           </CardContent>
         </Card>
 
         <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-white dark:from-blue-950 dark:to-background">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300 flex items-center gap-2">
-              <Package className="h-4 w-4" />
-              Total Products
+          <CardHeader className="pb-2 p-3 sm:p-6 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium text-blue-700 dark:text-blue-300 flex items-center gap-1 sm:gap-2">
+              <Package className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Total Products</span>
+              <span className="sm:hidden">Products</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-blue-900 dark:text-blue-100">{products.length}</div>
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-2xl sm:text-3xl font-bold text-blue-900 dark:text-blue-100">{products.length}</div>
           </CardContent>
         </Card>
 
         <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-white dark:from-purple-950 dark:to-background">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300">Avg Min Rate</CardTitle>
+          <CardHeader className="pb-2 p-3 sm:p-6 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium text-purple-700 dark:text-purple-300">
+              <span className="hidden sm:inline">Avg Min Rate</span>
+              <span className="sm:hidden">Avg Rate</span>
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-purple-900 dark:text-purple-100">
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-2xl sm:text-3xl font-bold text-purple-900 dark:text-purple-100">
               ₹{products.length > 0 ? (products.reduce((sum, p) => sum + p.min_rate, 0) / products.length).toFixed(0) : 0}
             </div>
           </CardContent>
         </Card>
 
         <Card className="border-orange-200 bg-gradient-to-br from-orange-50 to-white dark:from-orange-950 dark:to-background">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-orange-700 dark:text-orange-300">With Images</CardTitle>
+          <CardHeader className="pb-2 p-3 sm:p-6 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium text-orange-700 dark:text-orange-300">With Images</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-orange-900 dark:text-orange-100">
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-2xl sm:text-3xl font-bold text-orange-900 dark:text-orange-100">
               {categories.filter(c => c.image_url).length + products.filter(p => p.image_url).length}
             </div>
           </CardContent>
@@ -432,54 +437,59 @@ export default function CatalogPage() {
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="categories">
-            <Layers className="h-4 w-4 mr-2" />
-            Categories ({categories.length})
+          <TabsTrigger value="categories" className="text-xs sm:text-sm">
+            <Layers className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Categories</span>
+            <span className="sm:hidden">Cat.</span>
+            <span className="ml-1">({categories.length})</span>
           </TabsTrigger>
-          <TabsTrigger value="items">
-            <Package className="h-4 w-4 mr-2" />
-            Products ({products.length})
+          <TabsTrigger value="items" className="text-xs sm:text-sm">
+            <Package className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Products</span>
+            <span className="sm:hidden">Prod.</span>
+            <span className="ml-1">({products.length})</span>
           </TabsTrigger>
         </TabsList>
 
         {/* Categories Tab */}
-        <TabsContent value="categories" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <p className="text-sm text-muted-foreground">Manage scrap categories</p>
-            <Button onClick={handleAddCategory} className="bg-green-600 hover:bg-green-700">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Category
+        <TabsContent value="categories" className="space-y-3 sm:space-y-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0">
+            <p className="text-xs sm:text-sm text-muted-foreground">Manage scrap categories</p>
+            <Button onClick={handleAddCategory} size="sm" className="bg-green-600 hover:bg-green-700 w-full sm:w-auto sm:size-default">
+              <Plus className="h-4 w-4 sm:mr-2" />
+              <span className="sm:hidden">Add</span>
+              <span className="hidden sm:inline">Add Category</span>
             </Button>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {categories.map(category => (
               <Card key={category.id} className="border-green-100 hover:shadow-md transition-shadow">
-                <CardHeader>
+                <CardHeader className="p-3 sm:p-6">
                   <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3">
                       {category.image_url ? (
-                        <img src={category.image_url} alt={category.name} className="w-12 h-12 rounded object-cover" />
+                        <img src={category.image_url} alt={category.name} className="w-10 h-10 sm:w-12 sm:h-12 rounded object-cover" />
                       ) : (
-                        <div className="w-12 h-12 rounded bg-green-100 flex items-center justify-center">
-                          <ImageIcon className="h-6 w-6 text-green-600" />
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded bg-green-100 flex items-center justify-center">
+                          <ImageIcon className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
                         </div>
                       )}
-                      <div>
-                        <CardTitle className="text-green-900 dark:text-green-100">{category.name}</CardTitle>
-                        <CardDescription>{getProductCount(category.id)} products</CardDescription>
+                      <div className="min-w-0">
+                        <CardTitle className="text-sm sm:text-base text-green-900 dark:text-green-100 truncate">{category.name}</CardTitle>
+                        <CardDescription className="text-xs sm:text-sm">{getProductCount(category.id)} products</CardDescription>
                       </div>
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
                   <div className="flex items-center gap-2">
-                    <Button size="sm" variant="outline" onClick={() => handleEditCategory(category)} className="flex-1">
-                      <Edit className="h-4 w-4 mr-2" />
+                    <Button size="sm" variant="outline" onClick={() => handleEditCategory(category)} className="flex-1 h-8 sm:h-9 text-xs sm:text-sm">
+                      <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                       Edit
                     </Button>
-                    <Button size="sm" variant="outline" onClick={() => handleDeleteCategoryClick(category)} className="text-red-600 hover:text-red-700 hover:bg-red-50">
-                      <Trash2 className="h-4 w-4" />
+                    <Button size="sm" variant="outline" onClick={() => handleDeleteCategoryClick(category)} className="h-8 w-8 sm:h-9 sm:w-9 p-0 text-red-600 hover:text-red-700 hover:bg-red-50">
+                      <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                     </Button>
                   </div>
                 </CardContent>
@@ -490,88 +500,110 @@ export default function CatalogPage() {
 
 
         {/* Products Tab */}
-        <TabsContent value="items" className="space-y-4">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div className="flex-1 flex gap-2">
+        <TabsContent value="items" className="space-y-3 sm:space-y-4">
+          <div className="flex flex-col gap-3 sm:gap-4">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-2">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search products..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 h-9 sm:h-10"
                 />
               </div>
-              <Select value={categoryFilter.toString()} onValueChange={(v) => setCategoryFilter(v === 'all' ? 'all' : parseInt(v))}>
-                <SelectTrigger className="w-[180px]">
-                  <span className="flex items-center gap-2">
-                    <Filter className="h-4 w-4" />
-                    <SelectValue placeholder="Category" />
-                  </span>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  {categories.map(cat => (
-                    <SelectItem key={cat.id} value={cat.id.toString()}>{cat.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex gap-2">
+                <Select value={categoryFilter.toString()} onValueChange={(v) => setCategoryFilter(v === 'all' ? 'all' : parseInt(v))}>
+                  <SelectTrigger className="flex-1 sm:w-[180px] h-9 sm:h-10">
+                    <span className="flex items-center gap-2">
+                      <Filter className="h-4 w-4 hidden sm:block" />
+                      <SelectValue placeholder="Category" />
+                    </span>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    {categories.map(cat => (
+                      <SelectItem key={cat.id} value={cat.id.toString()}>{cat.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button onClick={handleAddItem} size="sm" className="bg-green-600 hover:bg-green-700 sm:size-default" disabled={categories.length === 0}>
+                  <Plus className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Add Product</span>
+                </Button>
+              </div>
             </div>
-            <Button onClick={handleAddItem} className="bg-green-600 hover:bg-green-700" disabled={categories.length === 0}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Product
-            </Button>
           </div>
 
           <Card className="border-green-100">
-            <CardContent className="pt-6">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Image</TableHead>
-                    <TableHead>Product Name</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Price Range</TableHead>
-                    <TableHead>Unit</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredItems.length === 0 ? (
+            <CardContent className="p-0 sm:pt-6 sm:p-6">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No products found</TableCell>
+                      <TableHead className="hidden sm:table-cell">Image</TableHead>
+                      <TableHead>Product</TableHead>
+                      <TableHead className="hidden md:table-cell">Category</TableHead>
+                      <TableHead>Price</TableHead>
+                      <TableHead className="hidden lg:table-cell">Unit</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
-                  ) : (
-                    filteredItems.map(item => (
-                      <TableRow key={item.id}>
-                        <TableCell>
-                          {item.image_url ? (
-                            <img src={item.image_url} alt={item.name} className="w-10 h-10 rounded object-cover" />
-                          ) : (
-                            <div className="w-10 h-10 rounded bg-green-100 flex items-center justify-center">
-                              <ImageIcon className="h-5 w-5 text-green-600" />
-                            </div>
-                          )}
-                        </TableCell>
-                        <TableCell className="font-medium">{item.name}</TableCell>
-                        <TableCell><Badge variant="outline">{getCategoryName(item.category)}</Badge></TableCell>
-                        <TableCell className="font-semibold text-green-600">₹{item.min_rate} - ₹{item.max_rate}</TableCell>
-                        <TableCell>{item.unit}</TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button size="sm" variant="outline" onClick={() => handleEditItem(item)}>
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button size="sm" variant="outline" onClick={() => handleDeleteItemClick(item)} className="text-red-600 hover:text-red-700 hover:bg-red-50">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredItems.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground text-sm">No products found</TableCell>
                       </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
+                    ) : (
+                      filteredItems.map(item => (
+                        <TableRow key={item.id}>
+                          <TableCell className="hidden sm:table-cell">
+                            {item.image_url ? (
+                              <img src={item.image_url} alt={item.name} className="w-8 h-8 sm:w-10 sm:h-10 rounded object-cover" />
+                            ) : (
+                              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded bg-green-100 flex items-center justify-center">
+                                <ImageIcon className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+                              </div>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2 sm:block">
+                              {/* Mobile: Show image inline */}
+                              <div className="sm:hidden">
+                                {item.image_url ? (
+                                  <img src={item.image_url} alt={item.name} className="w-8 h-8 rounded object-cover" />
+                                ) : (
+                                  <div className="w-8 h-8 rounded bg-green-100 flex items-center justify-center">
+                                    <ImageIcon className="h-4 w-4 text-green-600" />
+                                  </div>
+                                )}
+                              </div>
+                              <div>
+                                <span className="font-medium text-xs sm:text-sm block">{item.name}</span>
+                                {/* Mobile: Show category below name */}
+                                <span className="md:hidden text-[10px] sm:text-xs text-muted-foreground">{getCategoryName(item.category)}</span>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="hidden md:table-cell"><Badge variant="outline" className="text-xs">{getCategoryName(item.category)}</Badge></TableCell>
+                          <TableCell className="font-semibold text-green-600 text-xs sm:text-sm whitespace-nowrap">₹{item.min_rate}-{item.max_rate}</TableCell>
+                          <TableCell className="hidden lg:table-cell text-xs sm:text-sm">{item.unit}</TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-1 sm:gap-2">
+                              <Button size="sm" variant="outline" onClick={() => handleEditItem(item)} className="h-7 w-7 sm:h-8 sm:w-8 p-0">
+                                <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
+                              </Button>
+                              <Button size="sm" variant="outline" onClick={() => handleDeleteItemClick(item)} className="h-7 w-7 sm:h-8 sm:w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50">
+                                <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -580,59 +612,60 @@ export default function CatalogPage() {
 
       {/* Category Dialog */}
       <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto mx-4 sm:mx-auto">
           <DialogHeader>
-            <DialogTitle>{editingCategory ? 'Edit Category' : 'Add Category'}</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-base sm:text-lg">{editingCategory ? 'Edit Category' : 'Add Category'}</DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm">
               {editingCategory ? 'Update category details' : 'Create a new scrap category'}
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="cat-name">Category Name</Label>
+          <div className="grid gap-3 sm:gap-4 py-3 sm:py-4">
+            <div className="grid gap-1.5 sm:gap-2">
+              <Label htmlFor="cat-name" className="text-xs sm:text-sm">Category Name</Label>
               <Input
                 id="cat-name"
                 value={categoryForm.name}
                 onChange={(e) => setCategoryForm({ ...categoryForm, name: e.target.value })}
                 placeholder="e.g., Paper, Plastic"
                 disabled={savingCategory}
+                className="h-9 sm:h-10"
               />
             </div>
-            <div className="grid gap-2">
-              <Label>Image</Label>
+            <div className="grid gap-1.5 sm:gap-2">
+              <Label className="text-xs sm:text-sm">Image</Label>
               <div className="flex gap-2">
                 <Input
                   value={categoryForm.image_url}
                   onChange={(e) => setCategoryForm({ ...categoryForm, image_url: e.target.value, image: null })}
                   placeholder="https://s3.amazonaws.com/... or upload"
                   disabled={savingCategory || !!categoryForm.image}
-                  className="flex-1"
+                  className="flex-1 h-9 sm:h-10 text-xs sm:text-sm"
                 />
                 <label className="cursor-pointer">
                   <input type="file" accept="image/*" onChange={handleCategoryFileChange} className="hidden" disabled={savingCategory} />
-                  <Button type="button" variant="outline" size="icon"  disabled={savingCategory}>
+                  <Button type="button" variant="outline" size="icon" className="h-9 w-9 sm:h-10 sm:w-10" disabled={savingCategory}>
                     <span><Upload className="h-4 w-4" /></span>
                   </Button>
                 </label>
               </div>
               {categoryForm.image && (
-                <div className="flex items-center gap-2 text-sm text-green-600">
-                  <ImageIcon className="h-4 w-4" />
-                  {categoryForm.image.name}
-                  <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryForm({ ...categoryForm, image: null })} className="h-6 px-2 text-red-500">Remove</Button>
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-green-600">
+                  <ImageIcon className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="truncate max-w-[150px] sm:max-w-none">{categoryForm.image.name}</span>
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryForm({ ...categoryForm, image: null })} className="h-6 px-2 text-red-500 text-xs">Remove</Button>
                 </div>
               )}
             </div>
             {(categoryForm.image_url || categoryForm.image) && (
-              <div className="grid gap-2">
-                <Label>Preview</Label>
-                <img src={categoryForm.image ? URL.createObjectURL(categoryForm.image) : categoryForm.image_url} alt="Preview" className="w-full h-32 object-cover rounded border" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+              <div className="grid gap-1.5 sm:gap-2">
+                <Label className="text-xs sm:text-sm">Preview</Label>
+                <img src={categoryForm.image ? URL.createObjectURL(categoryForm.image) : categoryForm.image_url} alt="Preview" className="w-full h-24 sm:h-32 object-cover rounded border" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
               </div>
             )}
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsCategoryDialogOpen(false)} disabled={savingCategory}>Cancel</Button>
-            <Button onClick={handleSaveCategory} className="bg-green-600 hover:bg-green-700" disabled={savingCategory}>
+          <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setIsCategoryDialogOpen(false)} disabled={savingCategory} className="w-full sm:w-auto">Cancel</Button>
+            <Button onClick={handleSaveCategory} className="bg-green-600 hover:bg-green-700 w-full sm:w-auto" disabled={savingCategory}>
               {savingCategory ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving...</> : <>{editingCategory ? 'Update' : 'Add'} Category</>}
             </Button>
           </DialogFooter>
@@ -642,22 +675,22 @@ export default function CatalogPage() {
 
       {/* Item Dialog */}
       <Dialog open={isItemDialogOpen} onOpenChange={setIsItemDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto mx-4 sm:mx-auto">
           <DialogHeader>
-            <DialogTitle>{editingItem ? 'Edit Product' : 'Add Product'}</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-base sm:text-lg">{editingItem ? 'Edit Product' : 'Add Product'}</DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm">
               {editingItem ? 'Update product details' : 'Create a new scrap product'}
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="item-name">Product Name</Label>
-              <Input id="item-name" value={itemForm.name} onChange={(e) => setItemForm({ ...itemForm, name: e.target.value })} placeholder="e.g., Newspaper, PET Bottles" disabled={savingItem} />
+          <div className="grid gap-3 sm:gap-4 py-3 sm:py-4">
+            <div className="grid gap-1.5 sm:gap-2">
+              <Label htmlFor="item-name" className="text-xs sm:text-sm">Product Name</Label>
+              <Input id="item-name" value={itemForm.name} onChange={(e) => setItemForm({ ...itemForm, name: e.target.value })} placeholder="e.g., Newspaper, PET Bottles" disabled={savingItem} className="h-9 sm:h-10" />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="item-category">Category</Label>
+            <div className="grid gap-1.5 sm:gap-2">
+              <Label htmlFor="item-category" className="text-xs sm:text-sm">Category</Label>
               <Select value={itemForm.category.toString()} onValueChange={(v) => setItemForm({ ...itemForm, category: parseInt(v) })} disabled={savingItem}>
-                <SelectTrigger>
+                <SelectTrigger className="h-9 sm:h-10">
                 <span className="flex items-center">
                   <SelectValue placeholder="Select category" />
                 </span>
@@ -667,50 +700,50 @@ export default function CatalogPage() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="item-min">Min Rate (₹)</Label>
-                <Input id="item-min" type="number" value={itemForm.min_rate} onChange={(e) => setItemForm({ ...itemForm, min_rate: parseFloat(e.target.value) || 0 })} disabled={savingItem} />
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              <div className="grid gap-1.5 sm:gap-2">
+                <Label htmlFor="item-min" className="text-xs sm:text-sm">Min Rate (₹)</Label>
+                <Input id="item-min" type="number" value={itemForm.min_rate} onChange={(e) => setItemForm({ ...itemForm, min_rate: parseFloat(e.target.value) || 0 })} disabled={savingItem} className="h-9 sm:h-10" />
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="item-max">Max Rate (₹)</Label>
-                <Input id="item-max" type="number" value={itemForm.max_rate} onChange={(e) => setItemForm({ ...itemForm, max_rate: parseFloat(e.target.value) || 0 })} disabled={savingItem} />
+              <div className="grid gap-1.5 sm:gap-2">
+                <Label htmlFor="item-max" className="text-xs sm:text-sm">Max Rate (₹)</Label>
+                <Input id="item-max" type="number" value={itemForm.max_rate} onChange={(e) => setItemForm({ ...itemForm, max_rate: parseFloat(e.target.value) || 0 })} disabled={savingItem} className="h-9 sm:h-10" />
               </div>
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="item-unit">Unit</Label>
-              <Input id="item-unit" value={itemForm.unit} onChange={(e) => setItemForm({ ...itemForm, unit: e.target.value })} placeholder="kg, piece, ton" disabled={savingItem} />
+            <div className="grid gap-1.5 sm:gap-2">
+              <Label htmlFor="item-unit" className="text-xs sm:text-sm">Unit</Label>
+              <Input id="item-unit" value={itemForm.unit} onChange={(e) => setItemForm({ ...itemForm, unit: e.target.value })} placeholder="kg, piece, ton" disabled={savingItem} className="h-9 sm:h-10" />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="item-desc">Description</Label>
-              <Textarea id="item-desc" value={itemForm.description} onChange={(e) => setItemForm({ ...itemForm, description: e.target.value })} placeholder="Product description..." rows={3} disabled={savingItem} />
+            <div className="grid gap-1.5 sm:gap-2">
+              <Label htmlFor="item-desc" className="text-xs sm:text-sm">Description</Label>
+              <Textarea id="item-desc" value={itemForm.description} onChange={(e) => setItemForm({ ...itemForm, description: e.target.value })} placeholder="Product description..." rows={2} disabled={savingItem} className="text-sm" />
             </div>
-            <div className="grid gap-2">
-              <Label>Image</Label>
+            <div className="grid gap-1.5 sm:gap-2">
+              <Label className="text-xs sm:text-sm">Image</Label>
               <div className="flex gap-2">
-                <Input value={itemForm.image_url} onChange={(e) => setItemForm({ ...itemForm, image_url: e.target.value, image: null })} placeholder="https://s3.amazonaws.com/... or upload" disabled={savingItem || !!itemForm.image} className="flex-1" />
+                <Input value={itemForm.image_url} onChange={(e) => setItemForm({ ...itemForm, image_url: e.target.value, image: null })} placeholder="https://s3.amazonaws.com/... or upload" disabled={savingItem || !!itemForm.image} className="flex-1 h-9 sm:h-10 text-xs sm:text-sm" />
                 <label className="cursor-pointer">
                   <input type="file" accept="image/*" onChange={handleItemFileChange} className="hidden" disabled={savingItem} />
-                  <Button type="button" variant="outline" size="icon" asChild disabled={savingItem}><span><Upload className="h-4 w-4" /></span></Button>
+                  <Button type="button" variant="outline" size="icon" className="h-9 w-9 sm:h-10 sm:w-10" asChild disabled={savingItem}><span><Upload className="h-4 w-4" /></span></Button>
                 </label>
               </div>
               {itemForm.image && (
-                <div className="flex items-center gap-2 text-sm text-green-600">
-                  <ImageIcon className="h-4 w-4" />{itemForm.image.name}
-                  <Button type="button" variant="ghost" size="sm" onClick={() => setItemForm({ ...itemForm, image: null })} className="h-6 px-2 text-red-500">Remove</Button>
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-green-600">
+                  <ImageIcon className="h-3 w-3 sm:h-4 sm:w-4" /><span className="truncate max-w-[150px] sm:max-w-none">{itemForm.image.name}</span>
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setItemForm({ ...itemForm, image: null })} className="h-6 px-2 text-red-500 text-xs">Remove</Button>
                 </div>
               )}
             </div>
             {(itemForm.image_url || itemForm.image) && (
-              <div className="grid gap-2">
-                <Label>Preview</Label>
-                <img src={itemForm.image ? URL.createObjectURL(itemForm.image) : itemForm.image_url} alt="Preview" className="w-full h-32 object-cover rounded border" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+              <div className="grid gap-1.5 sm:gap-2">
+                <Label className="text-xs sm:text-sm">Preview</Label>
+                <img src={itemForm.image ? URL.createObjectURL(itemForm.image) : itemForm.image_url} alt="Preview" className="w-full h-24 sm:h-32 object-cover rounded border" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
               </div>
             )}
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsItemDialogOpen(false)} disabled={savingItem}>Cancel</Button>
-            <Button onClick={handleSaveItem} className="bg-green-600 hover:bg-green-700" disabled={savingItem}>
+          <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setIsItemDialogOpen(false)} disabled={savingItem} className="w-full sm:w-auto">Cancel</Button>
+            <Button onClick={handleSaveItem} className="bg-green-600 hover:bg-green-700 w-full sm:w-auto" disabled={savingItem}>
               {savingItem ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving...</> : <>{editingItem ? 'Update' : 'Add'} Product</>}
             </Button>
           </DialogFooter>

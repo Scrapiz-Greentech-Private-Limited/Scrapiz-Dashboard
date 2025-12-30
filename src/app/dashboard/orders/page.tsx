@@ -231,137 +231,139 @@ export default function OrdersPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-3xl font-bold text-green-900 dark:text-green-100">Scrap Orders</h2>
-          <p className="text-muted-foreground mt-1">Manage all scrap pickup orders and assignments</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-green-900 dark:text-green-100">Scrap Orders</h2>
+          <p className="text-sm text-muted-foreground mt-1 hidden sm:block">Manage all scrap pickup orders and assignments</p>
         </div>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={fetchOrders}
-            disabled={loading}
-          >
-            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-            Refresh
-          </Button>
-        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={fetchOrders}
+          disabled={loading}
+          className="self-start sm:self-auto"
+        >
+          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+          Refresh
+        </Button>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5 md:gap-4">
         <Card className="border-green-200 bg-gradient-to-br from-green-50 to-white dark:from-green-950 dark:to-background hover:shadow-md transition-shadow cursor-pointer" onClick={() => setActiveTab('all')}>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-green-700 dark:text-green-300">Total Orders</CardTitle>
+          <CardHeader className="p-3 pb-1 sm:p-4 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium text-green-700 dark:text-green-300">Total Orders</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-green-900 dark:text-green-100">{stats.total}</div>
-            <p className="text-xs text-muted-foreground mt-1">All time</p>
+          <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
+            <div className="text-2xl sm:text-3xl font-bold text-green-900 dark:text-green-100">{stats.total}</div>
+            <p className="text-xs text-muted-foreground mt-1 hidden sm:block">All time</p>
           </CardContent>
         </Card>
 
         <Card className="border-orange-200 bg-gradient-to-br from-orange-50 to-white dark:from-orange-950 dark:to-background hover:shadow-md transition-shadow cursor-pointer" onClick={() => setActiveTab('pending')}>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-orange-700 dark:text-orange-300">Pending</CardTitle>
+          <CardHeader className="p-3 pb-1 sm:p-4 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium text-orange-700 dark:text-orange-300">Pending</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-orange-900 dark:text-orange-100">{stats.pending}</div>
-            <p className="text-xs text-muted-foreground mt-1">Needs assignment</p>
+          <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
+            <div className="text-2xl sm:text-3xl font-bold text-orange-900 dark:text-orange-100">{stats.pending}</div>
+            <p className="text-xs text-muted-foreground mt-1 hidden sm:block">Needs assignment</p>
           </CardContent>
         </Card>
 
         <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-white dark:from-blue-950 dark:to-background hover:shadow-md transition-shadow cursor-pointer" onClick={() => setActiveTab('scheduled')}>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300">Scheduled</CardTitle>
+          <CardHeader className="p-3 pb-1 sm:p-4 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium text-blue-700 dark:text-blue-300">Scheduled</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-blue-900 dark:text-blue-100">{stats.scheduled}</div>
-            <p className="text-xs text-muted-foreground mt-1">Agent assigned</p>
+          <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
+            <div className="text-2xl sm:text-3xl font-bold text-blue-900 dark:text-blue-100">{stats.scheduled}</div>
+            <p className="text-xs text-muted-foreground mt-1 hidden sm:block">Agent assigned</p>
           </CardContent>
         </Card>
 
         <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-white dark:from-purple-950 dark:to-background hover:shadow-md transition-shadow cursor-pointer" onClick={() => setActiveTab('transit')}>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300">In Transit</CardTitle>
+          <CardHeader className="p-3 pb-1 sm:p-4 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium text-purple-700 dark:text-purple-300">In Transit</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-purple-900 dark:text-purple-100">{stats.transit}</div>
-            <p className="text-xs text-muted-foreground mt-1">On the way</p>
+          <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
+            <div className="text-2xl sm:text-3xl font-bold text-purple-900 dark:text-purple-100">{stats.transit}</div>
+            <p className="text-xs text-muted-foreground mt-1 hidden sm:block">On the way</p>
           </CardContent>
         </Card>
 
-        <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950 dark:to-background hover:shadow-md transition-shadow cursor-pointer" onClick={() => setActiveTab('completed')}>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Completed</CardTitle>
+        <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950 dark:to-background hover:shadow-md transition-shadow cursor-pointer col-span-2 sm:col-span-1" onClick={() => setActiveTab('completed')}>
+          <CardHeader className="p-3 pb-1 sm:p-4 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium text-emerald-700 dark:text-emerald-300">Completed</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-emerald-900 dark:text-emerald-100">{stats.completed}</div>
-            <p className="text-xs text-muted-foreground mt-1">Successfully done</p>
+          <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
+            <div className="text-2xl sm:text-3xl font-bold text-emerald-900 dark:text-emerald-100">{stats.completed}</div>
+            <p className="text-xs text-muted-foreground mt-1 hidden sm:block">Successfully done</p>
           </CardContent>
         </Card>
       </div>
 
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as OrderStatus | 'all')}>
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-        <TabsList className="w-full sm:w-auto">
-          <TabsTrigger value="all" className="flex-1 sm:flex-none">All</TabsTrigger>
-          <TabsTrigger value="pending" className="flex-1 sm:flex-none">Pending</TabsTrigger>
-          <TabsTrigger value="scheduled" className="flex-1 sm:flex-none">Scheduled</TabsTrigger>
-          <TabsTrigger value="transit" className="flex-1 sm:flex-none">In Transit</TabsTrigger>
-          <TabsTrigger value="completed" className="flex-1 sm:flex-none">Completed</TabsTrigger>
-          <TabsTrigger value="cancelled" className="hidden sm:flex">
-            Cancelled
-          </TabsTrigger>
-        </TabsList>
-        <div className="flex items-center gap-2 sm:ml-auto">
-         <div className="relative flex-1 sm:flex-initial">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search orders..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-lg bg-secondary pl-8 sm:w-[200px] lg:w-[320px]"
-            />
+        <div className="flex flex-col gap-3">
+          {/* Tabs - horizontally scrollable on mobile */}
+          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+            <TabsList className="inline-flex w-max sm:w-auto">
+              <TabsTrigger value="all" className="text-xs sm:text-sm px-2 sm:px-3">All</TabsTrigger>
+              <TabsTrigger value="pending" className="text-xs sm:text-sm px-2 sm:px-3">Pending</TabsTrigger>
+              <TabsTrigger value="scheduled" className="text-xs sm:text-sm px-2 sm:px-3">Scheduled</TabsTrigger>
+              <TabsTrigger value="transit" className="text-xs sm:text-sm px-2 sm:px-3">Transit</TabsTrigger>
+              <TabsTrigger value="completed" className="text-xs sm:text-sm px-2 sm:px-3">Done</TabsTrigger>
+              <TabsTrigger value="cancelled" className="text-xs sm:text-sm px-2 sm:px-3">Cancelled</TabsTrigger>
+            </TabsList>
           </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <AdvancedFilters
-            filterGroups={filterGroups}
-            filters={filters}
-            onFilterChange={setFilter}
-            onResetFilters={resetFilters}
-          />
-          {searchQuery && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSearchQuery('')}
-              className="h-9 px-2 lg:px-3"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          )}
-          <Button size="sm" variant="outline" className="h-9 gap-1 hidden sm:flex">
-            <File className="h-3.5 w-3.5" />
-            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-              Export
-            </span>
-          </Button>
+          
+          {/* Search and filters */}
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <div className="relative flex-1">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search orders..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full rounded-lg bg-secondary pl-8 sm:max-w-[280px] lg:max-w-[320px]"
+              />
+            </div>
+            <div className="flex items-center gap-2 justify-between sm:justify-end">
+              <AdvancedFilters
+                filterGroups={filterGroups}
+                filters={filters}
+                onFilterChange={setFilter}
+                onResetFilters={resetFilters}
+              />
+              {searchQuery && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSearchQuery('')}
+                  className="h-9 px-2"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+              <Button size="sm" variant="outline" className="h-9 gap-1 hidden sm:flex">
+                <File className="h-3.5 w-3.5" />
+                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                  Export
+                </span>
+              </Button>
+            </div>
+          </div>
         </div>
-        </div>
-      </div>
       <TabsContent value="all">
         <Card>
-            <CardHeader>
-                <CardTitle>All Orders</CardTitle>
-                <CardDescription>
-                    Manage all scrap pickup orders. Showing {filteredOrders.length} of {totalCount} orders.
+            <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="text-base sm:text-lg">All Orders</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
+                    Showing {filteredOrders.length} of {totalCount} orders
                 </CardDescription>
             </CardHeader>
-          <CardContent>
+          <CardContent className="p-0 sm:p-6 sm:pt-0">
             <OrdersTableClient 
               orders={filteredOrders} 
               loading={loading} 
@@ -374,13 +376,13 @@ export default function OrdersPage() {
       </TabsContent>
       <TabsContent value="pending">
         <Card>
-            <CardHeader>
-                <CardTitle>Pending Orders</CardTitle>
-                <CardDescription>
-                    Orders awaiting agent assignment. Showing {filteredOrders.length} orders.
+            <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="text-base sm:text-lg">Pending Orders</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
+                    {filteredOrders.length} orders awaiting assignment
                 </CardDescription>
             </CardHeader>
-          <CardContent>
+          <CardContent className="p-0 sm:p-6 sm:pt-0">
             <OrdersTableClient 
               orders={filteredOrders} 
               loading={loading} 
@@ -393,13 +395,13 @@ export default function OrdersPage() {
       </TabsContent>
        <TabsContent value="scheduled">
         <Card>
-            <CardHeader>
-                <CardTitle>Scheduled Orders</CardTitle>
-                <CardDescription>
-                    Orders that have been scheduled with an agent. Showing {filteredOrders.length} orders.
+            <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="text-base sm:text-lg">Scheduled Orders</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
+                    {filteredOrders.length} orders with agent assigned
                 </CardDescription>
             </CardHeader>
-          <CardContent>
+          <CardContent className="p-0 sm:p-6 sm:pt-0">
             <OrdersTableClient 
               orders={filteredOrders} 
               loading={loading} 
@@ -412,13 +414,13 @@ export default function OrdersPage() {
       </TabsContent>
        <TabsContent value="transit">
         <Card>
-            <CardHeader>
-                <CardTitle>In Transit Orders</CardTitle>
-                <CardDescription>
-                    Orders currently being picked up. Showing {filteredOrders.length} orders.
+            <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="text-base sm:text-lg">In Transit Orders</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
+                    {filteredOrders.length} orders being picked up
                 </CardDescription>
             </CardHeader>
-          <CardContent>
+          <CardContent className="p-0 sm:p-6 sm:pt-0">
             <OrdersTableClient 
               orders={filteredOrders} 
               loading={loading} 
@@ -431,13 +433,13 @@ export default function OrdersPage() {
       </TabsContent>
        <TabsContent value="completed">
         <Card>
-            <CardHeader>
-                <CardTitle>Completed Orders</CardTitle>
-                <CardDescription>
-                    Successfully completed orders. Showing {filteredOrders.length} orders.
+            <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="text-base sm:text-lg">Completed Orders</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
+                    {filteredOrders.length} orders completed
                 </CardDescription>
             </CardHeader>
-          <CardContent>
+          <CardContent className="p-0 sm:p-6 sm:pt-0">
             <OrdersTableClient 
               orders={filteredOrders} 
               loading={loading} 
@@ -450,13 +452,13 @@ export default function OrdersPage() {
       </TabsContent>
       <TabsContent value="cancelled">
         <Card>
-            <CardHeader>
-                <CardTitle>Cancelled Orders</CardTitle>
-                <CardDescription>
-                    Cancelled orders. Showing {filteredOrders.length} orders.
+            <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="text-base sm:text-lg">Cancelled Orders</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
+                    {filteredOrders.length} cancelled orders
                 </CardDescription>
             </CardHeader>
-          <CardContent>
+          <CardContent className="p-0 sm:p-6 sm:pt-0">
             <OrdersTableClient 
               orders={filteredOrders} 
               loading={loading} 

@@ -289,8 +289,8 @@ export default function UsersTableEnhanced({
         <>
         {/* Bulk Operations Toolbar */}
         {selectedUsers.size > 0 && (
-            <div className="mb-4 p-4 bg-muted rounded-lg flex items-center justify-between flex-wrap gap-4">
-                <span className="text-sm font-medium">
+            <div className="mb-4 p-3 sm:p-4 bg-muted rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                <span className="text-xs sm:text-sm font-medium">
                     {selectedUsers.size} user(s) selected
                 </span>
                 <div className="flex items-center gap-2 flex-wrap">
@@ -298,55 +298,62 @@ export default function UsersTableEnhanced({
                         variant="outline"
                         size="sm"
                         onClick={() => setBulkAction({ action: 'activate', count: selectedUsers.size })}
+                        className="h-8 text-xs sm:text-sm"
                     >
-                        <UserCheck className="h-4 w-4 mr-2" />
-                        Activate
+                        <UserCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4 sm:mr-2" />
+                        <span className="hidden sm:inline">Activate</span>
                     </Button>
                     <Button
                         variant="outline"
                         size="sm"
                         onClick={() => setBulkAction({ action: 'deactivate', count: selectedUsers.size })}
+                        className="h-8 text-xs sm:text-sm"
                     >
-                        <UserX className="h-4 w-4 mr-2" />
-                        Deactivate
+                        <UserX className="h-3.5 w-3.5 sm:h-4 sm:w-4 sm:mr-2" />
+                        <span className="hidden sm:inline">Deactivate</span>
                     </Button>
                     <Button
                         variant="outline"
                         size="sm"
                         onClick={handleExportSelected}
+                        className="h-8 text-xs sm:text-sm hidden sm:flex"
                     >
-                        <Download className="h-4 w-4 mr-2" />
-                        Export Selected
+                        <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-2" />
+                        Export
                     </Button>
                     <Button
                         variant="destructive"
                         size="sm"
                         onClick={() => setBulkAction({ action: 'delete', count: selectedUsers.size })}
+                        className="h-8 text-xs sm:text-sm"
                     >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete
+                        <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 sm:mr-2" />
+                        <span className="hidden sm:inline">Delete</span>
                     </Button>
                     <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => setSelectedUsers(new Set())}
+                        className="h-8 text-xs sm:text-sm"
                     >
-                        Clear Selection
+                        Clear
                     </Button>
                 </div>
             </div>
         )}
         
         {/* Export All Button */}
-        <div className="flex justify-end mb-4">
+        <div className="flex justify-end mb-3 sm:mb-4">
             <Button
                 variant="outline"
                 size="sm"
                 onClick={handleExportAll}
                 disabled={users.length === 0}
+                className="h-8 text-xs sm:text-sm"
             >
-                <Download className="h-4 w-4 mr-2" />
-                Export All Users
+                <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+                <span className="hidden sm:inline">Export All Users</span>
+                <span className="sm:hidden">Export All</span>
             </Button>
         </div>
 
@@ -354,7 +361,7 @@ export default function UsersTableEnhanced({
         <Table>
             <TableHeader>
                 <TableRow>
-                    <TableHead className="w-[50px]">
+                    <TableHead className="w-[40px] sm:w-[50px]">
                         <Checkbox
                             checked={isAllSelected}
                             onCheckedChange={handleSelectAll}
@@ -362,14 +369,14 @@ export default function UsersTableEnhanced({
                             className={isSomeSelected ? "data-[state=checked]:bg-primary/50" : ""}
                         />
                     </TableHead>
-                    <TableHead className="w-[60px]">Avatar</TableHead>
+                    <TableHead className="w-[40px] sm:w-[60px] hidden sm:table-cell">Avatar</TableHead>
                     <TableHead>User</TableHead>
-                    <TableHead className="hidden md:table-cell">Phone</TableHead>
-                    <TableHead>Role</TableHead>
+                    <TableHead className="hidden lg:table-cell">Phone</TableHead>
+                    <TableHead className="hidden sm:table-cell">Role</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead className="hidden lg:table-cell">Joined</TableHead>
-                    <TableHead className="hidden sm:table-cell text-right">Orders</TableHead>
-                    <TableHead className="w-[80px]">Actions</TableHead>
+                    <TableHead className="hidden xl:table-cell">Joined</TableHead>
+                    <TableHead className="hidden md:table-cell text-right">Orders</TableHead>
+                    <TableHead className="w-[50px] sm:w-[80px]">Actions</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
@@ -377,109 +384,128 @@ export default function UsersTableEnhanced({
                     const isSelected = selectedUsers.has(user.id);
                     return (
                     <TableRow key={user.id} className={isSelected ? 'bg-muted/50' : ''}>
-                        <TableCell>
+                        <TableCell className="p-2 sm:p-4">
                             <Checkbox
                                 checked={isSelected}
                                 onCheckedChange={(checked) => handleSelectUser(user.id, checked as boolean)}
                                 aria-label={`Select user ${user.name}`}
                             />
                         </TableCell>
-                        <TableCell>
-                            <Avatar className="h-9 w-9">
+                        <TableCell className="hidden sm:table-cell p-2 sm:p-4">
+                            <Avatar className="h-8 w-8 sm:h-9 sm:w-9">
                                 <AvatarImage src={user.profile_image || undefined} alt={user.name} />
-                                <AvatarFallback>{user.name?.charAt(0) || '?'}</AvatarFallback>
+                                <AvatarFallback className="text-xs sm:text-sm">{user.name?.charAt(0) || '?'}</AvatarFallback>
                             </Avatar>
                         </TableCell>
-                        <TableCell>
-                            <div className="font-medium">{user.name}</div>
-                            <div className="text-xs text-muted-foreground">{user.email}</div>
-                            {user.referral_code && (
-                                <div className="text-xs text-muted-foreground mt-1">
-                                    Ref: <code className="bg-muted px-1 rounded">{user.referral_code}</code>
+                        <TableCell className="p-2 sm:p-4">
+                            <div className="flex items-center gap-2 sm:block">
+                                <Avatar className="h-7 w-7 sm:hidden flex-shrink-0">
+                                    <AvatarImage src={user.profile_image || undefined} alt={user.name} />
+                                    <AvatarFallback className="text-[10px]">{user.name?.charAt(0) || '?'}</AvatarFallback>
+                                </Avatar>
+                                <div className="min-w-0">
+                                    <div className="font-medium text-xs sm:text-sm truncate max-w-[120px] sm:max-w-none">{user.name}</div>
+                                    <div className="text-[10px] sm:text-xs text-muted-foreground truncate max-w-[120px] sm:max-w-none">{user.email}</div>
+                                    {/* Mobile: Show role badge under name */}
+                                    <div className="sm:hidden mt-1">
+                                        {user.is_superuser && (
+                                            <Badge variant="default" className="bg-purple-600 text-[9px] px-1 py-0">Admin</Badge>
+                                        )}
+                                        {user.is_staff && !user.is_superuser && (
+                                            <Badge variant="secondary" className="text-[9px] px-1 py-0">Staff</Badge>
+                                        )}
+                                        {!user.is_staff && !user.is_superuser && (
+                                            <Badge variant="outline" className="text-[9px] px-1 py-0">User</Badge>
+                                        )}
+                                    </div>
                                 </div>
-                            )}
+                            </div>
                         </TableCell>
-                        <TableCell className="hidden md:table-cell">
+                        <TableCell className="hidden lg:table-cell text-xs sm:text-sm">
                             {user.phone_number || '-'}
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="hidden sm:table-cell">
                             {user.is_superuser && (
-                                <Badge variant="default" className="bg-purple-600">Superuser</Badge>
+                                <Badge variant="default" className="bg-purple-600 text-[10px] sm:text-xs">Superuser</Badge>
                             )}
                             {user.is_staff && !user.is_superuser && (
-                                <Badge variant="secondary">Staff</Badge>
+                                <Badge variant="secondary" className="text-[10px] sm:text-xs">Staff</Badge>
                             )}
                             {!user.is_staff && !user.is_superuser && (
-                                <Badge variant="outline">User</Badge>
+                                <Badge variant="outline" className="text-[10px] sm:text-xs">User</Badge>
                             )}
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="p-2 sm:p-4">
                             {user.is_active ? (
-                                <Badge variant="default" className="bg-green-600">Active</Badge>
+                                <Badge variant="default" className="bg-green-600 text-[9px] sm:text-xs px-1.5 sm:px-2">Active</Badge>
                             ) : (
-                                <Badge variant="destructive">Inactive</Badge>
+                                <Badge variant="destructive" className="text-[9px] sm:text-xs px-1.5 sm:px-2">Inactive</Badge>
                             )}
                         </TableCell>
-                        <TableCell className="hidden lg:table-cell">
+                        <TableCell className="hidden xl:table-cell text-xs sm:text-sm">
                             {user.date_joined 
                                 ? new Date(user.date_joined).toLocaleDateString()
                                 : '-'
                             }
                         </TableCell>
-                        <TableCell className="hidden sm:table-cell text-right">
+                        <TableCell className="hidden md:table-cell text-right text-xs sm:text-sm">
                             {user.orders?.length || 0}
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="p-1 sm:p-4">
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button
                                         aria-haspopup="true"
                                         size="icon"
                                         variant="ghost"
+                                        className="h-7 w-7 sm:h-8 sm:w-8"
                                     >
-                                        <MoreHorizontal className="h-4 w-4" />
+                                        <MoreHorizontal className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                                         <span className="sr-only">Toggle menu</span>
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                    <DropdownMenuItem onClick={() => handleViewDetails(user)}>
+                                    <DropdownMenuLabel className="text-xs sm:text-sm">Actions</DropdownMenuLabel>
+                                    <DropdownMenuItem onClick={() => handleViewDetails(user)} className="text-xs sm:text-sm">
                                         View Details
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => handleEditUser(user)}>
-                                        <Edit className="h-4 w-4 mr-2" />
+                                    <DropdownMenuItem onClick={() => handleEditUser(user)} className="text-xs sm:text-sm">
+                                        <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-2" />
                                         Edit User
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     {user.is_active ? (
                                         <DropdownMenuItem 
                                             onClick={() => setStatusChangeUser({ user, action: 'deactivate' })}
+                                            className="text-xs sm:text-sm"
                                         >
-                                            <UserX className="h-4 w-4 mr-2" />
+                                            <UserX className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-2" />
                                             Deactivate
                                         </DropdownMenuItem>
                                     ) : (
                                         <DropdownMenuItem 
                                             onClick={() => setStatusChangeUser({ user, action: 'activate' })}
+                                            className="text-xs sm:text-sm"
                                         >
-                                            <UserCheck className="h-4 w-4 mr-2" />
+                                            <UserCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-2" />
                                             Activate
                                         </DropdownMenuItem>
                                     )}
                                     {user.is_staff && !user.is_superuser && (
                                         <DropdownMenuItem 
                                             onClick={() => setStatusChangeUser({ user, action: 'restrict' })}
+                                            className="text-xs sm:text-sm"
                                         >
-                                            <ShieldOff className="h-4 w-4 mr-2" />
+                                            <ShieldOff className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-2" />
                                             Remove Staff Access
                                         </DropdownMenuItem>
                                     )}
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem 
                                         onClick={() => setDeleteConfirmUser(user)}
-                                        className="text-red-600"
+                                        className="text-red-600 text-xs sm:text-sm"
                                     >
-                                        <Trash2 className="h-4 w-4 mr-2" />
+                                        <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-2" />
                                         Delete User
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
@@ -494,11 +520,12 @@ export default function UsersTableEnhanced({
 
         {/* Pagination */}
         {totalPages > 1 && (
-            <div className="mt-4 flex flex-col items-center gap-2 sm:flex-row sm:justify-between">
-                <div className="text-sm text-muted-foreground">
-                    Showing {startIndex + 1}-{Math.min(endIndex, users.length)} of {users.length} users
+            <div className="mt-3 sm:mt-4 flex flex-col items-center gap-2 sm:flex-row sm:justify-between">
+                <div className="text-xs sm:text-sm text-muted-foreground order-2 sm:order-1">
+                    <span className="hidden sm:inline">Showing {startIndex + 1}-{Math.min(endIndex, users.length)} of {users.length} users</span>
+                    <span className="sm:hidden">Page {currentPage} of {totalPages}</span>
                 </div>
-                <Pagination>
+                <Pagination className="order-1 sm:order-2">
                     <PaginationContent>
                         <PaginationItem>
                             <PaginationPrevious 
@@ -507,7 +534,7 @@ export default function UsersTableEnhanced({
                                     e.preventDefault();
                                     setCurrentPage(p => Math.max(1, p - 1));
                                 }}
-                                className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                className={`h-8 sm:h-9 text-xs sm:text-sm ${currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}`}
                             />
                         </PaginationItem>
                         {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
@@ -530,7 +557,7 @@ export default function UsersTableEnhanced({
                                             setCurrentPage(page);
                                         }}
                                         isActive={currentPage === page}
-                                        className="cursor-pointer"
+                                        className="cursor-pointer h-8 sm:h-9 w-8 sm:w-9 text-xs sm:text-sm"
                                     >
                                         {page}
                                     </PaginationLink>
@@ -544,7 +571,7 @@ export default function UsersTableEnhanced({
                                     e.preventDefault();
                                     setCurrentPage(p => Math.min(totalPages, p + 1));
                                 }}
-                                className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                className={`h-8 sm:h-9 text-xs sm:text-sm ${currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}`}
                             />
                         </PaginationItem>
                     </PaginationContent>

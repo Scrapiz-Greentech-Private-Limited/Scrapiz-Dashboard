@@ -233,52 +233,61 @@ export default function ItemsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-green-900 dark:text-green-100">Products</h2>
-          <p className="text-muted-foreground">Manage scrap products and pricing</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-green-900 dark:text-green-100">Products</h2>
+          <p className="text-sm sm:text-base text-muted-foreground">Manage scrap products and pricing</p>
         </div>
-        <Button onClick={handleAdd} className="gap-2" disabled={categories.length === 0}>
+        <Button onClick={handleAdd} className="gap-2 w-full sm:w-auto" disabled={categories.length === 0}>
           <Plus className="h-4 w-4" />
           Add Product
         </Button>
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
         <Card className="border-green-100">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-green-900 dark:text-green-100">Total Products</CardTitle>
+          <CardHeader className="pb-1 sm:pb-2 p-3 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-green-900 dark:text-green-100">
+              <span className="hidden sm:inline">Total Products</span>
+              <span className="sm:hidden">Products</span>
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-900 dark:text-green-100">{products.length}</div>
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-xl sm:text-2xl font-bold text-green-900 dark:text-green-100">{products.length}</div>
           </CardContent>
         </Card>
         <Card className="border-green-100">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-green-900 dark:text-green-100">Categories</CardTitle>
+          <CardHeader className="pb-1 sm:pb-2 p-3 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-green-900 dark:text-green-100">Categories</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-900 dark:text-green-100">{categories.length}</div>
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-xl sm:text-2xl font-bold text-green-900 dark:text-green-100">{categories.length}</div>
           </CardContent>
         </Card>
         <Card className="border-green-100">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-green-900 dark:text-green-100">Avg Min Rate</CardTitle>
+          <CardHeader className="pb-1 sm:pb-2 p-3 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-green-900 dark:text-green-100">
+              <span className="hidden sm:inline">Avg Min Rate</span>
+              <span className="sm:hidden">Avg Rate</span>
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-900 dark:text-green-100">
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-xl sm:text-2xl font-bold text-green-900 dark:text-green-100">
               ₹{products.length > 0 ? (products.reduce((sum, p) => sum + p.min_rate, 0) / products.length).toFixed(0) : 0}
             </div>
           </CardContent>
         </Card>
         <Card className="border-green-100">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-green-900 dark:text-green-100">With Images</CardTitle>
+          <CardHeader className="pb-1 sm:pb-2 p-3 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-green-900 dark:text-green-100">
+              <span className="hidden sm:inline">With Images</span>
+              <span className="sm:hidden">Images</span>
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-900 dark:text-green-100">
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-xl sm:text-2xl font-bold text-green-900 dark:text-green-100">
               {products.filter(p => p.image_url).length}
             </div>
           </CardContent>
@@ -286,7 +295,7 @@ export default function ItemsPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-4">
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -297,7 +306,7 @@ export default function ItemsPage() {
           />
         </div>
         <Select value={filterCategory.toString()} onValueChange={(value) => setFilterCategory(value === 'all' ? 'all' : parseInt(value))}>
-          <SelectTrigger className="w-[200px]">
+          <SelectTrigger className="w-full sm:w-[200px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -316,12 +325,12 @@ export default function ItemsPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Image</TableHead>
-                  <TableHead>Product Name</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Price Range</TableHead>
-                  <TableHead>Unit</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="hidden sm:table-cell w-[60px]">Image</TableHead>
+                  <TableHead className="min-w-[150px]">Product</TableHead>
+                  <TableHead className="hidden md:table-cell">Category</TableHead>
+                  <TableHead className="hidden sm:table-cell">Price Range</TableHead>
+                  <TableHead className="hidden lg:table-cell">Unit</TableHead>
+                  <TableHead className="text-right min-w-[80px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -334,7 +343,7 @@ export default function ItemsPage() {
                 ) : (
                   filteredProducts.map(product => (
                     <TableRow key={product.id}>
-                      <TableCell>
+                      <TableCell className="hidden sm:table-cell">
                         {product.image_url ? (
                           <img 
                             src={product.image_url} 
@@ -347,26 +356,53 @@ export default function ItemsPage() {
                           </div>
                         )}
                       </TableCell>
-                      <TableCell className="font-medium">{product.name}</TableCell>
                       <TableCell>
+                        <div className="flex items-center gap-2 sm:gap-0">
+                          {/* Mobile: Show image inline */}
+                          <div className="sm:hidden flex-shrink-0">
+                            {product.image_url ? (
+                              <img 
+                                src={product.image_url} 
+                                alt={product.name}
+                                className="w-8 h-8 rounded object-cover"
+                              />
+                            ) : (
+                              <div className="w-8 h-8 rounded bg-green-100 flex items-center justify-center">
+                                <ImageIcon className="h-4 w-4 text-green-600" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-medium text-sm truncate">{product.name}</p>
+                            {/* Mobile: Show category and price inline */}
+                            <div className="md:hidden">
+                              <Badge variant="outline" className="text-xs mt-0.5">{getCategoryName(product.category)}</Badge>
+                            </div>
+                            <p className="text-xs text-green-600 font-semibold sm:hidden mt-0.5">
+                              ₹{product.min_rate} - ₹{product.max_rate}/{product.unit}
+                            </p>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
                         <Badge variant="outline">{getCategoryName(product.category)}</Badge>
                       </TableCell>
-                      <TableCell className="font-semibold text-green-600">
+                      <TableCell className="hidden sm:table-cell font-semibold text-green-600">
                         ₹{product.min_rate} - ₹{product.max_rate}
                       </TableCell>
-                      <TableCell>{product.unit}</TableCell>
+                      <TableCell className="hidden lg:table-cell">{product.unit}</TableCell>
                       <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button size="sm" variant="outline" onClick={() => handleEdit(product)}>
-                            <Edit className="h-4 w-4" />
+                        <div className="flex items-center justify-end gap-1 sm:gap-2">
+                          <Button size="sm" variant="outline" onClick={() => handleEdit(product)} className="h-8 w-8 p-0 sm:h-9 sm:w-9">
+                            <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                           </Button>
                           <Button 
                             size="sm" 
                             variant="outline" 
                             onClick={() => handleDeleteClick(product)}
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 w-8 p-0 sm:h-9 sm:w-9"
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                           </Button>
                         </div>
                       </TableCell>
@@ -381,16 +417,16 @@ export default function ItemsPage() {
 
       {/* Add/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editingProduct ? 'Edit Product' : 'Add New Product'}</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-base sm:text-lg">{editingProduct ? 'Edit Product' : 'Add New Product'}</DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm">
               {editingProduct ? 'Update product details and pricing' : 'Create a new scrap product'}
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
+          <div className="space-y-3 sm:space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Product Name</Label>
+              <Label htmlFor="name" className="text-sm">Product Name</Label>
               <Input
                 id="name"
                 value={formData.name}
@@ -400,7 +436,7 @@ export default function ItemsPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
+              <Label htmlFor="category" className="text-sm">Category</Label>
               <Select 
                 value={formData.category.toString()} 
                 onValueChange={(value) => setFormData({ ...formData, category: parseInt(value) })}
@@ -416,9 +452,9 @@ export default function ItemsPage() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-2">
-                <Label htmlFor="min_rate">Min Rate (₹)</Label>
+                <Label htmlFor="min_rate" className="text-sm">Min Rate (₹)</Label>
                 <Input
                   id="min_rate"
                   type="number"
@@ -429,7 +465,7 @@ export default function ItemsPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="max_rate">Max Rate (₹)</Label>
+                <Label htmlFor="max_rate" className="text-sm">Max Rate (₹)</Label>
                 <Input
                   id="max_rate"
                   type="number"
@@ -441,7 +477,7 @@ export default function ItemsPage() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="unit">Unit</Label>
+              <Label htmlFor="unit" className="text-sm">Unit</Label>
               <Input
                 id="unit"
                 value={formData.unit}
@@ -451,26 +487,27 @@ export default function ItemsPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description" className="text-sm">Description</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Product description..."
-                rows={3}
+                rows={2}
+                className="min-h-[60px] sm:min-h-[80px]"
                 disabled={saving}
               />
             </div>
             <div className="space-y-2">
-              <Label>Image</Label>
+              <Label className="text-sm">Image</Label>
               <div className="flex gap-2">
                 <Input
                   id="image_url"
                   value={formData.image_url}
                   onChange={(e) => setFormData({ ...formData, image_url: e.target.value, image: null })}
-                  placeholder="https://s3.amazonaws.com/... or upload below"
+                  placeholder="https://... or upload"
                   disabled={saving || !!formData.image}
-                  className="flex-1"
+                  className="flex-1 text-sm"
                 />
                 <label className="cursor-pointer">
                   <input
@@ -486,9 +523,9 @@ export default function ItemsPage() {
                 </label>
               </div>
               {formData.image && (
-                <div className="flex items-center gap-2 text-sm text-green-600">
-                  <ImageIcon className="h-4 w-4" />
-                  {formData.image.name}
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-green-600 flex-wrap">
+                  <ImageIcon className="h-4 w-4 flex-shrink-0" />
+                  <span className="truncate max-w-[150px] sm:max-w-[250px]">{formData.image.name}</span>
                   <Button
                     type="button"
                     variant="ghost"
@@ -506,11 +543,11 @@ export default function ItemsPage() {
             </div>
             {(formData.image_url || formData.image) && (
               <div className="space-y-2">
-                <Label>Image Preview</Label>
+                <Label className="text-sm">Image Preview</Label>
                 <img 
                   src={formData.image ? URL.createObjectURL(formData.image) : formData.image_url} 
                   alt="Preview"
-                  className="w-full h-32 object-cover rounded border"
+                  className="w-full h-24 sm:h-32 object-cover rounded border"
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = 'none';
                   }}
@@ -518,11 +555,11 @@ export default function ItemsPage() {
               </div>
             )}
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={saving}>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={saving} className="w-full sm:w-auto">
               Cancel
             </Button>
-            <Button onClick={handleSave} disabled={saving}>
+            <Button onClick={handleSave} disabled={saving} className="w-full sm:w-auto">
               {saving ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -538,19 +575,19 @@ export default function ItemsPage() {
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-[95vw] sm:max-w-[425px]">
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Product</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-base sm:text-lg">Delete Product</AlertDialogTitle>
+            <AlertDialogDescription className="text-xs sm:text-sm">
               Are you sure you want to delete "{productToDelete?.name}"? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+            <AlertDialogCancel disabled={deleting} className="w-full sm:w-auto">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={deleting}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 hover:bg-red-700 w-full sm:w-auto"
             >
               {deleting ? (
                 <>

@@ -58,10 +58,10 @@ export function BulkOperationsToolbar({
   }
 
   return (
-    <div className="border-b bg-muted/50 p-4 space-y-3">
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <Badge variant="secondary" className="text-sm">
+    <div className="border-b bg-muted/50 p-3 sm:p-4 space-y-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Badge variant="secondary" className="text-xs sm:text-sm">
             {selectedCount} selected
           </Badge>
           <Button
@@ -69,13 +69,14 @@ export function BulkOperationsToolbar({
             size="sm"
             onClick={onClearSelection}
             disabled={isProcessing}
+            className="h-8 px-2 text-xs sm:text-sm"
           >
             <X className="h-4 w-4 mr-1" />
             Clear
           </Button>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {onBulkStatusUpdate && statusOptions.length > 0 && (
             <>
               <Select
@@ -83,8 +84,8 @@ export function BulkOperationsToolbar({
                 onValueChange={setSelectedStatus}
                 disabled={isProcessing}
               >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Change status to..." />
+                <SelectTrigger className="w-[140px] sm:w-[180px] h-8 sm:h-9 text-xs sm:text-sm">
+                  <SelectValue placeholder="Change status..." />
                 </SelectTrigger>
                 <SelectContent>
                   {statusOptions.map((option) => (
@@ -98,8 +99,9 @@ export function BulkOperationsToolbar({
                 onClick={handleBulkUpdate}
                 disabled={!selectedStatus || isUpdating || isProcessing}
                 size="sm"
+                className="h-8 sm:h-9 text-xs sm:text-sm"
               >
-                {isUpdating && <RefreshCw className="h-4 w-4 mr-2 animate-spin" />}
+                {isUpdating && <RefreshCw className="h-4 w-4 mr-1 sm:mr-2 animate-spin" />}
                 Update
               </Button>
             </>
@@ -111,9 +113,11 @@ export function BulkOperationsToolbar({
               size="sm"
               onClick={onExport}
               disabled={isProcessing}
+              className="h-8 sm:h-9 text-xs sm:text-sm"
             >
-              <Download className="h-4 w-4 mr-2" />
-              Export Selected
+              <Download className="h-4 w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Export Selected</span>
+              <span className="sm:hidden">Export</span>
             </Button>
           )}
         </div>
@@ -121,7 +125,7 @@ export function BulkOperationsToolbar({
 
       {progress && (
         <div className="space-y-2">
-          <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center justify-between text-xs sm:text-sm">
             <span className="text-muted-foreground">
               Processing {progress.current} of {progress.total}...
             </span>
@@ -130,7 +134,7 @@ export function BulkOperationsToolbar({
             </span>
           </div>
           <Progress value={(progress.current / progress.total) * 100} />
-          <div className="flex gap-4 text-xs text-muted-foreground">
+          <div className="flex gap-3 sm:gap-4 text-xs text-muted-foreground">
             <span className="text-green-600">✓ {progress.successful} successful</span>
             {progress.failed > 0 && (
               <span className="text-destructive">✗ {progress.failed} failed</span>

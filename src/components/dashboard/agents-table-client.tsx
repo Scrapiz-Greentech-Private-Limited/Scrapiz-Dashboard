@@ -111,22 +111,22 @@ export default function AgentsTableClient({ agents, onRefresh }: AgentsTableClie
   return (
     <div className="space-y-4">
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
+      <div className="flex flex-col gap-3 sm:gap-4">
+        <div className="relative w-full">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search by name, phone, email..."
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
-            className="pl-9"
+            className="pl-9 w-full"
           />
         </div>
         
-        <div className="flex gap-2">
+        <div className="flex gap-2 w-full">
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="flex-1 sm:w-[140px] sm:flex-none">
               <span className="flex items-center gap-2">
-                <Filter className="h-4 w-4" />
+                <Filter className="h-4 w-4 hidden sm:block" />
                 <SelectValue placeholder="Status" />
               </span>
             </SelectTrigger>
@@ -140,7 +140,7 @@ export default function AgentsTableClient({ agents, onRefresh }: AgentsTableClie
           </Select>
 
           <Select value={kycFilter} onValueChange={setKycFilter}>
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="flex-1 sm:w-[140px] sm:flex-none">
               <SelectValue placeholder="KYC Status" />
             </SelectTrigger>
             <SelectContent>
@@ -154,17 +154,17 @@ export default function AgentsTableClient({ agents, onRefresh }: AgentsTableClie
       </div>
 
       {/* Table */}
-      <div className="rounded-md border">
+      <div className="rounded-md border overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Agent</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>KYC</TableHead>
-              <TableHead>Vehicle No.</TableHead>
-              <TableHead>Coverage Location</TableHead>
-              <TableHead className="hidden md:table-cell">Today's Orders</TableHead>
-              <TableHead className="text-right">Rating</TableHead>
+              <TableHead className="hidden sm:table-cell">KYC</TableHead>
+              <TableHead className="hidden lg:table-cell">Vehicle No.</TableHead>
+              <TableHead className="hidden md:table-cell">Coverage Location</TableHead>
+              <TableHead className="hidden xl:table-cell">Today's Orders</TableHead>
+              <TableHead className="text-right hidden sm:table-cell">Rating</TableHead>
               <TableHead>
                 <span className="sr-only">Actions</span>
               </TableHead>
@@ -181,35 +181,40 @@ export default function AgentsTableClient({ agents, onRefresh }: AgentsTableClie
               filteredAgents.map((agent) => (
                 <TableRow key={agent.id}>
                   <TableCell className="font-medium">
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-9 w-9">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <Avatar className="h-8 w-8 sm:h-9 sm:w-9">
                         <AvatarImage src={agent.profile_image_url || undefined} alt={agent.name} />
-                        <AvatarFallback>{getInitials(agent.name)}</AvatarFallback>
+                        <AvatarFallback className="text-xs sm:text-sm">{getInitials(agent.name)}</AvatarFallback>
                       </Avatar>
-                      <div>
-                        <p className="font-medium">{agent.name}</p>
+                      <div className="min-w-0">
+                        <p className="font-medium text-sm truncate max-w-[120px] sm:max-w-none">{agent.name}</p>
                         <p className="text-xs text-muted-foreground">{agent.phone}</p>
+                        {/* Mobile: Show rating inline */}
+                        <div className="flex items-center gap-1 sm:hidden mt-0.5">
+                          <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                          <span className="text-xs">{parseFloat(agent.average_rating).toFixed(1)}</span>
+                        </div>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={statusVariant[agent.status]} className="capitalize">
+                    <Badge variant={statusVariant[agent.status]} className="capitalize text-xs">
                       {agent.status_display}
                     </Badge>
                   </TableCell>
-                  <TableCell>
-                    <Badge variant={kycStatusVariant[agent.kyc_status]} className="capitalize">
+                  <TableCell className="hidden sm:table-cell">
+                    <Badge variant={kycStatusVariant[agent.kyc_status]} className="capitalize text-xs">
                       {agent.kyc_status_display}
                     </Badge>
                   </TableCell>
-                  <TableCell>{agent.vehicle_number || 'N/A'}</TableCell>
-                  <TableCell>
-                    <span className="text-sm">{agent.coverage_location || 'Not set'}</span>
+                  <TableCell className="hidden lg:table-cell">{agent.vehicle_number || 'N/A'}</TableCell>
+                  <TableCell className="hidden md:table-cell">
+                    <span className="text-sm truncate max-w-[150px] block">{agent.coverage_location || 'Not set'}</span>
                   </TableCell>
-                  <TableCell className="hidden md:table-cell text-center">
+                  <TableCell className="hidden xl:table-cell text-center">
                     {agent.today_orders}
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right hidden sm:table-cell">
                     <div className="flex items-center justify-end gap-1">
                       <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
                       <span>{parseFloat(agent.average_rating).toFixed(1)}</span>
@@ -218,7 +223,7 @@ export default function AgentsTableClient({ agents, onRefresh }: AgentsTableClie
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button aria-haspopup="true" size="icon" variant="ghost">
+                        <Button aria-haspopup="true" size="icon" variant="ghost" className="h-8 w-8">
                           <MoreHorizontal className="h-4 w-4" />
                           <span className="sr-only">Toggle menu</span>
                         </Button>

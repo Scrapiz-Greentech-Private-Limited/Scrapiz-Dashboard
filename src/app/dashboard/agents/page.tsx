@@ -100,16 +100,16 @@ export default function AgentsPage() {
 
   // Render statistics skeleton
   const renderStatsSkeleton = () => (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+    <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
       {[...Array(5)].map((_, i) => (
         <Card key={i} className="transition-all">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-4 w-4" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6 sm:pb-2">
+            <Skeleton className="h-3 sm:h-4 w-16 sm:w-24" />
+            <Skeleton className="h-3 sm:h-4 w-3 sm:w-4" />
           </CardHeader>
-          <CardContent>
-            <Skeleton className="h-8 w-16 mb-1" />
-            <Skeleton className="h-3 w-20" />
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <Skeleton className="h-6 sm:h-8 w-12 sm:w-16 mb-1" />
+            <Skeleton className="h-2 sm:h-3 w-16 sm:w-20" />
           </CardContent>
         </Card>
       ))}
@@ -136,18 +136,18 @@ export default function AgentsPage() {
     }
 
     return (
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
         <Card 
           className="transition-all hover:shadow-lg"
           style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
         >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">Total Agents</CardTitle>
-            <Users className="h-4 w-4 text-white" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium text-white">Total Agents</CardTitle>
+            <Users className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">{stats.total}</div>
-            <p className="text-xs text-purple-100">All registered agents</p>
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-xl sm:text-2xl font-bold text-white">{stats.total}</div>
+            <p className="text-[10px] sm:text-xs text-purple-100">All registered agents</p>
           </CardContent>
         </Card>
 
@@ -155,13 +155,13 @@ export default function AgentsPage() {
           className="transition-all hover:shadow-lg"
           style={{ background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' }}
         >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">Active Agents</CardTitle>
-            <CheckCircle className="h-4 w-4 text-white" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium text-white">Active Agents</CardTitle>
+            <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">{stats.active}</div>
-            <p className="text-xs text-green-100">Currently working</p>
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-xl sm:text-2xl font-bold text-white">{stats.active}</div>
+            <p className="text-[10px] sm:text-xs text-green-100">Currently working</p>
           </CardContent>
         </Card>
 
@@ -169,13 +169,13 @@ export default function AgentsPage() {
           className="transition-all hover:shadow-lg"
           style={{ background: 'linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%)' }}
         >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">Inactive</CardTitle>
-            <Clock className="h-4 w-4 text-white" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium text-white">Inactive</CardTitle>
+            <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">{stats.inactive}</div>
-            <p className="text-xs text-orange-100">Not available</p>
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-xl sm:text-2xl font-bold text-white">{stats.inactive}</div>
+            <p className="text-[10px] sm:text-xs text-orange-100">Not available</p>
           </CardContent>
         </Card>
 
@@ -183,29 +183,29 @@ export default function AgentsPage() {
           className="transition-all hover:shadow-lg"
           style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}
         >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">Total Orders</CardTitle>
-            <TrendingUp className="h-4 w-4 text-white" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium text-white">Total Orders</CardTitle>
+            <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">{stats.total_orders}</div>
-            <p className="text-xs text-cyan-100">Completed & assigned</p>
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-xl sm:text-2xl font-bold text-white">{stats.total_orders}</div>
+            <p className="text-[10px] sm:text-xs text-cyan-100">Completed & assigned</p>
           </CardContent>
         </Card>
 
         <Card 
-          className="transition-all hover:shadow-lg"
+          className="transition-all hover:shadow-lg col-span-2 sm:col-span-1"
           style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}
         >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">Avg Rating</CardTitle>
-            <TrendingUp className="h-4 w-4 text-white" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium text-white">Avg Rating</CardTitle>
+            <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-xl sm:text-2xl font-bold text-white">
               {parseFloat(stats.average_rating).toFixed(1)} ⭐
             </div>
-            <p className="text-xs text-pink-100">Overall performance</p>
+            <p className="text-[10px] sm:text-xs text-pink-100">Overall performance</p>
           </CardContent>
         </Card>
       </div>
@@ -244,21 +244,22 @@ export default function AgentsPage() {
   )
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Agent Management</h2>
-          <p className="text-muted-foreground">View, manage, and track your pickup agents</p>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Agent Management</h2>
+          <p className="text-sm sm:text-base text-muted-foreground">View, manage, and track your pickup agents</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleRefresh} disabled={isLoadingAgents || isLoadingStats}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${(isLoadingAgents || isLoadingStats) ? 'animate-spin' : ''}`} />
-            Refresh
+          <Button variant="outline" size="sm" className="sm:size-default" onClick={handleRefresh} disabled={isLoadingAgents || isLoadingStats}>
+            <RefreshCw className={`h-4 w-4 sm:mr-2 ${(isLoadingAgents || isLoadingStats) ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">Refresh</span>
           </Button>
-          <Button onClick={() => setIsAddDialogOpen(true)} size="lg">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Add Agent
+          <Button onClick={() => setIsAddDialogOpen(true)} size="sm" className="sm:size-default">
+            <PlusCircle className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">Add Agent</span>
+            <span className="sm:hidden">Add</span>
           </Button>
         </div>
       </div>

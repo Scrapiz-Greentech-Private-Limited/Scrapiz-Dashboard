@@ -212,77 +212,79 @@ export default function AuthenticationPage() {
     <PermissionGate hasPermission={permission.hasPermission} isLoading={permission.isLoading}>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-4">
           <div>
-            <h2 className="text-3xl font-bold text-green-900 dark:text-green-100">Authentication & Access</h2>
-            <p className="text-muted-foreground mt-1">Manage admin users, roles, permissions, and audit logs</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-green-900 dark:text-green-100">Authentication & Access</h2>
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">Manage admin users, roles, permissions, and audit logs</p>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={loadData} disabled={isLoading}>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button variant="outline" onClick={loadData} disabled={isLoading} className="w-full sm:w-auto">
               <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
             {isAdmin && (
-              <Button onClick={() => setShowCreateDialog(true)} className="bg-green-600 hover:bg-green-700">
+              <Button onClick={() => setShowCreateDialog(true)} className="bg-green-600 hover:bg-green-700 w-full sm:w-auto">
                 <UserPlus className="h-4 w-4 mr-2" />
-                Add Admin User
+                <span className="hidden sm:inline">Add Admin User</span>
+                <span className="sm:hidden">Add User</span>
               </Button>
             )}
           </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
           <Card className="border-green-200 bg-gradient-to-br from-green-50 to-white dark:from-green-950 dark:to-background">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-green-700 dark:text-green-300 flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                Total Admin Users
+            <CardHeader className="pb-2 p-3 sm:p-6 sm:pb-2">
+              <CardTitle className="text-xs sm:text-sm font-medium text-green-700 dark:text-green-300 flex items-center gap-1 sm:gap-2">
+                <Users className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                <span className="truncate">Total Admins</span>
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-green-900 dark:text-green-100">{stats?.total_admins ?? 0}</div>
+            <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+              <div className="text-2xl sm:text-3xl font-bold text-green-900 dark:text-green-100">{stats?.total_admins ?? 0}</div>
               <p className="text-xs text-muted-foreground mt-1">{stats?.active_admins ?? 0} active</p>
             </CardContent>
           </Card>
 
           <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-white dark:from-blue-950 dark:to-background">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300 flex items-center gap-2">
-                <Shield className="h-4 w-4" />
-                Roles
+            <CardHeader className="pb-2 p-3 sm:p-6 sm:pb-2">
+              <CardTitle className="text-xs sm:text-sm font-medium text-blue-700 dark:text-blue-300 flex items-center gap-1 sm:gap-2">
+                <Shield className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                <span className="truncate">Roles</span>
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-blue-900 dark:text-blue-100">2</div>
+            <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+              <div className="text-2xl sm:text-3xl font-bold text-blue-900 dark:text-blue-100">2</div>
               <p className="text-xs text-muted-foreground mt-1">
-                {stats?.admin_role_count ?? 0} Admin, {stats?.staff_role_count ?? 0} Staff
+                <span className="hidden sm:inline">{stats?.admin_role_count ?? 0} Admin, {stats?.staff_role_count ?? 0} Staff</span>
+                <span className="sm:hidden">{stats?.admin_role_count ?? 0}A / {stats?.staff_role_count ?? 0}S</span>
               </p>
             </CardContent>
           </Card>
 
           <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-white dark:from-purple-950 dark:to-background">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300 flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                Recent Logins
+            <CardHeader className="pb-2 p-3 sm:p-6 sm:pb-2">
+              <CardTitle className="text-xs sm:text-sm font-medium text-purple-700 dark:text-purple-300 flex items-center gap-1 sm:gap-2">
+                <FileText className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                <span className="truncate">Recent Logins</span>
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-purple-900 dark:text-purple-100">{stats?.recent_logins_24h ?? 0}</div>
+            <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+              <div className="text-2xl sm:text-3xl font-bold text-purple-900 dark:text-purple-100">{stats?.recent_logins_24h ?? 0}</div>
               <p className="text-xs text-muted-foreground mt-1">Last 24 hours</p>
             </CardContent>
           </Card>
 
           <Card className="border-orange-200 bg-gradient-to-br from-orange-50 to-white dark:from-orange-950 dark:to-background">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-orange-700 dark:text-orange-300 flex items-center gap-2">
-                <AlertCircle className="h-4 w-4" />
-                Failed Logins
+            <CardHeader className="pb-2 p-3 sm:p-6 sm:pb-2">
+              <CardTitle className="text-xs sm:text-sm font-medium text-orange-700 dark:text-orange-300 flex items-center gap-1 sm:gap-2">
+                <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                <span className="truncate">Failed Logins</span>
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-orange-900 dark:text-orange-100">{stats?.failed_logins_24h ?? 0}</div>
+            <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+              <div className="text-2xl sm:text-3xl font-bold text-orange-900 dark:text-orange-100">{stats?.failed_logins_24h ?? 0}</div>
               <p className="text-xs text-muted-foreground mt-1">Last 24 hours</p>
             </CardContent>
           </Card>
@@ -290,10 +292,22 @@ export default function AuthenticationPage() {
 
         {/* Tabs */}
         <Tabs defaultValue="users" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="users"><Users className="h-4 w-4 mr-2" />Admin Users</TabsTrigger>
-            <TabsTrigger value="audit"><FileText className="h-4 w-4 mr-2" />Audit Logs</TabsTrigger>
-            <TabsTrigger value="permissions"><Key className="h-4 w-4 mr-2" />Permissions</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 h-auto">
+            <TabsTrigger value="users" className="text-xs sm:text-sm py-2 px-1 sm:px-3 flex items-center gap-1 sm:gap-2">
+              <Users className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+              <span className="hidden sm:inline">Admin Users</span>
+              <span className="sm:hidden">Users</span>
+            </TabsTrigger>
+            <TabsTrigger value="audit" className="text-xs sm:text-sm py-2 px-1 sm:px-3 flex items-center gap-1 sm:gap-2">
+              <FileText className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+              <span className="hidden sm:inline">Audit Logs</span>
+              <span className="sm:hidden">Logs</span>
+            </TabsTrigger>
+            <TabsTrigger value="permissions" className="text-xs sm:text-sm py-2 px-1 sm:px-3 flex items-center gap-1 sm:gap-2">
+              <Key className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+              <span className="hidden sm:inline">Permissions</span>
+              <span className="sm:hidden">Perms</span>
+            </TabsTrigger>
           </TabsList>
 
           {/* Admin Users Tab */}
@@ -306,10 +320,10 @@ export default function AuthenticationPage() {
                 </CardTitle>
                 <CardDescription>Manage admin users and their access levels</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-3 sm:p-6">
                 {/* Filters */}
-                <div className="flex flex-col gap-4 md:flex-row md:items-center mb-6">
-                  <div className="flex-1 relative">
+                <div className="flex flex-col gap-3 sm:gap-4 mb-4 sm:mb-6">
+                  <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       placeholder="Search by name or email..."
@@ -318,38 +332,40 @@ export default function AuthenticationPage() {
                       className="pl-10"
                     />
                   </div>
-                  <Select value={roleFilter} onValueChange={setRoleFilter}>
-                    <SelectTrigger className="w-[150px]">
-                      <SelectValue placeholder="Filter by Role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Roles</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
-                      <SelectItem value="staff">Staff</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-[150px]">
-                      <SelectValue placeholder="Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex gap-2">
+                    <Select value={roleFilter} onValueChange={setRoleFilter}>
+                      <SelectTrigger className="flex-1 sm:w-[150px] sm:flex-none">
+                        <SelectValue placeholder="Role" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Roles</SelectItem>
+                        <SelectItem value="admin">Admin</SelectItem>
+                        <SelectItem value="staff">Staff</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                      <SelectTrigger className="flex-1 sm:w-[150px] sm:flex-none">
+                        <SelectValue placeholder="Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Status</SelectItem>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="inactive">Inactive</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
                 {/* Users Table */}
-                <div className="rounded-md border">
+                <div className="rounded-md border overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>User</TableHead>
-                        <TableHead>Role</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Last Login</TableHead>
-                        {isAdmin && <TableHead className="text-right">Actions</TableHead>}
+                        <TableHead className="min-w-[180px]">User</TableHead>
+                        <TableHead className="hidden sm:table-cell">Role</TableHead>
+                        <TableHead className="hidden md:table-cell">Status</TableHead>
+                        <TableHead className="hidden lg:table-cell">Last Login</TableHead>
+                        {isAdmin && <TableHead className="text-right min-w-[100px]">Actions</TableHead>}
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -369,28 +385,37 @@ export default function AuthenticationPage() {
                         adminUsers.map((user) => (
                           <TableRow key={user.id}>
                             <TableCell>
-                              <div className="flex items-center gap-3">
-                                <Avatar className="h-10 w-10">
-                                  <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
+                              <div className="flex items-center gap-2 sm:gap-3">
+                                <Avatar className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0">
+                                  <AvatarFallback className="text-xs sm:text-sm">{user.name.charAt(0).toUpperCase()}</AvatarFallback>
                                 </Avatar>
-                                <div>
-                                  <p className="font-medium">{user.name}</p>
-                                  <p className="text-sm text-muted-foreground">{user.email}</p>
+                                <div className="min-w-0">
+                                  <p className="font-medium text-sm sm:text-base truncate">{user.name}</p>
+                                  <p className="text-xs sm:text-sm text-muted-foreground truncate">{user.email}</p>
+                                  {/* Mobile: Show role & status inline */}
+                                  <div className="flex gap-1 mt-1 sm:hidden">
+                                    <Badge variant={user.role === 'admin' ? 'default' : 'outline'} className="text-xs px-1.5 py-0">
+                                      {user.role === 'admin' ? 'Admin' : 'Staff'}
+                                    </Badge>
+                                    <Badge variant={user.is_active ? 'default' : 'secondary'} className="text-xs px-1.5 py-0">
+                                      {user.is_active ? 'Active' : 'Inactive'}
+                                    </Badge>
+                                  </div>
                                 </div>
                               </div>
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="hidden sm:table-cell">
                               <Badge variant={user.role === 'admin' ? 'default' : 'outline'}>
                                 {user.role === 'admin' ? 'Admin' : 'Staff'}
                               </Badge>
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="hidden md:table-cell">
                               <Badge variant={user.is_active ? 'default' : 'secondary'}>
                                 {user.is_active ? <CheckCircle2 className="h-3 w-3 mr-1" /> : <XCircle className="h-3 w-3 mr-1" />}
                                 {user.is_active ? 'Active' : 'Inactive'}
                               </Badge>
                             </TableCell>
-                            <TableCell className="text-sm text-muted-foreground">
+                            <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">
                               <div className="flex items-center gap-1">
                                 <Clock className="h-3 w-3" />
                                 {formatDate(user.last_login)}
@@ -398,21 +423,21 @@ export default function AuthenticationPage() {
                             </TableCell>
                             {isAdmin && (
                               <TableCell className="text-right">
-                                <div className="flex justify-end gap-2">
-                                  <Button size="sm" variant="outline" onClick={() => openEditDialog(user)}>
-                                    <Edit className="h-4 w-4" />
+                                <div className="flex justify-end gap-1 sm:gap-2">
+                                  <Button size="sm" variant="outline" onClick={() => openEditDialog(user)} className="h-8 w-8 p-0 sm:h-9 sm:w-9">
+                                    <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                                   </Button>
-                                  <Button size="sm" variant="outline" onClick={() => handleToggleStatus(user)}>
-                                    {user.is_active ? <Lock className="h-4 w-4" /> : <Unlock className="h-4 w-4" />}
+                                  <Button size="sm" variant="outline" onClick={() => handleToggleStatus(user)} className="h-8 w-8 p-0 sm:h-9 sm:w-9">
+                                    {user.is_active ? <Lock className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : <Unlock className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
                                   </Button>
                                   {user.id !== currentUser?.id && (
                                     <Button
                                       size="sm"
                                       variant="outline"
-                                      className="text-red-600 hover:text-red-700"
+                                      className="text-red-600 hover:text-red-700 h-8 w-8 p-0 sm:h-9 sm:w-9"
                                       onClick={() => { setSelectedUser(user); setShowDeleteDialog(true); }}
                                     >
-                                      <Trash2 className="h-4 w-4" />
+                                      <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                                     </Button>
                                   )}
                                 </div>
@@ -431,24 +456,24 @@ export default function AuthenticationPage() {
           {/* Audit Logs Tab */}
           <TabsContent value="audit" className="space-y-4">
             <Card className="border-purple-100">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-purple-600" />
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                  <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
                   Audit Logs
                 </CardTitle>
-                <CardDescription>Track all admin activities and changes</CardDescription>
+                <CardDescription className="text-xs sm:text-sm">Track all admin activities and changes</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="rounded-md border">
+              <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
+                <div className="rounded-md border overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>User</TableHead>
-                        <TableHead>Action</TableHead>
-                        <TableHead>Target</TableHead>
-                        <TableHead>Timestamp</TableHead>
-                        <TableHead>IP Address</TableHead>
-                        <TableHead>Status</TableHead>
+                        <TableHead className="min-w-[120px]">User</TableHead>
+                        <TableHead className="min-w-[100px]">Action</TableHead>
+                        <TableHead className="hidden md:table-cell">Target</TableHead>
+                        <TableHead className="hidden sm:table-cell min-w-[140px]">Timestamp</TableHead>
+                        <TableHead className="hidden lg:table-cell">IP Address</TableHead>
+                        <TableHead className="min-w-[80px]">Status</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -467,20 +492,30 @@ export default function AuthenticationPage() {
                       ) : (
                         auditLogs.map((log) => (
                           <TableRow key={log.id}>
-                            <TableCell className="font-medium">{log.user}</TableCell>
-                            <TableCell><Badge variant="outline">{log.action_display}</Badge></TableCell>
-                            <TableCell className="text-sm text-muted-foreground">{log.target_user || '-'}</TableCell>
-                            <TableCell className="text-sm">
-                              <div className="flex items-center gap-1">
-                                <Clock className="h-3 w-3 text-muted-foreground" />
-                                {formatDate(log.timestamp)}
+                            <TableCell>
+                              <div className="min-w-0">
+                                <p className="font-medium text-sm truncate">{log.user}</p>
+                                {/* Mobile: Show timestamp below user */}
+                                <p className="text-xs text-muted-foreground sm:hidden mt-0.5">
+                                  {formatDate(log.timestamp)}
+                                </p>
                               </div>
                             </TableCell>
-                            <TableCell className="text-sm text-muted-foreground">{log.ip_address || '-'}</TableCell>
                             <TableCell>
-                              <Badge variant={log.status === 'success' ? 'default' : 'destructive'}>
+                              <Badge variant="outline" className="text-xs whitespace-nowrap">{log.action_display}</Badge>
+                            </TableCell>
+                            <TableCell className="hidden md:table-cell text-sm text-muted-foreground">{log.target_user || '-'}</TableCell>
+                            <TableCell className="hidden sm:table-cell text-sm">
+                              <div className="flex items-center gap-1">
+                                <Clock className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                                <span className="truncate">{formatDate(log.timestamp)}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">{log.ip_address || '-'}</TableCell>
+                            <TableCell>
+                              <Badge variant={log.status === 'success' ? 'default' : 'destructive'} className="text-xs">
                                 {log.status === 'success' ? <CheckCircle2 className="h-3 w-3 mr-1" /> : <XCircle className="h-3 w-3 mr-1" />}
-                                {log.status}
+                                <span className="hidden sm:inline">{log.status}</span>
                               </Badge>
                             </TableCell>
                           </TableRow>
@@ -496,19 +531,19 @@ export default function AuthenticationPage() {
           {/* Permissions Tab */}
           <TabsContent value="permissions" className="space-y-4">
             <Card className="border-blue-100">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Key className="h-5 w-5 text-blue-600" />
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                  <Key className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
                   Role Permissions
                 </CardTitle>
-                <CardDescription>Configure access permissions for different roles</CardDescription>
+                <CardDescription className="text-xs sm:text-sm">Configure access permissions for different roles</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
                 <div className="space-y-4">
-                  <div className="flex items-center gap-4 mb-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-4">
                     <span className="text-sm font-medium">Select Role:</span>
                     <Select value={selectedRole} onValueChange={setSelectedRole}>
-                      <SelectTrigger className="w-[200px]">
+                      <SelectTrigger className="w-full sm:w-[200px]">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -518,26 +553,39 @@ export default function AuthenticationPage() {
                     </Select>
                   </div>
 
-                  <div className="rounded-md border">
+                  <div className="rounded-md border overflow-x-auto">
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Module</TableHead>
-                          <TableHead className="text-center">View</TableHead>
-                          <TableHead className="text-center">Create</TableHead>
-                          <TableHead className="text-center">Edit</TableHead>
-                          <TableHead className="text-center">Delete</TableHead>
+                          <TableHead className="min-w-[100px]">Module</TableHead>
+                          <TableHead className="text-center w-[50px] sm:w-[70px]">
+                            <span className="hidden sm:inline">View</span>
+                            <Eye className="h-4 w-4 mx-auto sm:hidden" />
+                          </TableHead>
+                          <TableHead className="text-center w-[50px] sm:w-[70px]">
+                            <span className="hidden sm:inline">Create</span>
+                            <span className="sm:hidden text-xs">+</span>
+                          </TableHead>
+                          <TableHead className="text-center w-[50px] sm:w-[70px]">
+                            <span className="hidden sm:inline">Edit</span>
+                            <Edit className="h-4 w-4 mx-auto sm:hidden" />
+                          </TableHead>
+                          <TableHead className="text-center w-[50px] sm:w-[70px]">
+                            <span className="hidden sm:inline">Delete</span>
+                            <Trash2 className="h-4 w-4 mx-auto sm:hidden" />
+                          </TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {allPermissions?.permissions[selectedRole]?.map((perm) => (
                           <TableRow key={perm.page_key}>
-                            <TableCell className="font-medium">{perm.display_name}</TableCell>
+                            <TableCell className="font-medium text-xs sm:text-sm">{perm.display_name}</TableCell>
                             <TableCell className="text-center">
                               <Checkbox
                                 checked={perm.can_view}
                                 onCheckedChange={() => togglePermission(perm.page_key, 'can_view')}
                                 disabled={!isAdmin || selectedRole === 'admin'}
+                                className="h-4 w-4"
                               />
                             </TableCell>
                             <TableCell className="text-center">
@@ -545,6 +593,7 @@ export default function AuthenticationPage() {
                                 checked={perm.can_create}
                                 onCheckedChange={() => togglePermission(perm.page_key, 'can_create')}
                                 disabled={!isAdmin || selectedRole === 'admin'}
+                                className="h-4 w-4"
                               />
                             </TableCell>
                             <TableCell className="text-center">
@@ -552,6 +601,7 @@ export default function AuthenticationPage() {
                                 checked={perm.can_edit}
                                 onCheckedChange={() => togglePermission(perm.page_key, 'can_edit')}
                                 disabled={!isAdmin || selectedRole === 'admin'}
+                                className="h-4 w-4"
                               />
                             </TableCell>
                             <TableCell className="text-center">
@@ -559,6 +609,7 @@ export default function AuthenticationPage() {
                                 checked={perm.can_delete}
                                 onCheckedChange={() => togglePermission(perm.page_key, 'can_delete')}
                                 disabled={!isAdmin || selectedRole === 'admin'}
+                                className="h-4 w-4"
                               />
                             </TableCell>
                           </TableRow>
@@ -568,10 +619,10 @@ export default function AuthenticationPage() {
                   </div>
 
                   {isAdmin && selectedRole !== 'admin' && (
-                    <div className="flex justify-end gap-2 pt-4">
-                      <Button variant="outline" onClick={loadData}>Reset</Button>
+                    <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4">
+                      <Button variant="outline" onClick={loadData} className="w-full sm:w-auto">Reset</Button>
                       <Button
-                        className="bg-green-600 hover:bg-green-700"
+                        className="bg-green-600 hover:bg-green-700 w-full sm:w-auto"
                         onClick={handleSavePermissions}
                         disabled={isSubmitting}
                       >
@@ -588,10 +639,10 @@ export default function AuthenticationPage() {
 
         {/* Create User Dialog */}
         <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-          <DialogContent>
+          <DialogContent className="max-w-[95vw] sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Create Admin User</DialogTitle>
-              <DialogDescription>Add a new admin or staff user. They will receive a verification email.</DialogDescription>
+              <DialogTitle className="text-lg">Create Admin User</DialogTitle>
+              <DialogDescription className="text-sm">Add a new admin or staff user. They will receive a verification email.</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
@@ -636,9 +687,9 @@ export default function AuthenticationPage() {
                 </Select>
               </div>
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowCreateDialog(false)}>Cancel</Button>
-              <Button onClick={handleCreateUser} disabled={isSubmitting} className="bg-green-600 hover:bg-green-700">
+            <DialogFooter className="flex-col sm:flex-row gap-2">
+              <Button variant="outline" onClick={() => setShowCreateDialog(false)} className="w-full sm:w-auto">Cancel</Button>
+              <Button onClick={handleCreateUser} disabled={isSubmitting} className="bg-green-600 hover:bg-green-700 w-full sm:w-auto">
                 {isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 Create User
               </Button>
@@ -648,10 +699,10 @@ export default function AuthenticationPage() {
 
         {/* Edit User Dialog */}
         <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-          <DialogContent>
+          <DialogContent className="max-w-[95vw] sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Edit Admin User</DialogTitle>
-              <DialogDescription>Update user details and role.</DialogDescription>
+              <DialogTitle className="text-lg">Edit Admin User</DialogTitle>
+              <DialogDescription className="text-sm">Update user details and role.</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
@@ -679,9 +730,9 @@ export default function AuthenticationPage() {
                 </Select>
               </div>
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowEditDialog(false)}>Cancel</Button>
-              <Button onClick={handleUpdateUser} disabled={isSubmitting} className="bg-green-600 hover:bg-green-700">
+            <DialogFooter className="flex-col sm:flex-row gap-2">
+              <Button variant="outline" onClick={() => setShowEditDialog(false)} className="w-full sm:w-auto">Cancel</Button>
+              <Button onClick={handleUpdateUser} disabled={isSubmitting} className="bg-green-600 hover:bg-green-700 w-full sm:w-auto">
                 {isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 Save Changes
               </Button>
@@ -691,16 +742,16 @@ export default function AuthenticationPage() {
 
         {/* Delete Confirmation Dialog */}
         <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-          <DialogContent>
+          <DialogContent className="max-w-[95vw] sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Delete Admin User</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="text-lg">Delete Admin User</DialogTitle>
+              <DialogDescription className="text-sm">
                 Are you sure you want to delete {selectedUser?.name}? This action cannot be undone.
               </DialogDescription>
             </DialogHeader>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>Cancel</Button>
-              <Button variant="destructive" onClick={handleDeleteUser} disabled={isSubmitting}>
+            <DialogFooter className="flex-col sm:flex-row gap-2">
+              <Button variant="outline" onClick={() => setShowDeleteDialog(false)} className="w-full sm:w-auto">Cancel</Button>
+              <Button variant="destructive" onClick={handleDeleteUser} disabled={isSubmitting} className="w-full sm:w-auto">
                 {isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 Delete User
               </Button>

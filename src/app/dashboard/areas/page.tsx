@@ -747,15 +747,15 @@ export default function ServiceAreasPage() {
    * Render statistics skeleton
    */
   const renderStatsSkeleton = () => (
-    <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
+    <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
       {[...Array(5)].map((_, i) => (
-        <Card key={i}>
-          <CardHeader className="pb-2">
-            <Skeleton className="h-4 w-24" />
+        <Card key={i} className={i === 4 ? 'col-span-2 sm:col-span-1' : ''}>
+          <CardHeader className="pb-2 p-3 sm:p-6 sm:pb-2">
+            <Skeleton className="h-3 sm:h-4 w-16 sm:w-24" />
           </CardHeader>
-          <CardContent>
-            <Skeleton className="h-8 w-16 mb-1" />
-            <Skeleton className="h-3 w-20" />
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <Skeleton className="h-6 sm:h-8 w-12 sm:w-16 mb-1" />
+            <Skeleton className="h-2 sm:h-3 w-14 sm:w-20" />
           </CardContent>
         </Card>
       ))}
@@ -766,18 +766,18 @@ export default function ServiceAreasPage() {
    * Render city cards skeleton
    */
   const renderCitiesSkeleton = () => (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
       {[...Array(6)].map((_, i) => (
         <Card key={i}>
-          <CardHeader>
-            <Skeleton className="h-5 w-32" />
-            <Skeleton className="h-4 w-24" />
+          <CardHeader className="p-3 sm:p-6">
+            <Skeleton className="h-4 sm:h-5 w-24 sm:w-32" />
+            <Skeleton className="h-3 sm:h-4 w-16 sm:w-24" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
             <div className="space-y-2">
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-3/4" />
-              <Skeleton className="h-4 w-1/2" />
+              <Skeleton className="h-3 sm:h-4 w-full" />
+              <Skeleton className="h-3 sm:h-4 w-3/4" />
+              <Skeleton className="h-3 sm:h-4 w-1/2" />
             </div>
           </CardContent>
         </Card>
@@ -818,73 +818,78 @@ export default function ServiceAreasPage() {
     }
 
     return (
-      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
         <Card className="border-green-200 bg-gradient-to-br from-green-50 to-white dark:from-green-950 dark:to-background">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-green-700 dark:text-green-300 flex items-center gap-2">
-              <Building2 className="h-4 w-4" />
-              Total Cities
+          <CardHeader className="pb-2 p-3 sm:p-6 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium text-green-700 dark:text-green-300 flex items-center gap-1 sm:gap-2">
+              <Building2 className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Total Cities</span>
+              <span className="sm:hidden">Cities</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-green-900 dark:text-green-100">{stats.totalCities}</div>
-            <p className="text-xs text-muted-foreground mt-1">{stats.activeCities} active</p>
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-2xl sm:text-3xl font-bold text-green-900 dark:text-green-100">{stats.totalCities}</div>
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">{stats.activeCities} active</p>
           </CardContent>
         </Card>
 
         <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-white dark:from-blue-950 dark:to-background">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300 flex items-center gap-2">
-              <MapPin className="h-4 w-4" />
-              Total Pincodes
+          <CardHeader className="pb-2 p-3 sm:p-6 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium text-blue-700 dark:text-blue-300 flex items-center gap-1 sm:gap-2">
+              <MapPin className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Total Pincodes</span>
+              <span className="sm:hidden">Pincodes</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-blue-900 dark:text-blue-100">{stats.totalPincodes}</div>
-            <p className="text-xs text-muted-foreground mt-1">Across all cities</p>
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-2xl sm:text-3xl font-bold text-blue-900 dark:text-blue-100">{stats.totalPincodes}</div>
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Across all cities</p>
           </CardContent>
         </Card>
 
         <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-white dark:from-purple-950 dark:to-background">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300 flex items-center gap-2">
-              <Globe className="h-4 w-4" />
-              Active Cities
+          <CardHeader className="pb-2 p-3 sm:p-6 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium text-purple-700 dark:text-purple-300 flex items-center gap-1 sm:gap-2">
+              <Globe className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Active Cities</span>
+              <span className="sm:hidden">Active</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-purple-900 dark:text-purple-100">{stats.activeCities}</div>
-            <p className="text-xs text-muted-foreground mt-1">Currently serving</p>
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-2xl sm:text-3xl font-bold text-purple-900 dark:text-purple-100">{stats.activeCities}</div>
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Currently serving</p>
           </CardContent>
         </Card>
 
         <Card className="border-orange-200 bg-gradient-to-br from-orange-50 to-white dark:from-orange-950 dark:to-background">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-orange-700 dark:text-orange-300 flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Total Agents
+          <CardHeader className="pb-2 p-3 sm:p-6 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium text-orange-700 dark:text-orange-300 flex items-center gap-1 sm:gap-2">
+              <Users className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Total Agents</span>
+              <span className="sm:hidden">Agents</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-orange-900 dark:text-orange-100">
-              {loadingAgentStats ? <Skeleton className="h-9 w-12" /> : stats.totalAgents}
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-2xl sm:text-3xl font-bold text-orange-900 dark:text-orange-100">
+              {loadingAgentStats ? <Skeleton className="h-7 sm:h-9 w-10 sm:w-12" /> : stats.totalAgents}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Registered agents</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Registered agents</p>
           </CardContent>
         </Card>
 
-        <Card className="border-cyan-200 bg-gradient-to-br from-cyan-50 to-white dark:from-cyan-950 dark:to-background">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-cyan-700 dark:text-cyan-300 flex items-center gap-2">
-              <Compass className="h-4 w-4" />
-              Avg Agents/Area
+        <Card className="border-cyan-200 bg-gradient-to-br from-cyan-50 to-white dark:from-cyan-950 dark:to-background col-span-2 sm:col-span-1">
+          <CardHeader className="pb-2 p-3 sm:p-6 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium text-cyan-700 dark:text-cyan-300 flex items-center gap-1 sm:gap-2">
+              <Compass className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Avg Agents/Area</span>
+              <span className="sm:hidden">Avg/Area</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-cyan-900 dark:text-cyan-100">
-              {loadingAgentStats ? <Skeleton className="h-9 w-12" /> : stats.avgAgentsPerArea}
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-2xl sm:text-3xl font-bold text-cyan-900 dark:text-cyan-100">
+              {loadingAgentStats ? <Skeleton className="h-7 sm:h-9 w-10 sm:w-12" /> : stats.avgAgentsPerArea}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Per pincode</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Per pincode</p>
           </CardContent>
         </Card>
       </div>
@@ -903,40 +908,41 @@ export default function ServiceAreasPage() {
       }`}
       onClick={() => handleCitySelect(city)}
     >
-      <CardHeader className="pb-2">
-        <div className="flex items-start justify-between">
-          <div>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Building2 className="h-4 w-4 text-green-600" />
-              {city.name}
+      <CardHeader className="pb-2 p-3 sm:p-6 sm:pb-2">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0 flex-1">
+            <CardTitle className="text-base sm:text-lg flex items-center gap-1 sm:gap-2 truncate">
+              <Building2 className="h-3 w-3 sm:h-4 sm:w-4 text-green-600 flex-shrink-0" />
+              <span className="truncate">{city.name}</span>
             </CardTitle>
-            <CardDescription>{city.state}</CardDescription>
+            <CardDescription className="text-xs sm:text-sm">{city.state}</CardDescription>
           </div>
           <Badge 
             variant={city.status === 'available' ? 'default' : 'secondary'}
-            className={city.status === 'available' 
+            className={`text-[10px] sm:text-xs flex-shrink-0 ${city.status === 'available' 
               ? 'bg-green-100 text-green-700 border-green-200' 
               : 'bg-yellow-100 text-yellow-700 border-yellow-200'
-            }
+            }`}
           >
             {city.status === 'available' ? (
-              <><CheckCircle2 className="h-3 w-3 mr-1" /> Available</>
+              <><CheckCircle2 className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1" /> <span className="hidden sm:inline">Available</span><span className="sm:hidden">Active</span></>
             ) : (
-              <><Clock className="h-3 w-3 mr-1" /> Coming Soon</>
+              <><Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1" /> <span className="hidden sm:inline">Coming Soon</span><span className="sm:hidden">Soon</span></>
             )}
           </Badge>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-2 text-sm">
+      <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+        <div className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm">
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Pincodes:</span>
-            <Badge variant="outline">{city.pincode_count}</Badge>
+            <Badge variant="outline" className="text-xs">{city.pincode_count}</Badge>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Coordinates:</span>
-            <span className="font-mono text-xs">
-              {parseFloat(city.latitude).toFixed(4)}, {parseFloat(city.longitude).toFixed(4)}
+            <span className="text-muted-foreground hidden sm:inline">Coordinates:</span>
+            <span className="text-muted-foreground sm:hidden">Coords:</span>
+            <span className="font-mono text-[10px] sm:text-xs">
+              {parseFloat(city.latitude).toFixed(2)}, {parseFloat(city.longitude).toFixed(2)}
             </span>
           </div>
           <div className="flex items-center justify-between">
@@ -946,27 +952,28 @@ export default function ServiceAreasPage() {
         </div>
         
         {/* Action buttons */}
-        <div className="flex justify-end gap-2 mt-4 pt-4 border-t">
+        <div className="flex justify-end gap-1.5 sm:gap-2 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t">
           <Button 
             size="sm" 
             variant="outline"
+            className="h-8 w-8 sm:h-9 sm:w-9 p-0"
             onClick={(e) => {
               e.stopPropagation();
               handleEditCity(city);
             }}
           >
-            <Edit className="h-4 w-4" />
+            <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Button>
           <Button 
             size="sm" 
             variant="outline"
+            className="h-8 w-8 sm:h-9 sm:w-9 p-0 text-destructive hover:text-destructive"
             onClick={(e) => {
               e.stopPropagation();
               handleDeleteCity(city);
             }}
-            className="text-destructive hover:text-destructive"
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Button>
         </div>
       </CardContent>
@@ -1012,7 +1019,7 @@ export default function ServiceAreasPage() {
     }
 
     return (
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {filteredCities.map(renderCityCard)}
       </div>
     );
@@ -1023,29 +1030,32 @@ export default function ServiceAreasPage() {
   // ==========================================================================
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h2 className="text-3xl font-bold text-green-900 dark:text-green-100">Service Areas</h2>
-          <p className="text-muted-foreground mt-1">Manage serviceable cities and pincodes</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-green-900 dark:text-green-100">Service Areas</h2>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">Manage serviceable cities and pincodes</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Button 
             variant="outline" 
+            size="sm"
+            className="sm:size-default"
             onClick={handleRefresh}
             disabled={loading.cities}
           >
-            <RefreshCw className={`h-4 w-4 mr-2 ${loading.cities ? 'animate-spin' : ''}`} />
-            Refresh
+            <RefreshCw className={`h-4 w-4 sm:mr-2 ${loading.cities ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">Refresh</span>
           </Button>
-          <Button variant="outline" onClick={handleViewMap}>
-            <Map className="h-4 w-4 mr-2" />
-            View Map
+          <Button variant="outline" size="sm" className="sm:size-default" onClick={handleViewMap}>
+            <Map className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">View Map</span>
           </Button>
-          <Button onClick={handleAddCity} className="bg-green-600 hover:bg-green-700">
-            <Plus className="h-4 w-4 mr-2" />
-            Add City
+          <Button onClick={handleAddCity} size="sm" className="sm:size-default bg-green-600 hover:bg-green-700">
+            <Plus className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">Add City</span>
+            <span className="sm:hidden">Add</span>
           </Button>
         </div>
       </div>
@@ -1055,8 +1065,8 @@ export default function ServiceAreasPage() {
 
       {/* Filters - Task 6.4 */}
       <Card className="border-green-100">
-        <CardContent className="pt-6">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center">
+        <CardContent className="p-3 sm:pt-6 sm:p-6">
+          <div className="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-center">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -1066,34 +1076,38 @@ export default function ServiceAreasPage() {
                 className="pl-10"
               />
             </div>
-            <Select 
-              value={statusFilter} 
-              onValueChange={(value) => setStatusFilter(value as 'all' | CityStatus)}
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filter by Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="available">Available</SelectItem>
-                <SelectItem value="coming_soon">Coming Soon</SelectItem>
-              </SelectContent>
-            </Select>
-            {(searchQuery || statusFilter !== 'all') && (
-              <Button variant="outline" onClick={handleClearFilters}>
-                Clear
-              </Button>
-            )}
+            <div className="flex gap-2">
+              <Select 
+                value={statusFilter} 
+                onValueChange={(value) => setStatusFilter(value as 'all' | CityStatus)}
+              >
+                <SelectTrigger className="flex-1 sm:w-[180px]">
+                  <SelectValue placeholder="Filter by Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="available">Available</SelectItem>
+                  <SelectItem value="coming_soon">Coming Soon</SelectItem>
+                </SelectContent>
+              </Select>
+              {(searchQuery || statusFilter !== 'all') && (
+                <Button variant="outline" size="sm" className="sm:size-default" onClick={handleClearFilters}>
+                  Clear
+                </Button>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
 
       {/* City List - Task 6.2 */}
       <div>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold flex items-center gap-2">
-            <Building2 className="h-5 w-5 text-green-600" />
-            Serviceable Cities ({filteredCities.length})
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
+          <h3 className="text-base sm:text-lg font-semibold flex items-center gap-1.5 sm:gap-2">
+            <Building2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+            <span className="hidden sm:inline">Serviceable Cities</span>
+            <span className="sm:hidden">Cities</span>
+            <span className="text-muted-foreground">({filteredCities.length})</span>
           </h3>
         </div>
         {renderCityList()}
@@ -1102,26 +1116,27 @@ export default function ServiceAreasPage() {
       {/* Pincode Section - Task 9 */}
       {selectedCity && (
         <Card className="border-blue-100">
-          <CardHeader>
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <MapPin className="h-5 w-5 text-blue-600" />
-                  Pincodes in {selectedCity.name}
+          <CardHeader className="p-3 sm:p-6">
+            <div className="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
+                <CardTitle className="flex items-center gap-1.5 sm:gap-2 text-base sm:text-lg">
+                  <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 flex-shrink-0" />
+                  <span className="truncate">Pincodes in {selectedCity.name}</span>
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-xs sm:text-sm mt-1">
                   Manage serviceable pincodes for {selectedCity.name}, {selectedCity.state}
                 </CardDescription>
               </div>
-              <Button onClick={handleAddPincode} className="bg-blue-600 hover:bg-blue-700">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Pincode
+              <Button onClick={handleAddPincode} size="sm" className="sm:size-default bg-blue-600 hover:bg-blue-700 w-full sm:w-auto">
+                <Plus className="h-4 w-4 sm:mr-2" />
+                <span className="sm:hidden">Add</span>
+                <span className="hidden sm:inline">Add Pincode</span>
               </Button>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
             {/* Pincode Search - Task 9.5 */}
-            <div className="mb-4">
+            <div className="mb-3 sm:mb-4">
               <div className="flex gap-2">
                 <div className="flex-1 relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -1133,7 +1148,7 @@ export default function ServiceAreasPage() {
                   />
                 </div>
                 {pincodeSearchQuery && (
-                  <Button variant="outline" onClick={handleClearPincodeSearch}>
+                  <Button variant="outline" size="sm" className="sm:size-default" onClick={handleClearPincodeSearch}>
                     Clear
                   </Button>
                 )}
@@ -1146,20 +1161,24 @@ export default function ServiceAreasPage() {
             ) : (
               <>
                 {/* Pincode Table - Task 9.1 */}
-                <PincodeTable
-                  pincodes={filteredPincodes}
-                  selectedPincode={selectedPincode}
-                  loading={loading.pincodes}
-                  searchQuery={pincodeSearchQuery}
-                  onRowClick={handlePincodeSelect}
-                  onEdit={handleEditPincode}
-                  onDelete={handleDeletePincode}
-                  onManageAreas={handleManageAreas}
-                />
+                <div className="overflow-x-auto -mx-3 sm:mx-0">
+                  <div className="min-w-[500px] sm:min-w-0 px-3 sm:px-0">
+                    <PincodeTable
+                      pincodes={filteredPincodes}
+                      selectedPincode={selectedPincode}
+                      loading={loading.pincodes}
+                      searchQuery={pincodeSearchQuery}
+                      onRowClick={handlePincodeSelect}
+                      onEdit={handleEditPincode}
+                      onDelete={handleDeletePincode}
+                      onManageAreas={handleManageAreas}
+                    />
+                  </div>
+                </div>
                 
                 {/* Pincode count info */}
                 {!loading.pincodes && filteredPincodes.length > 0 && (
-                  <p className="text-sm text-muted-foreground mt-4">
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-3 sm:mt-4">
                     Showing {filteredPincodes.length} of {pincodes.length} pincode{pincodes.length !== 1 ? 's' : ''}
                     {pincodeSearchQuery && ` matching "${pincodeSearchQuery}"`}
                   </p>

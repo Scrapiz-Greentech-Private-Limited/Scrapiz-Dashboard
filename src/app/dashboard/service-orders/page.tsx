@@ -189,82 +189,82 @@ export default function ServiceOrdersPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <Card className="border-green-200 bg-gradient-to-br from-green-50 to-white dark:from-green-950 dark:to-background hover:shadow-md transition-shadow cursor-pointer" onClick={() => setActiveTab('pending')}>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-green-700 dark:text-green-300 flex items-center gap-2">
-              <Clock className="h-4 w-4" />
+          <CardHeader className="pb-1 sm:pb-2 p-3 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-green-700 dark:text-green-300 flex items-center gap-1.5 sm:gap-2">
+              <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               Pending
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-green-900 dark:text-green-100">
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-2xl sm:text-3xl font-bold text-green-900 dark:text-green-100">
               {stats.pending}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Awaiting confirmation</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1 hidden sm:block">Awaiting confirmation</p>
           </CardContent>
         </Card>
         <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-white dark:from-blue-950 dark:to-background hover:shadow-md transition-shadow cursor-pointer" onClick={() => setActiveTab('confirmed')}>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300 flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4" />
+          <CardHeader className="pb-1 sm:pb-2 p-3 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-blue-700 dark:text-blue-300 flex items-center gap-1.5 sm:gap-2">
+              <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               Confirmed
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-blue-900 dark:text-blue-100">
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-2xl sm:text-3xl font-bold text-blue-900 dark:text-blue-100">
               {stats.confirmed}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Ready to start</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1 hidden sm:block">Ready to start</p>
           </CardContent>
         </Card>
         <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950 dark:to-background hover:shadow-md transition-shadow cursor-pointer" onClick={() => setActiveTab('completed')}>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-emerald-700 dark:text-emerald-300 flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4" />
+          <CardHeader className="pb-1 sm:pb-2 p-3 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-emerald-700 dark:text-emerald-300 flex items-center gap-1.5 sm:gap-2">
+              <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               Completed
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-emerald-900 dark:text-emerald-100">
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-2xl sm:text-3xl font-bold text-emerald-900 dark:text-emerald-100">
               {stats.completed}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Successfully done</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1 hidden sm:block">Successfully done</p>
           </CardContent>
         </Card>
         <Card className="border-red-200 bg-gradient-to-br from-red-50 to-white dark:from-red-950 dark:to-background hover:shadow-md transition-shadow cursor-pointer" onClick={() => setActiveTab('cancelled')}>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-red-700 dark:text-red-300 flex items-center gap-2">
-              <XCircle className="h-4 w-4" />
+          <CardHeader className="pb-1 sm:pb-2 p-3 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-red-700 dark:text-red-300 flex items-center gap-1.5 sm:gap-2">
+              <XCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               Cancelled
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-red-900 dark:text-red-100">
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-2xl sm:text-3xl font-bold text-red-900 dark:text-red-100">
               {stats.cancelled}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Cancelled bookings</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1 hidden sm:block">Cancelled bookings</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Filters */}
       <Card className="border-green-100">
-        <CardContent className="pt-6">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center">
-            <div className="flex-1 relative">
+        <CardContent className="p-3 sm:p-6">
+          <div className="flex flex-col gap-3 sm:gap-4">
+            <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search by customer name, order ID, phone, or service..."
+                placeholder="Search name, ID, phone..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="pl-10 text-sm"
               />
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Select value={serviceFilter} onValueChange={setServiceFilter}>
-                <SelectTrigger className="w-[180px]">
-                  <Filter className="h-4 w-4 mr-2" />
+                <SelectTrigger className="w-full sm:w-[180px] text-sm">
+                  <Filter className="h-4 w-4 mr-2 hidden sm:inline" />
                   <SelectValue placeholder="Service Type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -275,7 +275,7 @@ export default function ServiceOrdersPage() {
                 </SelectContent>
               </Select>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[150px]">
+                <SelectTrigger className="w-full sm:w-[150px] text-sm">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -289,6 +289,8 @@ export default function ServiceOrdersPage() {
               {(searchQuery || statusFilter !== 'all' || serviceFilter !== 'all') && (
                 <Button 
                   variant="outline" 
+                  size="sm"
+                  className="w-full sm:w-auto"
                   onClick={() => {
                     setSearchQuery('');
                     setStatusFilter('all');
@@ -305,13 +307,30 @@ export default function ServiceOrdersPage() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="all">All ({bookings.length})</TabsTrigger>
-          <TabsTrigger value="pending">Pending ({stats.pending})</TabsTrigger>
-          <TabsTrigger value="confirmed">Confirmed ({stats.confirmed})</TabsTrigger>
-          <TabsTrigger value="completed">Completed ({stats.completed})</TabsTrigger>
-          <TabsTrigger value="cancelled">Cancelled ({stats.cancelled})</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+          <TabsList className="inline-flex w-max sm:grid sm:w-full sm:grid-cols-5 min-w-full">
+            <TabsTrigger value="all" className="text-xs sm:text-sm px-2 sm:px-4">
+              <span className="hidden sm:inline">All ({bookings.length})</span>
+              <span className="sm:hidden">All</span>
+            </TabsTrigger>
+            <TabsTrigger value="pending" className="text-xs sm:text-sm px-2 sm:px-4">
+              <span className="hidden sm:inline">Pending ({stats.pending})</span>
+              <span className="sm:hidden">{stats.pending}</span>
+            </TabsTrigger>
+            <TabsTrigger value="confirmed" className="text-xs sm:text-sm px-2 sm:px-4">
+              <span className="hidden sm:inline">Confirmed ({stats.confirmed})</span>
+              <span className="sm:hidden">{stats.confirmed}</span>
+            </TabsTrigger>
+            <TabsTrigger value="completed" className="text-xs sm:text-sm px-2 sm:px-4">
+              <span className="hidden sm:inline">Completed ({stats.completed})</span>
+              <span className="sm:hidden">{stats.completed}</span>
+            </TabsTrigger>
+            <TabsTrigger value="cancelled" className="text-xs sm:text-sm px-2 sm:px-4">
+              <span className="hidden sm:inline">Cancelled ({stats.cancelled})</span>
+              <span className="sm:hidden">{stats.cancelled}</span>
+            </TabsTrigger>
+          </TabsList>
+        </div>
       </Tabs>
 
       {/* Service Bookings List */}
@@ -336,23 +355,24 @@ export default function ServiceOrdersPage() {
             
             return (
               <Card key={order.id} className="hover:shadow-xl transition-all duration-300 border-2 border-green-100 hover:border-green-400 bg-gradient-to-br from-white to-green-50/30 dark:from-background dark:to-green-950/10">
-                <CardHeader className="pb-4 bg-gradient-to-r from-green-50 to-transparent dark:from-green-950/20 dark:to-transparent">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="h-10 w-10 rounded-lg bg-green-100 dark:bg-green-900 flex items-center justify-center">
-                          <Wrench className="h-5 w-5 text-green-600" />
+                <CardHeader className="pb-3 sm:pb-4 p-3 sm:p-6 bg-gradient-to-r from-green-50 to-transparent dark:from-green-950/20 dark:to-transparent">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                        <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-green-100 dark:bg-green-900 flex items-center justify-center flex-shrink-0">
+                          <Wrench className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
                         </div>
-                        <div>
-                          <CardTitle className="text-lg font-bold text-green-900 dark:text-green-100">
+                        <div className="min-w-0 flex-1">
+                          <CardTitle className="text-base sm:text-lg font-bold text-green-900 dark:text-green-100 truncate">
                             {order.service}
                           </CardTitle>
-                          <CardDescription className="flex items-center gap-2 mt-0.5">
+                          <CardDescription className="flex flex-wrap items-center gap-1 sm:gap-2 mt-0.5 text-xs sm:text-sm">
                             <span className="font-medium">#{order.id}</span>
-                            <span>•</span>
+                            <span className="hidden sm:inline">•</span>
                             <span className="flex items-center gap-1">
                               <Calendar className="h-3 w-3" />
-                              {formattedDate} • {formattedTime}
+                              <span className="hidden sm:inline">{formattedDate} • {formattedTime}</span>
+                              <span className="sm:hidden">{formattedDate}</span>
                             </span>
                           </CardDescription>
                         </div>
@@ -360,62 +380,60 @@ export default function ServiceOrdersPage() {
                     </div>
                     <Badge 
                       variant={statusColors[order.status as keyof typeof statusColors]}
-                      className="flex items-center gap-1 text-sm px-3 py-1.5"
+                      className="flex items-center gap-1 text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-1.5 self-start"
                     >
-                      <StatusIcon className="h-3.5 w-3.5" />
+                      <StatusIcon className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                       {statusLabels[order.status as keyof typeof statusLabels]}
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent className="pt-4">
-                  <div className="grid md:grid-cols-2 gap-6 mb-5">
+                <CardContent className="pt-3 sm:pt-4 p-3 sm:p-6">
+                  <div className="grid gap-3 sm:gap-6 mb-4 sm:mb-5">
                     {/* Customer Info */}
-                    <div className="space-y-3 p-3 rounded-lg bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900">
-                      <h4 className="text-xs font-bold text-blue-700 dark:text-blue-300 uppercase tracking-wide flex items-center gap-1.5">
-                        <User className="h-3.5 w-3.5" />
+                    <div className="space-y-2 sm:space-y-3 p-2.5 sm:p-3 rounded-lg bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900">
+                      <h4 className="text-[10px] sm:text-xs font-bold text-blue-700 dark:text-blue-300 uppercase tracking-wide flex items-center gap-1 sm:gap-1.5">
+                        <User className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                         Customer
                       </h4>
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-sm">
-                          <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center flex-shrink-0">
-                            <User className="h-4 w-4 text-blue-600" />
-                          </div>
-                          <span className="font-semibold truncate text-blue-900 dark:text-blue-100">{order.name}</span>
+                      <div className="flex items-center gap-2 text-sm">
+                        <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center flex-shrink-0">
+                          <User className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-600" />
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground pl-10">
-                          <Phone className="h-3.5 w-3.5 flex-shrink-0" />
-                          <span>{order.phone}</span>
+                        <div className="min-w-0 flex-1">
+                          <span className="font-semibold text-blue-900 dark:text-blue-100 text-sm truncate block">{order.name}</span>
+                          <span className="text-xs text-muted-foreground flex items-center gap-1">
+                            <Phone className="h-3 w-3 flex-shrink-0" />
+                            {order.phone}
+                          </span>
                         </div>
                       </div>
                     </div>
 
                     {/* Location Info */}
-                    <div className="space-y-3 p-3 rounded-lg bg-purple-50/50 dark:bg-purple-950/20 border border-purple-100 dark:border-purple-900">
-                      <h4 className="text-xs font-bold text-purple-700 dark:text-purple-300 uppercase tracking-wide flex items-center gap-1.5">
-                        <MapPin className="h-3.5 w-3.5" />
+                    <div className="space-y-2 sm:space-y-3 p-2.5 sm:p-3 rounded-lg bg-purple-50/50 dark:bg-purple-950/20 border border-purple-100 dark:border-purple-900">
+                      <h4 className="text-[10px] sm:text-xs font-bold text-purple-700 dark:text-purple-300 uppercase tracking-wide flex items-center gap-1 sm:gap-1.5">
+                        <MapPin className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                         Location
                       </h4>
-                      <div className="space-y-2">
-                        <div className="flex items-start gap-2 text-sm text-muted-foreground">
-                          <MapPin className="h-4 w-4 flex-shrink-0 mt-0.5 text-purple-600" />
-                          <span className="line-clamp-2 leading-relaxed">{order.address}</span>
-                        </div>
+                      <div className="flex items-start gap-2 text-xs sm:text-sm text-muted-foreground">
+                        <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0 mt-0.5 text-purple-600" />
+                        <span className="line-clamp-2 leading-relaxed">{order.address}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Google Meet Link */}
                   {order.meeting_link && (
-                    <div className="mb-4 p-3 rounded-lg bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-blue-900 dark:text-blue-100">Google Meet Link:</span>
+                    <div className="mb-3 sm:mb-4 p-2.5 sm:p-3 rounded-lg bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                        <span className="text-xs sm:text-sm font-medium text-blue-900 dark:text-blue-100">Google Meet:</span>
                         <Button
                           size="sm"
                           variant="outline"
                           onClick={() => window.open(order.meeting_link!, '_blank')}
-                          className="hover:bg-blue-100"
+                          className="hover:bg-blue-100 text-xs sm:text-sm h-8"
                         >
-                          <ExternalLink className="h-4 w-4 mr-1.5" />
+                          <ExternalLink className="h-3.5 w-3.5 mr-1.5" />
                           Join Meeting
                         </Button>
                       </div>
@@ -424,35 +442,36 @@ export default function ServiceOrdersPage() {
 
                   {/* Notes */}
                   {order.notes && (
-                    <div className="mb-4 p-3 rounded-lg bg-yellow-50/50 dark:bg-yellow-950/20 border border-yellow-100 dark:border-yellow-900">
-                      <h4 className="text-xs font-bold text-yellow-700 dark:text-yellow-300 uppercase tracking-wide mb-2">Notes</h4>
-                      <p className="text-sm text-yellow-900 dark:text-yellow-100">{order.notes}</p>
+                    <div className="mb-3 sm:mb-4 p-2.5 sm:p-3 rounded-lg bg-yellow-50/50 dark:bg-yellow-950/20 border border-yellow-100 dark:border-yellow-900">
+                      <h4 className="text-[10px] sm:text-xs font-bold text-yellow-700 dark:text-yellow-300 uppercase tracking-wide mb-1.5 sm:mb-2">Notes</h4>
+                      <p className="text-xs sm:text-sm text-yellow-900 dark:text-yellow-100 line-clamp-2">{order.notes}</p>
                     </div>
                   )}
 
                   {/* Actions */}
-                  <div className="flex flex-wrap gap-2 pt-4 border-t-2 border-green-100">
+                  <div className="flex flex-wrap gap-2 pt-3 sm:pt-4 border-t-2 border-green-100">
                     <Button 
                       size="sm" 
                       variant="outline" 
                       onClick={() => handleViewDetails(order)}
-                      className="hover:bg-green-50 hover:text-green-700 hover:border-green-400 transition-all"
+                      className="hover:bg-green-50 hover:text-green-700 hover:border-green-400 transition-all text-xs sm:text-sm h-8 sm:h-9"
                     >
-                      <FileText className="h-4 w-4 mr-1.5" />
-                      View Details
+                      <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-1.5" />
+                      <span className="hidden sm:inline">View Details</span>
+                      <span className="sm:hidden">Details</span>
                     </Button>
                     {order.status === 'pending' && (
                       <>
                         <Button 
                           size="sm" 
-                          className="bg-green-600 hover:bg-green-700 shadow-sm hover:shadow-md transition-all" 
+                          className="bg-green-600 hover:bg-green-700 shadow-sm hover:shadow-md transition-all text-xs sm:text-sm h-8 sm:h-9" 
                           onClick={() => handleConfirmOrder(order.id)}
                           disabled={updatingStatus === order.id}
                         >
                           {updatingStatus === order.id ? (
-                            <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+                            <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-1.5 animate-spin" />
                           ) : (
-                            <CheckCircle2 className="h-4 w-4 mr-1.5" />
+                            <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-1.5" />
                           )}
                           Confirm
                         </Button>
@@ -461,8 +480,9 @@ export default function ServiceOrdersPage() {
                           variant="outline" 
                           onClick={() => handleCancelOrder(order.id)}
                           disabled={updatingStatus === order.id}
+                          className="text-xs sm:text-sm h-8 sm:h-9"
                         >
-                          <XCircle className="h-4 w-4 mr-1.5" />
+                          <XCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-1.5" />
                           Cancel
                         </Button>
                       </>
@@ -470,16 +490,17 @@ export default function ServiceOrdersPage() {
                     {order.status === 'confirmed' && (
                       <Button 
                         size="sm" 
-                        className="bg-emerald-600 hover:bg-emerald-700 shadow-sm hover:shadow-md transition-all" 
+                        className="bg-emerald-600 hover:bg-emerald-700 shadow-sm hover:shadow-md transition-all text-xs sm:text-sm h-8 sm:h-9" 
                         onClick={() => handleMarkComplete(order.id)}
                         disabled={updatingStatus === order.id}
                       >
                         {updatingStatus === order.id ? (
-                          <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+                          <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-1.5 animate-spin" />
                         ) : (
-                          <CheckCircle2 className="h-4 w-4 mr-1.5" />
+                          <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-1.5" />
                         )}
-                        Mark Complete
+                        <span className="hidden sm:inline">Mark Complete</span>
+                        <span className="sm:hidden">Complete</span>
                       </Button>
                     )}
                   </div>
@@ -493,62 +514,60 @@ export default function ServiceOrdersPage() {
       {/* Service Booking Details Dialog */}
       {selectedOrder && (
         <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
             <DialogHeader>
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
-                  <DialogTitle className="flex items-center gap-2 text-xl">
-                    <Wrench className="h-6 w-6 text-green-600" />
-                    {selectedOrder.service}
+                  <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                    <Wrench className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
+                    <span className="truncate">{selectedOrder.service}</span>
                   </DialogTitle>
-                  <DialogDescription className="mt-1">Booking #{selectedOrder.id}</DialogDescription>
+                  <DialogDescription className="mt-1 text-xs sm:text-sm">Booking #{selectedOrder.id}</DialogDescription>
                 </div>
                 <Badge 
                   variant={statusColors[selectedOrder.status as keyof typeof statusColors]}
-                  className="text-sm px-3 py-1"
+                  className="text-xs sm:text-sm px-2 sm:px-3 py-1 self-start sm:self-auto"
                 >
                   {statusLabels[selectedOrder.status as keyof typeof statusLabels]}
                 </Badge>
               </div>
             </DialogHeader>
             
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {/* Customer & Service Info */}
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid gap-4 sm:gap-6">
                 <Card className="border-green-100">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-semibold text-green-900 dark:text-green-100 flex items-center gap-2">
-                      <User className="h-4 w-4" />
+                  <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
+                    <CardTitle className="text-xs sm:text-sm font-semibold text-green-900 dark:text-green-100 flex items-center gap-2">
+                      <User className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                       Customer Information
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
-                        <User className="h-5 w-5 text-green-600" />
+                  <CardContent className="space-y-2 sm:space-y-3 p-3 pt-0 sm:p-6 sm:pt-0">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center flex-shrink-0">
+                        <User className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
                       </div>
-                      <div>
-                        <p className="font-semibold text-sm">{selectedOrder.name}</p>
-                        <p className="text-xs text-muted-foreground">Customer</p>
+                      <div className="min-w-0">
+                        <p className="font-semibold text-xs sm:text-sm truncate">{selectedOrder.name}</p>
+                        <p className="text-[10px] sm:text-xs text-muted-foreground">Customer</p>
                       </div>
                     </div>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Phone className="h-4 w-4" />
-                        <span>{selectedOrder.phone}</span>
-                      </div>
+                    <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+                      <Phone className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+                      <span>{selectedOrder.phone}</span>
                     </div>
                   </CardContent>
                 </Card>
 
                 <Card className="border-blue-100">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-semibold text-blue-900 dark:text-blue-100 flex items-center gap-2">
-                      <Calendar className="h-4 w-4" />
+                  <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
+                    <CardTitle className="text-xs sm:text-sm font-semibold text-blue-900 dark:text-blue-100 flex items-center gap-2">
+                      <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                       Service Details
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-3 text-sm">
+                  <CardContent className="space-y-2 sm:space-y-3 text-xs sm:text-sm p-3 pt-0 sm:p-6 sm:pt-0">
                     <div className="flex items-center justify-between">
                       <span className="text-muted-foreground">Preferred Date</span>
                       <span className="font-medium">{new Date(selectedOrder.preferred_datetime).toLocaleDateString()}</span>
@@ -567,39 +586,39 @@ export default function ServiceOrdersPage() {
 
               {/* Address */}
               <Card className="border-green-100">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-semibold text-green-900 dark:text-green-100 flex items-center gap-2">
-                    <MapPin className="h-4 w-4" />
+                <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
+                  <CardTitle className="text-xs sm:text-sm font-semibold text-green-900 dark:text-green-100 flex items-center gap-2">
+                    <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     Service Location
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-sm">{selectedOrder.address}</p>
+                <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+                  <p className="text-xs sm:text-sm">{selectedOrder.address}</p>
                 </CardContent>
               </Card>
 
               {/* Google Meet Link */}
               {selectedOrder.meeting_link && (
                 <Card className="border-blue-200 bg-blue-50/50 dark:bg-blue-950/20">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-semibold text-blue-900 dark:text-blue-100 flex items-center gap-2">
-                      <ExternalLink className="h-4 w-4" />
+                  <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
+                    <CardTitle className="text-xs sm:text-sm font-semibold text-blue-900 dark:text-blue-100 flex items-center gap-2">
+                      <ExternalLink className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                       Meeting Link
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm text-muted-foreground">Google Meet</p>
+                  <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                      <p className="text-xs sm:text-sm text-muted-foreground">Google Meet</p>
                       <Button
                         size="sm"
                         onClick={() => window.open(selectedOrder.meeting_link!, '_blank')}
-                        className="bg-blue-600 hover:bg-blue-700"
+                        className="bg-blue-600 hover:bg-blue-700 text-xs sm:text-sm h-8"
                       >
-                        <ExternalLink className="h-4 w-4 mr-2" />
+                        <ExternalLink className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                         Join Meeting
                       </Button>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-2 break-all">{selectedOrder.meeting_link}</p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground mt-2 break-all">{selectedOrder.meeting_link}</p>
                   </CardContent>
                 </Card>
               )}
@@ -607,24 +626,24 @@ export default function ServiceOrdersPage() {
               {/* Notes */}
               {selectedOrder.notes && (
                 <Card className="border-yellow-200 bg-yellow-50/50 dark:bg-yellow-900/10">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-semibold text-yellow-900 dark:text-yellow-100 flex items-center gap-2">
-                      <FileText className="h-4 w-4" />
+                  <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
+                    <CardTitle className="text-xs sm:text-sm font-semibold text-yellow-900 dark:text-yellow-100 flex items-center gap-2">
+                      <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                       Additional Notes
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-yellow-900 dark:text-yellow-100">{selectedOrder.notes}</p>
+                  <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+                    <p className="text-xs sm:text-sm text-yellow-900 dark:text-yellow-100">{selectedOrder.notes}</p>
                   </CardContent>
                 </Card>
               )}
 
               {/* Action Buttons */}
-              <div className="flex gap-2 pt-4 border-t">
+              <div className="flex flex-col sm:flex-row gap-2 pt-3 sm:pt-4 border-t">
                 {selectedOrder.status === 'pending' && (
                   <>
                     <Button 
-                      className="flex-1 bg-green-600 hover:bg-green-700" 
+                      className="flex-1 bg-green-600 hover:bg-green-700 text-xs sm:text-sm h-9 sm:h-10" 
                       onClick={() => {
                         handleConfirmOrder(selectedOrder.id);
                         setIsDetailsOpen(false);
@@ -632,29 +651,29 @@ export default function ServiceOrdersPage() {
                       disabled={updatingStatus === selectedOrder.id}
                     >
                       {updatingStatus === selectedOrder.id ? (
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 animate-spin" />
                       ) : (
-                        <CheckCircle2 className="h-4 w-4 mr-2" />
+                        <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                       )}
                       Confirm Booking
                     </Button>
                     <Button 
                       variant="outline" 
-                      className="flex-1" 
+                      className="flex-1 text-xs sm:text-sm h-9 sm:h-10" 
                       onClick={() => {
                         handleCancelOrder(selectedOrder.id);
                         setIsDetailsOpen(false);
                       }}
                       disabled={updatingStatus === selectedOrder.id}
                     >
-                      <XCircle className="h-4 w-4 mr-2" />
+                      <XCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                       Cancel Booking
                     </Button>
                   </>
                 )}
                 {selectedOrder.status === 'confirmed' && (
                   <Button 
-                    className="flex-1 bg-emerald-600 hover:bg-emerald-700" 
+                    className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-xs sm:text-sm h-9 sm:h-10" 
                     onClick={() => {
                       handleMarkComplete(selectedOrder.id);
                       setIsDetailsOpen(false);
@@ -662,9 +681,9 @@ export default function ServiceOrdersPage() {
                     disabled={updatingStatus === selectedOrder.id}
                   >
                     {updatingStatus === selectedOrder.id ? (
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 animate-spin" />
                     ) : (
-                      <CheckCircle2 className="h-4 w-4 mr-2" />
+                      <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                     )}
                     Mark as Completed
                   </Button>

@@ -136,11 +136,11 @@ export default function UsersPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">User Management</h2>
-          <p className="text-muted-foreground">
-            Manage all registered users, their accounts, and permissions
+          <h2 className="text-xl sm:text-3xl font-bold tracking-tight">User Management</h2>
+          <p className="text-xs sm:text-sm text-muted-foreground">
+            Manage users, accounts, and permissions
           </p>
         </div>
         <Button 
@@ -148,14 +148,15 @@ export default function UsersPage() {
           size="sm" 
           onClick={handleRefresh}
           disabled={loading}
+          className="self-start sm:self-auto h-8 sm:h-9 text-xs sm:text-sm"
         >
-          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 ${loading ? 'animate-spin' : ''}`} />
           Refresh
         </Button>
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {loading && users.length === 0 ? (
           <>
             <CardSkeleton />
@@ -173,13 +174,13 @@ export default function UsersPage() {
               }`}
               onClick={() => { setRoleFilter('all'); setStatusFilter('all'); }}
             >
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 p-3 sm:p-6">
+                <CardTitle className="text-xs sm:text-sm font-medium">Total Users</CardTitle>
+                <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{displayStats.total}</div>
-                <p className="text-xs text-muted-foreground">
+              <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+                <div className="text-xl sm:text-2xl font-bold">{displayStats.total}</div>
+                <p className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block">
                   All registered accounts
                 </p>
               </CardContent>
@@ -193,13 +194,13 @@ export default function UsersPage() {
               }`}
               onClick={() => setStatusFilter(statusFilter === 'active' ? 'all' : 'active')}
             >
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Active Users</CardTitle>
-                <UserCheck className="h-4 w-4 text-green-600" />
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 p-3 sm:p-6">
+                <CardTitle className="text-xs sm:text-sm font-medium">Active</CardTitle>
+                <UserCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-600" />
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-green-600">{displayStats.active}</div>
-                <p className="text-xs text-muted-foreground">
+              <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+                <div className="text-xl sm:text-2xl font-bold text-green-600">{displayStats.active}</div>
+                <p className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block">
                   Currently active accounts
                 </p>
               </CardContent>
@@ -213,13 +214,13 @@ export default function UsersPage() {
               }`}
               onClick={() => setStatusFilter(statusFilter === 'inactive' ? 'all' : 'inactive')}
             >
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Inactive Users</CardTitle>
-                <UserX className="h-4 w-4 text-red-600" />
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 p-3 sm:p-6">
+                <CardTitle className="text-xs sm:text-sm font-medium">Inactive</CardTitle>
+                <UserX className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-600" />
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-red-600">{displayStats.inactive}</div>
-                <p className="text-xs text-muted-foreground">
+              <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+                <div className="text-xl sm:text-2xl font-bold text-red-600">{displayStats.inactive}</div>
+                <p className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block">
                   Deactivated accounts
                 </p>
               </CardContent>
@@ -233,13 +234,13 @@ export default function UsersPage() {
               }`}
               onClick={() => setRoleFilter(roleFilter === 'staff' ? 'all' : 'staff')}
             >
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Staff & Admins</CardTitle>
-                <Shield className="h-4 w-4 text-purple-600" />
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 p-3 sm:p-6">
+                <CardTitle className="text-xs sm:text-sm font-medium">Staff</CardTitle>
+                <Shield className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-purple-600" />
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-purple-600">{displayStats.staff}</div>
-                <p className="text-xs text-muted-foreground">
+              <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+                <div className="text-xl sm:text-2xl font-bold text-purple-600">{displayStats.staff}</div>
+                <p className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block">
                   {displayStats.superusers} superusers
                 </p>
               </CardContent>
@@ -249,7 +250,7 @@ export default function UsersPage() {
       </div>
 
       {/* Additional Stats Row */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
         {loading && users.length === 0 ? (
           <>
             <CardSkeleton />
@@ -259,39 +260,39 @@ export default function UsersPage() {
         ) : (
           <>
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Users with Orders</CardTitle>
-                <TrendingUp className="h-4 w-4 text-blue-600" />
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 p-2 sm:p-6">
+                <CardTitle className="text-[10px] sm:text-sm font-medium">With Orders</CardTitle>
+                <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-blue-600">{displayStats.with_orders}</div>
-                <p className="text-xs text-muted-foreground">
+              <CardContent className="p-2 pt-0 sm:p-6 sm:pt-0">
+                <div className="text-lg sm:text-2xl font-bold text-blue-600">{displayStats.with_orders}</div>
+                <p className="text-[9px] sm:text-xs text-muted-foreground hidden sm:block">
                   Have placed at least one order
                 </p>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Regular Users</CardTitle>
-                <UserPlus className="h-4 w-4 text-cyan-600" />
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 p-2 sm:p-6">
+                <CardTitle className="text-[10px] sm:text-sm font-medium">Regular</CardTitle>
+                <UserPlus className="h-3 w-3 sm:h-4 sm:w-4 text-cyan-600" />
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-cyan-600">{displayStats.regular_users}</div>
-                <p className="text-xs text-muted-foreground">
+              <CardContent className="p-2 pt-0 sm:p-6 sm:pt-0">
+                <div className="text-lg sm:text-2xl font-bold text-cyan-600">{displayStats.regular_users}</div>
+                <p className="text-[9px] sm:text-xs text-muted-foreground hidden sm:block">
                   App users (non-staff)
                 </p>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">With Referral Codes</CardTitle>
-                <Users className="h-4 w-4 text-orange-600" />
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 p-2 sm:p-6">
+                <CardTitle className="text-[10px] sm:text-sm font-medium">Referrals</CardTitle>
+                <Users className="h-3 w-3 sm:h-4 sm:w-4 text-orange-600" />
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-orange-600">{displayStats.with_referrals}</div>
-                <p className="text-xs text-muted-foreground">
+              <CardContent className="p-2 pt-0 sm:p-6 sm:pt-0">
+                <div className="text-lg sm:text-2xl font-bold text-orange-600">{displayStats.with_referrals}</div>
+                <p className="text-[9px] sm:text-xs text-muted-foreground hidden sm:block">
                   Have referral codes assigned
                 </p>
               </CardContent>
@@ -302,25 +303,25 @@ export default function UsersPage() {
 
       {/* Search and Filters */}
       <Card>
-        <CardHeader>
-          <CardTitle>Search & Filter</CardTitle>
-          <CardDescription>Find users by name, email, phone, or referral code</CardDescription>
+        <CardHeader className="p-3 sm:p-6">
+          <CardTitle className="text-base sm:text-lg">Search & Filter</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">Find users by name, email, phone, or referral code</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-4 sm:flex-row">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search users..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              
+        <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+          <div className="flex flex-col gap-3 sm:gap-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search users..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 text-sm"
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-row sm:gap-4">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full sm:w-[150px]">
+                <SelectTrigger className="w-full sm:w-[130px] text-xs sm:text-sm h-9 sm:h-10">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -331,7 +332,7 @@ export default function UsersPage() {
               </Select>
 
               <Select value={roleFilter} onValueChange={setRoleFilter}>
-                <SelectTrigger className="w-full sm:w-[150px]">
+                <SelectTrigger className="w-full sm:w-[130px] text-xs sm:text-sm h-9 sm:h-10">
                   <SelectValue placeholder="Role" />
                 </SelectTrigger>
                 <SelectContent>
@@ -343,7 +344,7 @@ export default function UsersPage() {
               </Select>
 
               <Select value={genderFilter} onValueChange={setGenderFilter}>
-                <SelectTrigger className="w-full sm:w-[150px]">
+                <SelectTrigger className="w-full sm:w-[130px] text-xs sm:text-sm h-9 sm:h-10">
                   <SelectValue placeholder="Gender" />
                 </SelectTrigger>
                 <SelectContent>
@@ -355,38 +356,38 @@ export default function UsersPage() {
               </Select>
 
               {hasActiveFilters && (
-                <Button variant="ghost" size="sm" onClick={clearFilters}>
-                  <X className="h-4 w-4 mr-2" />
+                <Button variant="ghost" size="sm" onClick={clearFilters} className="h-9 sm:h-10 text-xs sm:text-sm">
+                  <X className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                   Clear
                 </Button>
               )}
             </div>
 
             {hasActiveFilters && (
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-sm text-muted-foreground">Active filters:</span>
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                <span className="text-xs sm:text-sm text-muted-foreground">Filters:</span>
                 {searchQuery && (
-                  <Badge variant="secondary" className="gap-1">
-                    Search: {searchQuery}
-                    <X className="h-3 w-3 cursor-pointer" onClick={() => setSearchQuery('')} />
+                  <Badge variant="secondary" className="gap-1 text-[10px] sm:text-xs px-1.5 sm:px-2">
+                    {searchQuery.slice(0, 10)}{searchQuery.length > 10 ? '...' : ''}
+                    <X className="h-2.5 w-2.5 sm:h-3 sm:w-3 cursor-pointer" onClick={() => setSearchQuery('')} />
                   </Badge>
                 )}
                 {statusFilter !== 'all' && (
-                  <Badge variant="secondary" className="gap-1">
-                    Status: {statusFilter}
-                    <X className="h-3 w-3 cursor-pointer" onClick={() => setStatusFilter('all')} />
+                  <Badge variant="secondary" className="gap-1 text-[10px] sm:text-xs px-1.5 sm:px-2">
+                    {statusFilter}
+                    <X className="h-2.5 w-2.5 sm:h-3 sm:w-3 cursor-pointer" onClick={() => setStatusFilter('all')} />
                   </Badge>
                 )}
                 {roleFilter !== 'all' && (
-                  <Badge variant="secondary" className="gap-1">
-                    Role: {roleFilter}
-                    <X className="h-3 w-3 cursor-pointer" onClick={() => setRoleFilter('all')} />
+                  <Badge variant="secondary" className="gap-1 text-[10px] sm:text-xs px-1.5 sm:px-2">
+                    {roleFilter}
+                    <X className="h-2.5 w-2.5 sm:h-3 sm:w-3 cursor-pointer" onClick={() => setRoleFilter('all')} />
                   </Badge>
                 )}
                 {genderFilter !== 'all' && (
-                  <Badge variant="secondary" className="gap-1">
-                    Gender: {genderFilter}
-                    <X className="h-3 w-3 cursor-pointer" onClick={() => setGenderFilter('all')} />
+                  <Badge variant="secondary" className="gap-1 text-[10px] sm:text-xs px-1.5 sm:px-2">
+                    {genderFilter}
+                    <X className="h-2.5 w-2.5 sm:h-3 sm:w-3 cursor-pointer" onClick={() => setGenderFilter('all')} />
                   </Badge>
                 )}
               </div>
@@ -397,17 +398,17 @@ export default function UsersPage() {
 
       {/* Users Table */}
       <Card>
-        <CardHeader>
+        <CardHeader className="p-3 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>All Users</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-base sm:text-lg">All Users</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">
                 Showing {filteredUsers.length} of {users.length} users
               </CardDescription>
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-2 sm:p-6 pt-0 sm:pt-0">
           <UsersTableEnhanced 
             users={filteredUsers} 
             onUserUpdated={handleRefresh}

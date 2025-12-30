@@ -198,42 +198,51 @@ export default function CategoriesPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-green-900 dark:text-green-100">Scrap Categories</h2>
-          <p className="text-muted-foreground">Manage scrap categories and their associated products</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-green-900 dark:text-green-100">Scrap Categories</h2>
+          <p className="text-sm sm:text-base text-muted-foreground">Manage scrap categories and their associated products</p>
         </div>
-        <Button onClick={handleAdd} className="gap-2">
+        <Button onClick={handleAdd} className="gap-2 w-full sm:w-auto">
           <Plus className="h-4 w-4" />
           Add Category
         </Button>
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-3 sm:gap-4 grid-cols-3">
         <Card className="border-green-100">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-green-900 dark:text-green-100">Total Categories</CardTitle>
+          <CardHeader className="pb-1 sm:pb-2 p-3 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-green-900 dark:text-green-100">
+              <span className="hidden sm:inline">Total Categories</span>
+              <span className="sm:hidden">Categories</span>
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-900 dark:text-green-100">{categories.length}</div>
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-xl sm:text-2xl font-bold text-green-900 dark:text-green-100">{categories.length}</div>
           </CardContent>
         </Card>
         <Card className="border-green-100">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-green-900 dark:text-green-100">Total Products</CardTitle>
+          <CardHeader className="pb-1 sm:pb-2 p-3 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-green-900 dark:text-green-100">
+              <span className="hidden sm:inline">Total Products</span>
+              <span className="sm:hidden">Products</span>
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-900 dark:text-green-100">{products.length}</div>
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-xl sm:text-2xl font-bold text-green-900 dark:text-green-100">{products.length}</div>
           </CardContent>
         </Card>
         <Card className="border-green-100">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-green-900 dark:text-green-100">With Images</CardTitle>
+          <CardHeader className="pb-1 sm:pb-2 p-3 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-green-900 dark:text-green-100">
+              <span className="hidden sm:inline">With Images</span>
+              <span className="sm:hidden">Images</span>
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-900 dark:text-green-100">
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-xl sm:text-2xl font-bold text-green-900 dark:text-green-100">
               {categories.filter(c => c.image_url).length}
             </div>
           </CardContent>
@@ -241,50 +250,50 @@ export default function CategoriesPage() {
       </div>
 
       {/* Categories Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {categories.map(category => {
           const productCount = getProductCount(category.id);
           return (
             <Card key={category.id} className="border-green-100">
-              <CardHeader>
+              <CardHeader className="p-3 sm:p-6">
                 <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                     {category.image_url ? (
                       <img 
                         src={category.image_url} 
                         alt={category.name}
-                        className="w-12 h-12 rounded object-cover"
+                        className="w-10 h-10 sm:w-12 sm:h-12 rounded object-cover flex-shrink-0"
                       />
                     ) : (
-                      <div className="w-12 h-12 rounded bg-green-100 flex items-center justify-center">
-                        <ImageIcon className="h-6 w-6 text-green-600" />
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded bg-green-100 flex items-center justify-center flex-shrink-0">
+                        <ImageIcon className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
                       </div>
                     )}
-                    <div>
-                      <CardTitle className="text-green-900 dark:text-green-100">{category.name}</CardTitle>
-                      <CardDescription>{productCount} product{productCount !== 1 ? 's' : ''}</CardDescription>
+                    <div className="min-w-0">
+                      <CardTitle className="text-green-900 dark:text-green-100 text-sm sm:text-base truncate">{category.name}</CardTitle>
+                      <CardDescription className="text-xs sm:text-sm">{productCount} product{productCount !== 1 ? 's' : ''}</CardDescription>
                     </div>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
                 <div className="flex items-center gap-2">
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => handleEdit(category)}
-                    className="flex-1"
+                    className="flex-1 h-8 sm:h-9 text-xs sm:text-sm"
                   >
-                    <Edit className="h-4 w-4 mr-2" />
+                    <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                     Edit
                   </Button>
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => handleDeleteClick(category)}
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 w-8 sm:h-9 sm:w-9 p-0"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   </Button>
                 </div>
               </CardContent>
@@ -295,16 +304,16 @@ export default function CategoriesPage() {
 
       {/* Add/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-[95vw] sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editingCategory ? 'Edit Category' : 'Add New Category'}</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-base sm:text-lg">{editingCategory ? 'Edit Category' : 'Add New Category'}</DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm">
               {editingCategory ? 'Update category details' : 'Create a new scrap category'}
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
+          <div className="space-y-3 sm:space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Category Name</Label>
+              <Label htmlFor="name" className="text-sm">Category Name</Label>
               <Input
                 id="name"
                 value={formData.name}
@@ -314,15 +323,15 @@ export default function CategoriesPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label>Image</Label>
+              <Label className="text-sm">Image</Label>
               <div className="flex gap-2">
                 <Input
                   id="image_url"
                   value={formData.image_url}
                   onChange={(e) => setFormData({ ...formData, image_url: e.target.value, image: null })}
-                  placeholder="https://s3.amazonaws.com/... or upload below"
+                  placeholder="https://... or upload"
                   disabled={saving || !!formData.image}
-                  className="flex-1"
+                  className="flex-1 text-sm"
                 />
                 <label className="cursor-pointer">
                   <input
@@ -338,9 +347,9 @@ export default function CategoriesPage() {
                 </label>
               </div>
               {formData.image && (
-                <div className="flex items-center gap-2 text-sm text-green-600">
-                  <ImageIcon className="h-4 w-4" />
-                  {formData.image.name}
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-green-600 flex-wrap">
+                  <ImageIcon className="h-4 w-4 flex-shrink-0" />
+                  <span className="truncate max-w-[150px] sm:max-w-[200px]">{formData.image.name}</span>
                   <Button
                     type="button"
                     variant="ghost"
@@ -358,11 +367,11 @@ export default function CategoriesPage() {
             </div>
             {(formData.image_url || formData.image) && (
               <div className="space-y-2">
-                <Label>Image Preview</Label>
+                <Label className="text-sm">Image Preview</Label>
                 <img 
                   src={formData.image ? URL.createObjectURL(formData.image) : formData.image_url} 
                   alt="Preview"
-                  className="w-full h-32 object-cover rounded border"
+                  className="w-full h-24 sm:h-32 object-cover rounded border"
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = 'none';
                   }}
@@ -370,11 +379,11 @@ export default function CategoriesPage() {
               </div>
             )}
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={saving}>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={saving} className="w-full sm:w-auto">
               Cancel
             </Button>
-            <Button onClick={handleSave} disabled={saving}>
+            <Button onClick={handleSave} disabled={saving} className="w-full sm:w-auto">
               {saving ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -390,19 +399,19 @@ export default function CategoriesPage() {
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-[95vw] sm:max-w-[425px]">
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Category</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-base sm:text-lg">Delete Category</AlertDialogTitle>
+            <AlertDialogDescription className="text-xs sm:text-sm">
               Are you sure you want to delete "{categoryToDelete?.name}"? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+            <AlertDialogCancel disabled={deleting} className="w-full sm:w-auto">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={deleting}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 hover:bg-red-700 w-full sm:w-auto"
             >
               {deleting ? (
                 <>

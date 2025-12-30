@@ -108,83 +108,83 @@ export default function AuditLogsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-3xl font-bold tracking-tight">Audit Logs</h2>
-        <p className="text-muted-foreground">Track administrative actions and security events</p>
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Audit Logs</h2>
+        <p className="text-sm sm:text-base text-muted-foreground">Track administrative actions and security events</p>
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
         <Card className="border-purple-200 bg-purple-50/50">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Logs</CardTitle>
-            <FileText className="h-4 w-4 text-purple-600" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium">Total Logs</CardTitle>
+            <FileText className="h-3 w-3 sm:h-4 sm:w-4 text-purple-600" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-purple-700">{stats.total}</div>
-            <p className="text-xs text-purple-600">All audit entries</p>
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-xl sm:text-2xl font-bold text-purple-700">{stats.total}</div>
+            <p className="text-[10px] sm:text-xs text-purple-600">All audit entries</p>
           </CardContent>
         </Card>
 
         <Card className="border-green-200 bg-green-50/50">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Logins</CardTitle>
-            <Shield className="h-4 w-4 text-green-600" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium">Logins</CardTitle>
+            <Shield className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-700">{stats.login}</div>
-            <p className="text-xs text-green-600">Login events</p>
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-xl sm:text-2xl font-bold text-green-700">{stats.login}</div>
+            <p className="text-[10px] sm:text-xs text-green-600">Login events</p>
           </CardContent>
         </Card>
 
         <Card className="border-blue-200 bg-blue-50/50">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">OAuth Logins</CardTitle>
-            <Shield className="h-4 w-4 text-blue-600" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium">OAuth</CardTitle>
+            <Shield className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-700">{stats.oauthLogin}</div>
-            <p className="text-xs text-blue-600">Google OAuth</p>
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-xl sm:text-2xl font-bold text-blue-700">{stats.oauthLogin}</div>
+            <p className="text-[10px] sm:text-xs text-blue-600">Google OAuth</p>
           </CardContent>
         </Card>
 
         <Card className="border-orange-200 bg-orange-50/50">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Password Resets</CardTitle>
-            <Shield className="h-4 w-4 text-orange-600" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium">Resets</CardTitle>
+            <Shield className="h-3 w-3 sm:h-4 sm:w-4 text-orange-600" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-700">{stats.passwordReset}</div>
-            <p className="text-xs text-orange-600">Reset events</p>
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-xl sm:text-2xl font-bold text-orange-700">{stats.passwordReset}</div>
+            <p className="text-[10px] sm:text-xs text-orange-600">Reset events</p>
           </CardContent>
         </Card>
 
-        <Card className="border-red-200 bg-red-50/50">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Deletions</CardTitle>
-            <Shield className="h-4 w-4 text-red-600" />
+        <Card className="border-red-200 bg-red-50/50 col-span-2 sm:col-span-1">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium">Deletions</CardTitle>
+            <Shield className="h-3 w-3 sm:h-4 sm:w-4 text-red-600" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-700">{stats.accountDeleted}</div>
-            <p className="text-xs text-red-600">Account deletions</p>
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-xl sm:text-2xl font-bold text-red-700">{stats.accountDeleted}</div>
+            <p className="text-[10px] sm:text-xs text-red-600">Account deletions</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Filters */}
       <Card>
-        <CardHeader>
-          <CardTitle>Filters</CardTitle>
-          <CardDescription>Filter audit logs by action type and date range</CardDescription>
+        <CardHeader className="p-3 sm:p-6">
+          <CardTitle className="text-base sm:text-lg">Filters</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">Filter audit logs by action type and date range</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Action Type</label>
+        <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+          <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="space-y-1.5 sm:space-y-2">
+              <label className="text-xs sm:text-sm font-medium">Action Type</label>
               <Select value={actionFilter} onValueChange={setActionFilter}>
-                <SelectTrigger>
+                <SelectTrigger className="h-9 sm:h-10">
                   <SelectValue placeholder="Select action" />
                 </SelectTrigger>
                 <SelectContent>
@@ -199,33 +199,38 @@ export default function AuditLogsPage() {
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Start Date</label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <label className="text-xs sm:text-sm font-medium">Start Date</label>
               <Input
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
+                className="h-9 sm:h-10"
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">End Date</label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <label className="text-xs sm:text-sm font-medium">End Date</label>
               <Input
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
+                className="h-9 sm:h-10"
               />
             </div>
 
-            <div className="space-y-2 flex items-end gap-2">
-              <Button onClick={handleApplyFilters} className="flex-1 bg-green-600 hover:bg-green-700">
-                <Filter className="h-4 w-4 mr-2" />
-                Apply
-              </Button>
-              <Button onClick={handleClearFilters} variant="outline" className="flex-1">
-                <X className="h-4 w-4 mr-2" />
-                Clear
-              </Button>
+            <div className="space-y-1.5 sm:space-y-2 flex flex-col justify-end">
+              <label className="text-xs sm:text-sm font-medium sm:invisible">Actions</label>
+              <div className="flex gap-2">
+                <Button onClick={handleApplyFilters} size="sm" className="flex-1 sm:size-default bg-green-600 hover:bg-green-700">
+                  <Filter className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Apply</span>
+                </Button>
+                <Button onClick={handleClearFilters} variant="outline" size="sm" className="flex-1 sm:size-default">
+                  <X className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Clear</span>
+                </Button>
+              </div>
             </div>
           </div>
         </CardContent>
@@ -233,18 +238,18 @@ export default function AuditLogsPage() {
 
       {/* Search */}
       <Card>
-        <CardHeader>
-          <CardTitle>Search Audit Logs</CardTitle>
-          <CardDescription>Search by user email, name, action, or IP address</CardDescription>
+        <CardHeader className="p-3 sm:p-6">
+          <CardTitle className="text-base sm:text-lg">Search Audit Logs</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">Search by user email, name, action, or IP address</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
           <div className="relative">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search audit logs..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 h-9 sm:h-10"
             />
           </div>
         </CardContent>
@@ -252,13 +257,13 @@ export default function AuditLogsPage() {
 
       {/* Audit Logs Table */}
       <Card>
-        <CardHeader>
-          <CardTitle>Audit Log Entries</CardTitle>
-          <CardDescription>
+        <CardHeader className="p-3 sm:p-6">
+          <CardTitle className="text-base sm:text-lg">Audit Log Entries</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             Showing {filteredLogs.length} of {auditLogs.length} audit logs
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
           <AuditLogsTableClient auditLogs={filteredLogs} />
         </CardContent>
       </Card>

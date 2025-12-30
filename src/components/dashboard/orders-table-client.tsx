@@ -639,23 +639,25 @@ export default function OrdersTableClient({
             progress={bulkProgress || undefined}
         />
         
-        <div className="flex justify-end p-4 border-b">
+        <div className="flex justify-end p-3 sm:p-4 border-b">
             <Button
                 variant="outline"
                 size="sm"
                 onClick={handleExportAll}
                 disabled={orders.length === 0 || isBulkProcessing}
+                className="text-xs sm:text-sm"
             >
-                <Download className="h-4 w-4 mr-2" />
-                Export All Orders
+                <Download className="h-4 w-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Export All Orders</span>
+                <span className="sm:hidden">Export</span>
             </Button>
         </div>
 
-        <div className="overflow-x-auto">
-        <Table>
+        <div className="overflow-x-auto -mx-4 sm:mx-0">
+        <Table className="min-w-[600px] sm:min-w-0">
             <TableHeader>
                 <TableRow>
-                    <TableHead className="w-[50px]">
+                    <TableHead className="w-[40px] sm:w-[50px]">
                         <Checkbox
                             checked={isAllSelected}
                             onCheckedChange={handleSelectAll}
@@ -669,7 +671,7 @@ export default function OrdersTableClient({
                         label="Order ID"
                         sortConfig={sortConfig}
                         onSort={onSort}
-                        className="hidden w-[100px] sm:table-cell"
+                        className="w-[80px] sm:w-[100px]"
                     />
                     <SortableTableHeader
                         column="sellerId"
@@ -677,13 +679,13 @@ export default function OrdersTableClient({
                         sortConfig={sortConfig}
                         onSort={onSort}
                     />
-                    <TableHead className="hidden sm:table-cell">Agent</TableHead>
+                    <TableHead className="hidden md:table-cell">Agent</TableHead>
                     <SortableTableHeader
                         column="scrapCategory"
                         label="Category"
                         sortConfig={sortConfig}
                         onSort={onSort}
-                        className="hidden md:table-cell"
+                        className="hidden lg:table-cell"
                     />
                     <SortableTableHeader
                         column="status"
@@ -696,7 +698,7 @@ export default function OrdersTableClient({
                         label="Pickup Date"
                         sortConfig={sortConfig}
                         onSort={onSort}
-                        className="hidden lg:table-cell"
+                        className="hidden xl:table-cell"
                     />
                     <SortableTableHeader
                         column="totalAmount"
@@ -706,10 +708,10 @@ export default function OrdersTableClient({
                         className="hidden sm:table-cell"
                         align="right"
                     />
-                     <TableHead className="hidden xl:table-cell">
+                     <TableHead className="hidden 2xl:table-cell">
                         Address
                     </TableHead>
-                    <TableHead>
+                    <TableHead className="w-[50px]">
                         <span className="sr-only">Actions</span>
                     </TableHead>
                 </TableRow>
@@ -723,7 +725,7 @@ export default function OrdersTableClient({
                             key={order.id} 
                             className={`${isUpdating ? 'opacity-50' : ''} ${isSelected ? 'bg-muted/50' : ''}`}
                         >
-                            <TableCell>
+                            <TableCell className="p-2 sm:p-4">
                                 <Checkbox
                                     checked={isSelected}
                                     onCheckedChange={(checked) => handleSelectOrder(order.id, checked as boolean)}
@@ -731,37 +733,39 @@ export default function OrdersTableClient({
                                     disabled={isBulkProcessing}
                                 />
                             </TableCell>
-                            <TableCell className="hidden sm:table-cell font-medium">{order.id}</TableCell>
-                            <TableCell>
-                                <div className="font-medium">{order.sellerId}</div>
+                            <TableCell className="p-2 sm:p-4 font-medium text-xs sm:text-sm">{order.id}</TableCell>
+                            <TableCell className="p-2 sm:p-4">
+                                <div className="font-medium text-xs sm:text-sm truncate max-w-[120px] sm:max-w-none">{order.sellerId}</div>
                                 {order.customerPhone && (
                                     <div className="text-xs text-muted-foreground flex items-center gap-1">
                                         <Phone className="h-3 w-3" />
-                                        {order.customerPhone}
+                                        <span className="truncate">{order.customerPhone}</span>
                                     </div>
                                 )}
-                                <div className="text-xs text-muted-foreground sm:hidden">
-                                    {order.scrapCategory} • ₹{typeof order.totalAmount === 'number' ? order.totalAmount.toFixed(2) : 'N/A'}
+                                {/* Mobile-only: show extra info */}
+                                <div className="text-xs text-muted-foreground md:hidden mt-1">
+                                    {order.agentId && <span className="block">Agent: {order.agentId}</span>}
+                                    <span className="sm:hidden">₹{typeof order.totalAmount === 'number' ? order.totalAmount.toFixed(0) : 'N/A'}</span>
                                 </div>
                             </TableCell>
-                            <TableCell className="hidden sm:table-cell">{order.agentId || "Unassigned"}</TableCell>
-                            <TableCell className="hidden md:table-cell">{order.scrapCategory}</TableCell>
-                            <TableCell>
-                                <Badge variant={statusVariant[order.status] || 'secondary'} className="capitalize text-xs">
+                            <TableCell className="hidden md:table-cell p-2 sm:p-4 text-sm">{order.agentId || "Unassigned"}</TableCell>
+                            <TableCell className="hidden lg:table-cell p-2 sm:p-4 text-sm">{order.scrapCategory}</TableCell>
+                            <TableCell className="p-2 sm:p-4">
+                                <Badge variant={statusVariant[order.status] || 'secondary'} className="capitalize text-[10px] sm:text-xs whitespace-nowrap">
                                     {order.status.replace(/_/g, ' ')}
                                 </Badge>
                             </TableCell>
-                            <TableCell className="hidden lg:table-cell">
+                            <TableCell className="hidden xl:table-cell p-2 sm:p-4 text-sm">
                                 {format(new Date(order.pickupTime), "PPp")}
                             </TableCell>
-                            <TableCell className="hidden sm:table-cell text-right">₹{typeof order.totalAmount === 'number' ? order.totalAmount.toFixed(2) : 'N/A'}</TableCell>
-                             <TableCell className="hidden xl:table-cell">
-                                <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.pickupAddress)}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-primary hover:underline">
+                            <TableCell className="hidden sm:table-cell p-2 sm:p-4 text-right text-sm">₹{typeof order.totalAmount === 'number' ? order.totalAmount.toFixed(2) : 'N/A'}</TableCell>
+                             <TableCell className="hidden 2xl:table-cell p-2 sm:p-4">
+                                <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.pickupAddress)}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-primary hover:underline text-sm">
                                     <MapPin className="w-4 h-4" />
                                     View Map
                                 </a>
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="p-2 sm:p-4">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button
@@ -872,12 +876,12 @@ export default function OrdersTableClient({
         </Table>
         </div>
         {totalPages > 1 && (
-            <div className="mt-4 flex flex-col items-center gap-2 sm:flex-row sm:justify-between">
-                <div className="text-sm text-muted-foreground">
+            <div className="mt-4 px-3 sm:px-0 flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
+                <div className="text-xs sm:text-sm text-muted-foreground order-2 sm:order-1">
                     Page {currentPage} of {totalPages}
                 </div>
-                <Pagination>
-                    <PaginationContent>
+                <Pagination className="order-1 sm:order-2">
+                    <PaginationContent className="gap-1">
                         <PaginationItem>
                             <PaginationPrevious 
                                 href="#"
@@ -885,7 +889,7 @@ export default function OrdersTableClient({
                                     e.preventDefault();
                                     setCurrentPage(p => Math.max(1, p - 1));
                                 }}
-                                className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                className={`h-8 sm:h-9 px-2 sm:px-3 text-xs sm:text-sm ${currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}`}
                             />
                         </PaginationItem>
                         {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
@@ -908,7 +912,7 @@ export default function OrdersTableClient({
                                             setCurrentPage(page);
                                         }}
                                         isActive={currentPage === page}
-                                        className="cursor-pointer"
+                                        className="cursor-pointer h-8 sm:h-9 w-8 sm:w-9 text-xs sm:text-sm"
                                     >
                                         {page}
                                     </PaginationLink>
@@ -922,7 +926,7 @@ export default function OrdersTableClient({
                                     e.preventDefault();
                                     setCurrentPage(p => Math.min(totalPages, p + 1));
                                 }}
-                                className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                className={`h-8 sm:h-9 px-2 sm:px-3 text-xs sm:text-sm ${currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}`}
                             />
                         </PaginationItem>
                     </PaginationContent>
