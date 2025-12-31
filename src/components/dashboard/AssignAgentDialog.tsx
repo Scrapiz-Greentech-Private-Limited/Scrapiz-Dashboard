@@ -73,31 +73,23 @@ export function AssignAgentDialog({
   /**
    * Fetch eligible agents
    * Requirements: 10.2 - Filter: status='active' OR status='onboarding'
+   * Also includes agents without any service areas assigned
    */
   const fetchEligibleAgents = useCallback(async () => {
     setLoading(true);
     setError(null);
     
     try {
-      // Fetch active agents
-      const activeResponse = await AgentService.getAgents({ 
-        status: 'active',
-        page_size: 100 
-      });
-      
-      // Fetch onboarding agents
-      const onboardingResponse = await AgentService.getAgents({ 
-        status: 'onboarding',
-        page_size: 100 
-      });
-      
-      // Combine and deduplicate
-      const allAgents = [...activeResponse.results, ...onboardingResponse.results];
-      const uniqueAgents = allAgents.filter((agent, index, self) => 
-        index === self.findIndex(a => a.id === agent.id)
+      // Use the eligible agents endpoint with include_onboarding and include_unassigned flags
+      // This returns agents that are active/onboarding, not rejected KYC, and includes
+      // agents without any service areas assigned
+      const agents = await AgentService.getEligibleAgents(
+        undefined, // no pincode filter
+        true,      // include onboarding agents
+        true       // include agents without service areas
       );
       
-      setAgents(uniqueAgents);
+      setAgents(agents);
     } catch (err: any) {
       const errorMessage = err.message || 'Failed to load agents';
       setError(errorMessage);

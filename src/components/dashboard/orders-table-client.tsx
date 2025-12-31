@@ -179,10 +179,14 @@ export default function OrdersTableClient({
         setSelectedAgentId("");
         setAssignAgentDialogOpen(true);
         
-        // Fetch eligible agents
+        // Fetch eligible agents (including those without service areas)
         setLoadingAgents(true);
         try {
-            const agents = await AgentService.getEligibleAgents();
+            const agents = await AgentService.getEligibleAgents(
+                undefined, // no pincode filter
+                true,      // include onboarding agents
+                true       // include agents without service areas
+            );
             setEligibleAgents(agents);
         } catch (error: any) {
             console.error('Failed to fetch eligible agents:', error);

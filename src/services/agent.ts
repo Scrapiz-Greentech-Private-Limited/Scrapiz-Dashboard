@@ -221,13 +221,18 @@ export class AgentService {
 
   /**
    * Get eligible agents for order dispatch or service area assignment
-   * Optionally filter by pincode and include onboarding agents
+   * Optionally filter by pincode, include onboarding agents, and include unassigned agents
    */
-  static async getEligibleAgents(pincode?: string, includeOnboarding?: boolean): Promise<AgentListItem[]> {
+  static async getEligibleAgents(
+    pincode?: string, 
+    includeOnboarding?: boolean,
+    includeUnassigned?: boolean
+  ): Promise<AgentListItem[]> {
     try {
       const queryParams = new URLSearchParams();
       if (pincode) queryParams.append('pincode', pincode);
       if (includeOnboarding) queryParams.append('include_onboarding', 'true');
+      if (includeUnassigned) queryParams.append('include_unassigned', 'true');
       
       const queryString = queryParams.toString();
       const url = `${this.BASE_PATH}/eligible/${queryString ? `?${queryString}` : ''}`;
