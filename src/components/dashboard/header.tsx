@@ -38,7 +38,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { usePathname, useRouter } from "next/navigation";
 import Navigation from "./navigation";
 
@@ -83,6 +83,7 @@ export default function Header() {
           </Button>
         </SheetTrigger>
         <SheetContent side="left" className="sm:max-w-xs p-0" aria-describedby="navigation-description">
+          <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
           <div className="sr-only" id="navigation-description">Navigation menu</div>
           <Navigation isMobile={true} />
         </SheetContent>
