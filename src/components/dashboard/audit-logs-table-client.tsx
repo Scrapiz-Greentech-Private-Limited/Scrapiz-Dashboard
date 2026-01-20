@@ -16,10 +16,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { AuditLog } from "@/components/backend/apiService"
-import { Eye, User, Shield, LogIn, LogOut, Key, Trash2, Calendar, MapPin } from "lucide-react"
+import { Eye, User, Shield, LogIn, LogOut, Key, Trash2, Calendar, MapPin, MoreVertical, MessageSquare } from "lucide-react"
 import { format } from 'date-fns'
 
 interface AuditLogsTableClientProps {
@@ -29,6 +35,7 @@ interface AuditLogsTableClientProps {
 export default function AuditLogsTableClient({ auditLogs }: AuditLogsTableClientProps) {
   const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null)
   const [detailsOpen, setDetailsOpen] = useState(false)
+  const [feedbackOpen, setFeedbackOpen] = useState(false)
 
   const getActionIcon = (action: string) => {
     switch (action) {
@@ -83,6 +90,23 @@ export default function AuditLogsTableClient({ auditLogs }: AuditLogsTableClient
     setDetailsOpen(true)
   }
 
+  const handleViewFeedback = (log: AuditLog) => {
+    setSelectedLog(log)
+    setFeedbackOpen(true)
+  }
+
+  const getReasonLabel = (reason: string) => {
+    const labels: Record<string, string> = {
+      'better_alternative': 'Found a better alternative',
+      'not_using': 'Not using the service anymore',
+      'privacy_concerns': 'Privacy concerns',
+      'difficult_to_use': 'Difficult to use',
+      'other': 'Other',
+      'not_specified': 'Not specified'
+    }
+    return labels[reason] || reason
+  }
+
   if (auditLogs.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
@@ -120,6 +144,12 @@ export default function AuditLogsTableClient({ auditLogs }: AuditLogsTableClient
                         <span className="font-medium">{log.user.name}</span>
                         <span className="block truncate max-w-[150px]">{log.user.email}</span>
                       </div>
+                    ) : log.action === 'account_deleted' && log.deleted_user_email ? (
+                      <div className="text-xs text-muted-foreground">
+                        <span className="font-medium">{log.deleted_user_name || 'Deleted User'}</span>
+                        <span className="block truncate max-w-[150px]">{log.deleted_user_email}</span>
+                        <Badge variant="outline" className="text-[9px] mt-0.5 text-red-600 border-red-200">Deleted</Badge>
+                      </div>
                     ) : (
                       <span className="text-xs text-muted-foreground italic">System</span>
                     )}
@@ -133,6 +163,15 @@ export default function AuditLogsTableClient({ auditLogs }: AuditLogsTableClient
                         <span className="font-medium text-xs sm:text-sm">{log.user.name}</span>
                       </div>
                       <div className="text-xs text-muted-foreground truncate max-w-[150px] lg:max-w-none">{log.user.email}</div>
+                    </div>
+                  ) : log.action === 'account_deleted' && log.deleted_user_email ? (
+                    <div className="space-y-0.5 sm:space-y-1">
+                      <div className="flex items-center gap-1.5 sm:gap-2">
+                        <User className="h-3 w-3 sm:h-4 sm:w-4 text-red-500" />
+                        <span className="font-medium text-xs sm:text-sm">{log.deleted_user_name || 'Deleted User'}</span>
+                      </div>
+                      <div className="text-xs text-muted-foreground truncate max-w-[150px] lg:max-w-none">{log.deleted_user_email}</div>
+                      <Badge variant="outline" className="text-[10px] text-red-600 border-red-200">Account Deleted</Badge>
                     </div>
                   ) : (
                     <span className="text-muted-foreground italic text-xs sm:text-sm">System</span>
@@ -152,15 +191,25 @@ export default function AuditLogsTableClient({ auditLogs }: AuditLogsTableClient
                   )}
                 </TableCell>
                 <TableCell className="text-right">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 w-8 p-0 sm:h-9 sm:w-auto sm:px-3"
-                    onClick={() => handleViewDetails(log)}
-                  >
-                    <Eye className="h-4 w-4 sm:mr-2" />
-                    <span className="hidden sm:inline">View</span>
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleViewDetails(log)}>
+                        <Eye className="h-4 w-4 mr-2" />
+                        View Details
+                      </DropdownMenuItem>
+                      {log.action === 'account_deleted' && (log.deletion_feedback || log.deleted_user_email) && (
+                        <DropdownMenuItem onClick={() => handleViewFeedback(log)}>
+                          <MessageSquare className="h-4 w-4 mr-2" />
+                          View Deletion Reason
+                        </DropdownMenuItem>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </TableCell>
               </TableRow>
             ))}
@@ -213,6 +262,20 @@ export default function AuditLogsTableClient({ auditLogs }: AuditLogsTableClient
                       User ID: {selectedLog.user.id}
                     </div>
                   </div>
+                ) : selectedLog.action === 'account_deleted' && selectedLog.deleted_user_email ? (
+                  <div className="mt-1.5 sm:mt-2 space-y-1.5 sm:space-y-2 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <User className="h-3 w-3 sm:h-4 sm:w-4 text-red-500" />
+                      <span className="font-medium text-sm sm:text-base">{selectedLog.deleted_user_name || 'Deleted User'}</span>
+                      <Badge variant="outline" className="text-[10px] text-red-600 border-red-300">Deleted</Badge>
+                    </div>
+                    <div className="text-xs sm:text-sm text-muted-foreground break-all">
+                      Email: {selectedLog.deleted_user_email}
+                    </div>
+                    <div className="text-xs sm:text-sm text-muted-foreground">
+                      Original User ID: {selectedLog.deleted_user_id}
+                    </div>
+                  </div>
                 ) : (
                   <div className="mt-1.5 sm:mt-2 p-3 sm:p-4 bg-muted rounded-lg">
                     <span className="text-muted-foreground italic text-sm">System action (no user associated)</span>
@@ -237,6 +300,37 @@ export default function AuditLogsTableClient({ auditLogs }: AuditLogsTableClient
                 </div>
               </div>
 
+              {/* Deletion Feedback Preview (if available) */}
+              {selectedLog.action === 'account_deleted' && selectedLog.deletion_feedback && (
+                <div>
+                  <label className="text-xs sm:text-sm font-medium text-muted-foreground">Deletion Feedback</label>
+                  <div className="mt-1.5 sm:mt-2 p-3 sm:p-4 bg-orange-50 border border-orange-200 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <MessageSquare className="h-4 w-4 text-orange-600" />
+                      <span className="font-medium text-sm text-orange-800">
+                        {selectedLog.deletion_feedback.reason_display || getReasonLabel(selectedLog.deletion_feedback.reason)}
+                      </span>
+                    </div>
+                    {selectedLog.deletion_feedback.comments && (
+                      <p className="text-xs sm:text-sm text-muted-foreground mt-2">
+                        &quot;{selectedLog.deletion_feedback.comments}&quot;
+                      </p>
+                    )}
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="mt-3"
+                      onClick={() => {
+                        setDetailsOpen(false)
+                        setFeedbackOpen(true)
+                      }}
+                    >
+                      View Full Feedback
+                    </Button>
+                  </div>
+                </div>
+              )}
+
               {/* Log ID */}
               <div>
                 <label className="text-xs sm:text-sm font-medium text-muted-foreground">Log ID</label>
@@ -244,6 +338,94 @@ export default function AuditLogsTableClient({ auditLogs }: AuditLogsTableClient
                   <span className="font-mono text-xs sm:text-sm break-all">{selectedLog.id}</span>
                 </div>
               </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Deletion Feedback Dialog */}
+      <Dialog open={feedbackOpen} onOpenChange={setFeedbackOpen}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto mx-4 sm:mx-auto">
+          <DialogHeader>
+            <DialogTitle className="text-base sm:text-lg flex items-center gap-2">
+              <Trash2 className="h-5 w-5 text-red-500" />
+              Account Deletion Feedback
+            </DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm">
+              Feedback provided by the user when deleting their account
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedLog && (
+            <div className="space-y-4 sm:space-y-6">
+              {/* User Info */}
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <User className="h-4 w-4 text-red-500" />
+                  <span className="font-medium">{selectedLog.deleted_user_name || selectedLog.user?.name || 'Unknown User'}</span>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {selectedLog.deleted_user_email || selectedLog.user?.email || 'No email'}
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  User ID: {selectedLog.deleted_user_id || selectedLog.user?.id || 'N/A'}
+                </div>
+              </div>
+
+              {/* Deletion Reason */}
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Reason for Deletion</label>
+                <div className="mt-2 p-4 bg-orange-50 border border-orange-200 rounded-lg">
+                  {selectedLog.deletion_feedback ? (
+                    <>
+                      <Badge className="bg-orange-100 text-orange-800 hover:bg-orange-100">
+                        {selectedLog.deletion_feedback.reason_display || getReasonLabel(selectedLog.deletion_feedback.reason)}
+                      </Badge>
+                      <div className="text-xs text-muted-foreground mt-2">
+                        Reason code: {selectedLog.deletion_feedback.reason}
+                      </div>
+                    </>
+                  ) : (
+                    <span className="text-muted-foreground italic">No feedback provided</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Comments */}
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Additional Comments</label>
+                <div className="mt-2 p-4 bg-muted rounded-lg min-h-[80px]">
+                  {selectedLog.deletion_feedback?.comments ? (
+                    <p className="text-sm whitespace-pre-wrap">{selectedLog.deletion_feedback.comments}</p>
+                  ) : (
+                    <span className="text-muted-foreground italic text-sm">No additional comments provided</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Deletion Timestamp */}
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Deleted At</label>
+                <div className="mt-2 flex items-center gap-2 p-3 bg-muted rounded-lg">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm">
+                    {selectedLog.deletion_feedback?.deleted_at 
+                      ? formatTimestamp(selectedLog.deletion_feedback.deleted_at)
+                      : formatTimestamp(selectedLog.timestamp)}
+                  </span>
+                </div>
+              </div>
+
+              {/* IP Address */}
+              {selectedLog.ip_address && (
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">IP Address</label>
+                  <div className="mt-2 flex items-center gap-2 p-3 bg-muted rounded-lg">
+                    <MapPin className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-mono text-sm">{selectedLog.ip_address}</span>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </DialogContent>

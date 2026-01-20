@@ -5,6 +5,16 @@ import {
   ListFilter,
   Search,
   RefreshCw,
+  User,
+  Package,
+  Calendar,
+  MapPin,
+  Phone,
+  MoreVertical,
+  Eye,
+  UserPlus,
+  XCircle,
+  CheckCircle,
 } from "lucide-react"
 import {
   DropdownMenu,
@@ -13,6 +23,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuItem,
 } from "@/components/ui/dropdown-menu"
 import {
   Tabs,
@@ -29,6 +40,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 
+import { Badge } from "@/components/ui/badge"
 import OrdersTableClient from "@/components/dashboard/orders-table-client"
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -143,6 +155,168 @@ const mapBackendStatus = (backendStatus: string): OrderStatus => {
   return statusMap[backendStatus.toLowerCase()] || 'pending';
 };
 
+// Status badge styling
+const getStatusBadge = (status: OrderStatus) => {
+  const styles: Record<OrderStatus, { className: string; label: string }> = {
+    pending: { className: 'bg-orange-100 text-orange-700 border-orange-200', label: 'Pending' },
+    scheduled: { className: 'bg-blue-100 text-blue-700 border-blue-200', label: 'Scheduled' },
+    transit: { className: 'bg-purple-100 text-purple-700 border-purple-200', label: 'In Transit' },
+    completed: { className: 'bg-green-100 text-green-700 border-green-200', label: 'Completed' },
+    cancelled: { className: 'bg-red-100 text-red-700 border-red-200', label: 'Cancelled' },
+  };
+  return styles[status] || styles.pending;
+};
+
+// Mobile Order Card Component
+function MobileOrderCard({ order, onViewDetails }: { order: Order; onViewDetails?: (order: Order) => void }) {
+  const statusBadge = getStatusBadge(order.status);
+  const formattedDate = order.createdAt 
+    ? new Date(order.createdAt).toLocaleDateString('en-IN', { 
+        month: 'short', 
+        day: 'numeric', 
+        year: 'numeric' 
+      }) + ' • ' + new Date(order.createdAt).toLocaleTimeString('en-IN', { 
+        hour: 'numeric', 
+        minute: '2-digit',
+        hour12: true 
+      })
+    : 'N/A';
+
+  return (
+    <Card className="border-gray-200 hover:shadow-md transition-shadow">
+      <CardContent className="p-4">
+        {/* Header: Order ID + Status + Menu */}
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Order ID</p>
+            <p className="font-semibold text-sm">{order.id}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className={`text-[10px] px-2 py-0.5 ${statusBadge.className}`}>
+              {statusBadge.label}
+            </Badge>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                  <MoreVertical className="h-4 w-4" />
+                  <span className="sr-only">Open menu</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => onViewDetails?.(order)}>
+                  <Eye className="h-4 w-4 mr-2" />
+                  View Details
+                </DropdownMenuItem>
+                {order.status === 'pending' && (
+                  <DropdownMenuItem>
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    Assign Agent
+                  </DropdownMenuItem>
+                )}
+                {order.status !== 'completed' && order.status !== 'cancelled' && (
+                  <DropdownMenuItem>
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Mark Complete
+                  </DropdownMenuItem>
+                )}
+                {order.status !== 'cancelled' && order.status !== 'completed' && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="text-red-600">
+                      <XCircle className="h-4 w-4 mr-2" />
+                      Cancel Order
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+
+        {/* Customer Info */}
+        <div className="flex items-center gap-2 mb-2">
+          <User className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+          <div className="min-w-0 flex-1">
+            <p className="text-sm truncate">{order.sellerId}</p>
+            {order.customerPhone && (
+              <p className="text-xs text-muted-foreground">{order.customerPhone}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Category */}
+        <div className="flex items-center gap-2 mb-2">
+          <Package className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+          <p className="text-sm truncate">{order.scrapCategory}</p>
+        </div>
+
+        {/* Date */}
+        <div className="flex items-center gap-2 mb-3">
+          <Calendar className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+          <p className="text-sm text-muted-foreground">{formattedDate}</p>
+        </div>
+
+        {/* Footer: View Map + Price */}
+        <div className="flex items-center justify-between pt-3 border-t">
+          <button className="flex items-center gap-1 text-green-600 text-sm font-medium">
+            <MapPin className="h-3.5 w-3.5" />
+            View Map
+          </button>
+          <p className="text-lg font-bold text-green-700">₹{formatCurrency(order.totalAmount, 2)}</p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Mobile Orders List Component
+function MobileOrdersList({ orders, loading, onViewDetails }: { orders: Order[]; loading: boolean; onViewDetails?: (order: Order) => void }) {
+  if (loading) {
+    return (
+      <div className="space-y-3 p-4">
+        {[1, 2, 3].map((i) => (
+          <Card key={i} className="border-gray-200">
+            <CardContent className="p-4">
+              <div className="animate-pulse space-y-3">
+                <div className="flex justify-between">
+                  <div className="h-4 bg-gray-200 rounded w-24" />
+                  <div className="h-5 bg-gray-200 rounded w-16" />
+                </div>
+                <div className="h-4 bg-gray-200 rounded w-3/4" />
+                <div className="h-4 bg-gray-200 rounded w-1/2" />
+                <div className="h-4 bg-gray-200 rounded w-2/3" />
+                <div className="flex justify-between pt-2 border-t">
+                  <div className="h-4 bg-gray-200 rounded w-20" />
+                  <div className="h-5 bg-gray-200 rounded w-16" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
+  if (orders.length === 0) {
+    return (
+      <div className="p-8 text-center">
+        <Package className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+        <p className="text-muted-foreground">No orders found</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3 p-4">
+      {orders.map((order) => (
+        <MobileOrderCard key={order.id} order={order} onViewDetails={onViewDetails} />
+      ))}
+    </div>
+  );
+}
+
 export default function OrdersPage() {
   const searchParams = useSearchParams();
   const [orders, setOrders] = useState<Order[]>([]);
@@ -250,8 +424,44 @@ export default function OrdersPage() {
         </Button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5 md:gap-4">
+      {/* Stats Cards - Horizontal scroll on mobile */}
+      <div className="sm:hidden">
+        <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          <Card className="min-w-[120px] flex-shrink-0 border-green-200 bg-gradient-to-br from-green-50 to-white cursor-pointer" onClick={() => setActiveTab('all')}>
+            <CardContent className="p-3">
+              <p className="text-[10px] text-green-700 font-medium">Total Orders</p>
+              <p className="text-xl font-bold text-green-900">{stats.total}</p>
+            </CardContent>
+          </Card>
+          <Card className="min-w-[120px] flex-shrink-0 border-orange-200 bg-gradient-to-br from-orange-50 to-white cursor-pointer" onClick={() => setActiveTab('pending')}>
+            <CardContent className="p-3">
+              <p className="text-[10px] text-orange-700 font-medium">Pending</p>
+              <p className="text-xl font-bold text-orange-900">{stats.pending}</p>
+            </CardContent>
+          </Card>
+          <Card className="min-w-[120px] flex-shrink-0 border-blue-200 bg-gradient-to-br from-blue-50 to-white cursor-pointer" onClick={() => setActiveTab('scheduled')}>
+            <CardContent className="p-3">
+              <p className="text-[10px] text-blue-700 font-medium">Scheduled</p>
+              <p className="text-xl font-bold text-blue-900">{stats.scheduled}</p>
+            </CardContent>
+          </Card>
+          <Card className="min-w-[120px] flex-shrink-0 border-purple-200 bg-gradient-to-br from-purple-50 to-white cursor-pointer" onClick={() => setActiveTab('transit')}>
+            <CardContent className="p-3">
+              <p className="text-[10px] text-purple-700 font-medium">In Transit</p>
+              <p className="text-xl font-bold text-purple-900">{stats.transit}</p>
+            </CardContent>
+          </Card>
+          <Card className="min-w-[120px] flex-shrink-0 border-emerald-200 bg-gradient-to-br from-emerald-50 to-white cursor-pointer" onClick={() => setActiveTab('completed')}>
+            <CardContent className="p-3">
+              <p className="text-[10px] text-emerald-700 font-medium">Completed</p>
+              <p className="text-xl font-bold text-emerald-900">{stats.completed}</p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Stats Cards - Grid on tablet/desktop */}
+      <div className="hidden sm:grid grid-cols-3 md:grid-cols-5 gap-3 md:gap-4">
         <Card className="border-green-200 bg-gradient-to-br from-green-50 to-white dark:from-green-950 dark:to-background hover:shadow-md transition-shadow cursor-pointer" onClick={() => setActiveTab('all')}>
           <CardHeader className="p-3 pb-1 sm:p-4 sm:pb-2">
             <CardTitle className="text-xs sm:text-sm font-medium text-green-700 dark:text-green-300">Total Orders</CardTitle>
@@ -292,7 +502,7 @@ export default function OrdersPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950 dark:to-background hover:shadow-md transition-shadow cursor-pointer col-span-2 sm:col-span-1" onClick={() => setActiveTab('completed')}>
+        <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950 dark:to-background hover:shadow-md transition-shadow cursor-pointer" onClick={() => setActiveTab('completed')}>
           <CardHeader className="p-3 pb-1 sm:p-4 sm:pb-2">
             <CardTitle className="text-xs sm:text-sm font-medium text-emerald-700 dark:text-emerald-300">Completed</CardTitle>
           </CardHeader>
@@ -356,7 +566,16 @@ export default function OrdersPage() {
           </div>
         </div>
       <TabsContent value="all">
-        <Card>
+        {/* Mobile View */}
+        <div className="sm:hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-50/50">
+            <p className="text-sm font-medium">All Orders</p>
+            <p className="text-xs text-muted-foreground">{filteredOrders.length} orders</p>
+          </div>
+          <MobileOrdersList orders={filteredOrders} loading={loading} />
+        </div>
+        {/* Desktop View */}
+        <Card className="hidden sm:block">
             <CardHeader className="p-4 sm:p-6">
                 <CardTitle className="text-base sm:text-lg">All Orders</CardTitle>
                 <CardDescription className="text-xs sm:text-sm">
@@ -375,7 +594,16 @@ export default function OrdersPage() {
         </Card>
       </TabsContent>
       <TabsContent value="pending">
-        <Card>
+        {/* Mobile View */}
+        <div className="sm:hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-50/50">
+            <p className="text-sm font-medium">Pending Orders</p>
+            <p className="text-xs text-muted-foreground">{filteredOrders.length} orders</p>
+          </div>
+          <MobileOrdersList orders={filteredOrders} loading={loading} />
+        </div>
+        {/* Desktop View */}
+        <Card className="hidden sm:block">
             <CardHeader className="p-4 sm:p-6">
                 <CardTitle className="text-base sm:text-lg">Pending Orders</CardTitle>
                 <CardDescription className="text-xs sm:text-sm">
@@ -394,7 +622,16 @@ export default function OrdersPage() {
         </Card>
       </TabsContent>
        <TabsContent value="scheduled">
-        <Card>
+        {/* Mobile View */}
+        <div className="sm:hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-50/50">
+            <p className="text-sm font-medium">Scheduled Orders</p>
+            <p className="text-xs text-muted-foreground">{filteredOrders.length} orders</p>
+          </div>
+          <MobileOrdersList orders={filteredOrders} loading={loading} />
+        </div>
+        {/* Desktop View */}
+        <Card className="hidden sm:block">
             <CardHeader className="p-4 sm:p-6">
                 <CardTitle className="text-base sm:text-lg">Scheduled Orders</CardTitle>
                 <CardDescription className="text-xs sm:text-sm">
@@ -413,7 +650,16 @@ export default function OrdersPage() {
         </Card>
       </TabsContent>
        <TabsContent value="transit">
-        <Card>
+        {/* Mobile View */}
+        <div className="sm:hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-50/50">
+            <p className="text-sm font-medium">In Transit Orders</p>
+            <p className="text-xs text-muted-foreground">{filteredOrders.length} orders</p>
+          </div>
+          <MobileOrdersList orders={filteredOrders} loading={loading} />
+        </div>
+        {/* Desktop View */}
+        <Card className="hidden sm:block">
             <CardHeader className="p-4 sm:p-6">
                 <CardTitle className="text-base sm:text-lg">In Transit Orders</CardTitle>
                 <CardDescription className="text-xs sm:text-sm">
@@ -432,7 +678,16 @@ export default function OrdersPage() {
         </Card>
       </TabsContent>
        <TabsContent value="completed">
-        <Card>
+        {/* Mobile View */}
+        <div className="sm:hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-50/50">
+            <p className="text-sm font-medium">Completed Orders</p>
+            <p className="text-xs text-muted-foreground">{filteredOrders.length} orders</p>
+          </div>
+          <MobileOrdersList orders={filteredOrders} loading={loading} />
+        </div>
+        {/* Desktop View */}
+        <Card className="hidden sm:block">
             <CardHeader className="p-4 sm:p-6">
                 <CardTitle className="text-base sm:text-lg">Completed Orders</CardTitle>
                 <CardDescription className="text-xs sm:text-sm">
@@ -451,7 +706,16 @@ export default function OrdersPage() {
         </Card>
       </TabsContent>
       <TabsContent value="cancelled">
-        <Card>
+        {/* Mobile View */}
+        <div className="sm:hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-50/50">
+            <p className="text-sm font-medium">Cancelled Orders</p>
+            <p className="text-xs text-muted-foreground">{filteredOrders.length} orders</p>
+          </div>
+          <MobileOrdersList orders={filteredOrders} loading={loading} />
+        </div>
+        {/* Desktop View */}
+        <Card className="hidden sm:block">
             <CardHeader className="p-4 sm:p-6">
                 <CardTitle className="text-base sm:text-lg">Cancelled Orders</CardTitle>
                 <CardDescription className="text-xs sm:text-sm">

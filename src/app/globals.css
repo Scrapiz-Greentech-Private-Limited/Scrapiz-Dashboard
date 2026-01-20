@@ -114,6 +114,16 @@ body {
     @apply max-w-full overflow-x-hidden;
   }
   
+  /* Hide scrollbar for horizontal scroll containers */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
   /* Better touch targets for mobile */
   .touch-target {
     @apply min-h-[44px] min-w-[44px];

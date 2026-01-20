@@ -48,6 +48,7 @@ import { AssignAgentDialog } from "@/components/dashboard/AssignAgentDialog";
 import { RemoveAgentDialog } from "@/components/dashboard/RemoveAgentDialog";
 import { MapViewDialog } from "@/components/dashboard/MapViewDialog";
 import { AreasManagementDialog } from "@/components/dashboard/AreasManagementDialog";
+import SellScreenEnforcementToggle from "@/components/SellScreenEnforcementToggle";
 import type { AgentListItem, Agent } from "@/types/agent";
 import type { 
   ServiceableCity, 
@@ -1062,6 +1063,9 @@ export default function ServiceAreasPage() {
 
       {/* Statistics Cards */}
       {renderStatsCards()}
+
+      {/* Sell Screen Enforcement Toggle */}
+      <SellScreenEnforcementToggle />
 
       {/* Filters - Task 6.4 */}
       <Card className="border-green-100">

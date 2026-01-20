@@ -1741,6 +1741,17 @@ export interface AuditLog {
   action: string;
   ip_address: string | null;
   timestamp: string;
+  // Fields for account_deleted actions
+  deleted_user_id?: number | null;
+  deleted_user_email?: string | null;
+  deleted_user_name?: string | null;
+  deletion_feedback?: {
+    id: number;
+    reason: string;
+    reason_display: string;
+    comments?: string | null;
+    deleted_at?: string | null;
+  } | null;
 }
 
 export interface AuditLogFilters {
