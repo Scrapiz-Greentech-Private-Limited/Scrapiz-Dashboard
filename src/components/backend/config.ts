@@ -1,5 +1,7 @@
 // API Configuration
-const FRONTEND_KEY =  'Scrapiz#0nn$(tab!z';
+const FRONTEND_KEY =
+  process.env.NEXT_PUBLIC_ADMIN_FRONTEND_SECRET ||
+  process.env.NEXT_PUBLIC_FRONTEND_SECRET ; 
 
 export const API_CONFIG = {
   BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.scrapiz.in/api',

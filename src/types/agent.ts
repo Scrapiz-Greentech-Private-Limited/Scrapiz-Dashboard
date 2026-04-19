@@ -146,6 +146,8 @@ export interface Agent {
   email: string;
   address: string;
   profile_image_url: string | null;
+  can_be_vendor: boolean;
+  imported_vendor: number | null;
   
   // Status fields
   status: AgentStatus;
@@ -200,6 +202,8 @@ export interface AgentListItem {
   phone: string;
   email: string;
   profile_image_url: string | null;
+  can_be_vendor: boolean;
+  imported_vendor: number | null;
   status: AgentStatus;
   status_display: string;
   kyc_status: KycStatus;
@@ -248,6 +252,7 @@ export interface UpdateAgentRequest {
   email?: string;
   address?: string;
   profile_image_url?: string | null;
+  can_be_vendor?: boolean;
   status?: AgentStatus;
   availability?: AvailabilityStatus;
   vehicle_number?: string | null;
@@ -313,6 +318,11 @@ export interface AgentListResponse {
   next: string | null;
   previous: string | null;
   results: AgentListItem[];
+}
+
+export interface AgentImportResult {
+  imported: Array<{ agent_id: number; vendor_id: number }>;
+  skipped: Array<{ agent_id: number; reason: string }>;
 }
 
 /**

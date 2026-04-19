@@ -89,6 +89,7 @@ export interface ScrapCategory {
 export interface Payment {
   id: string;
   userId: string;
+  userName?: string;
   orderId: string;
   amount: number;
   type: PaymentType;

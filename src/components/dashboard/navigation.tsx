@@ -16,6 +16,7 @@ import {
   CreditCard,
   Settings,
   Truck,
+  Store,
   Map,
   Wrench,
   Gift,
@@ -39,6 +40,7 @@ const navItems = [
   { href: '/dashboard/carousel', icon: Image, label: 'Carousel', pageKey: 'carousel' },
   { href: '/dashboard/areas', icon: Map, label: 'Areas', pageKey: null }, // No permission check
   { href: '/dashboard/agents', icon: Truck, label: 'Agents', pageKey: 'agents' },
+  { href: '/dashboard/vendors', icon: Store, label: 'Vendors', pageKey: null },
   { href: '/dashboard/reviews', icon: Star, label: 'Reviews', pageKey: null }, // Agent reviews
   { href: '/dashboard/users', icon: Users, label: 'Users', pageKey: 'users' },
   { href: '/dashboard/notifications', icon: Bell, label: 'Notifications', pageKey: 'notifications' },

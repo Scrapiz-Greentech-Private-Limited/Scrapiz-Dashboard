@@ -69,6 +69,35 @@ export interface OrderSummary {
   // Django DecimalField returns string
   estimated_order_value?: number | string;
   redeemed_referral_bonus?: number | string;
+  quote_status?: string | null;
+  quote_total_amount?: number | string | null;
+  quote_payment_method?: string | null;
+}
+
+export interface AvailableVendorSummary {
+  id: number;
+  name: string;
+  phone?: string;
+  service_city?: string;
+  service_area?: string;
+  is_online: boolean;
+  distance_km?: number | null;
+  last_location_at?: string | null;
+}
+
+export interface AssignVendorResponse {
+  message?: string;
+  lead?: {
+    id?: string;
+    [key: string]: unknown;
+  } | null;
+  vendor?: {
+    id?: number;
+    name?: string;
+    [key: string]: unknown;
+  } | null;
+  push_queued?: boolean;
+  order?: OrderSummary | null;
 }
 
 export interface AddressSummary {
@@ -1267,6 +1296,28 @@ export class OrderService {
       return response.data.order as OrderSummary;
     } catch (error: any) {
       throw new Error(error.response?.data?.error || 'Failed to unassign agent');
+    }
+  }
+
+  // Get available online vendors for an order (admin only)
+  static async getAvailableVendors(orderId: number): Promise<AvailableVendorSummary[]> {
+    try {
+      const response = await apiClient.get(`${API_CONFIG.ENDPOINTS.ADMIN_ORDERS}${orderId}/available-vendors/`);
+      return (response.data?.vendors || []) as AvailableVendorSummary[];
+    } catch (error: any) {
+      throw new Error(error.response?.data?.error || 'Failed to load available vendors');
+    }
+  }
+
+  // Manually dispatch order to a specific vendor (admin only)
+  static async assignVendor(orderId: number, vendorId: number): Promise<AssignVendorResponse> {
+    try {
+      const response = await apiClient.post(`${API_CONFIG.ENDPOINTS.ADMIN_ORDERS}${orderId}/assign-vendor/`, {
+        vendor_id: vendorId,
+      });
+      return response.data as AssignVendorResponse;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.error || 'Failed to send order to vendor');
     }
   }
 

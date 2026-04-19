@@ -928,12 +928,12 @@ export default function AgentDetailsDialog({
                               className="flex items-center justify-between p-4 border rounded-lg"
                             >
                               <div>
-                                <p className="font-medium">{area.area_name}</p>
+                                <p className="font-medium">{area.name}</p>
                                 <p className="text-sm text-muted-foreground">
                                   {area.city_name}, {area.city_state}
                                 </p>
                                 <p className="text-xs text-muted-foreground">
-                                  Pincode: {area.pincode}
+                                  Pincode: {area.pincode_code}
                                 </p>
                               </div>
                               <Badge variant={area.city_status === 'available' ? 'default' : 'secondary'}>

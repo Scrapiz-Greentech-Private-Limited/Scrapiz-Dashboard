@@ -23,6 +23,7 @@ import type {
   AgentQueryParams,
   AuditLogQueryParams,
   AgentApiError,
+  AgentImportResult,
 } from '@/types/agent';
 
 // Create axios instance with base configuration
@@ -189,6 +190,21 @@ export class AgentService {
     try {
       const response = await apiClient.patch(`${this.BASE_PATH}/${id}/`, data);
       return response.data as Agent;
+    } catch (error: any) {
+      throw new Error(getErrorMessage(error));
+    }
+  }
+
+  static async setVendorImportEnabled(id: number, enabled: boolean): Promise<Agent> {
+    return this.updateAgent(id, { can_be_vendor: enabled });
+  }
+
+  static async importAgentsToVendors(agentIds: number[]): Promise<AgentImportResult> {
+    try {
+      const response = await apiClient.post(`/vendor/admin/import-agents/`, {
+        agent_ids: agentIds,
+      });
+      return response.data?.data as AgentImportResult;
     } catch (error: any) {
       throw new Error(getErrorMessage(error));
     }

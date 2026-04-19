@@ -98,6 +98,16 @@ export type {
 
 // Serviceability Management Service
 export { ServiceabilityService } from './serviceability';
+
+// Booking Management Service (Demolition and other services)
+export { BookingService } from './bookingService';
+export type {
+  ServiceDetails,
+  ServiceBooking,
+  DemolitionBooking,
+  BookingFilters,
+  BookingListResponse,
+} from './bookingService';
 export type {
   ServiceableCity,
   ServiceablePincode,

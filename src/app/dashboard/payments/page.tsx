@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Card,
   CardContent,
@@ -8,34 +8,145 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { payments } from "@/lib/data"
 import PaymentsTableClient from "@/components/dashboard/payments-table-client"
 import { DollarSign, CheckCircle, Clock, XCircle, TrendingUp, Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import type { PaymentStatus } from "@/lib/types"
+import type { Payment, PaymentStatus } from "@/lib/types"
+import { OrderService, OrderSummary as BackendOrderSummary } from "@/components/backend/apiService"
 
 export default function PaymentsPage() {
+  const [paymentsData, setPaymentsData] = useState<Payment[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [statusFilter, setStatusFilter] = useState<PaymentStatus | 'all'>('all')
 
-  const stats = {
-    total: payments.reduce((sum, p) => sum + p.amount, 0),
-    completed: payments.filter(p => p.status === 'completed').reduce((sum, p) => sum + p.amount, 0),
-    pending: payments.filter(p => p.status === 'pending').reduce((sum, p) => sum + p.amount, 0),
-    failed: payments.filter(p => p.status === 'failed').reduce((sum, p) => sum + p.amount, 0),
-    count: {
-      total: payments.length,
-      completed: payments.filter(p => p.status === 'completed').length,
-      pending: payments.filter(p => p.status === 'pending').length,
-      failed: payments.filter(p => p.status === 'failed').length,
-    }
-  }
+  useEffect(() => {
+    let mounted = true
 
-  const filteredPayments = statusFilter === 'all' 
-    ? payments 
-    : payments.filter(p => p.status === statusFilter)
+    const toNumber = (value: unknown): number => {
+      const parsed = Number(value)
+      return Number.isFinite(parsed) ? parsed : 0
+    }
+
+    const mapOrderToPayment = (order: BackendOrderSummary): Payment | null => {
+      const orderRecord = order as BackendOrderSummary & {
+        quote_status?: string | null
+        quote_total_amount?: string | number | null
+        quote_payment_method?: string | null
+      }
+
+      const quoteStatus = (orderRecord.quote_status || '').toLowerCase()
+      const orderStatus = (order.status?.name || '').toLowerCase()
+      const quoteAmount = toNumber(orderRecord.quote_total_amount)
+      const estimatedAmount = toNumber(order.estimated_order_value)
+      const amount = quoteAmount > 0 ? quoteAmount : estimatedAmount
+
+      if (amount <= 0) {
+        return null
+      }
+
+      let paymentStatus: PaymentStatus = 'pending'
+      if (quoteStatus === 'paid' || orderStatus === 'completed') {
+        paymentStatus = 'completed'
+      } else if (['rejected', 'expired', 'cancelled'].includes(quoteStatus) || orderStatus === 'cancelled') {
+        paymentStatus = 'failed'
+      }
+
+      return {
+        id: `PAY-${order.id}`,
+        userId: String(order.user_id ?? order.user ?? order.id),
+        userName: order.user_email || String(order.user || 'Unknown User'),
+        orderId: order.order_number,
+        amount,
+        type: 'sellerPayout',
+        paymentMode: orderRecord.quote_payment_method?.toLowerCase() === 'upi' ? 'UPI' : 'bank',
+        status: paymentStatus,
+        createdAt: order.created_at,
+      }
+    }
+
+    const loadPayments = async () => {
+      setIsLoading(true)
+      setLoadError(null)
+      try {
+        const orders = await OrderService.getAllOrders()
+        const mapped = orders
+          .map(mapOrderToPayment)
+          .filter((item): item is Payment => Boolean(item))
+        if (mounted) {
+          setPaymentsData(mapped)
+        }
+      } catch (error: any) {
+        if (mounted) {
+          setLoadError(error?.message || 'Failed to load payments')
+          setPaymentsData([])
+        }
+      } finally {
+        if (mounted) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    loadPayments()
+
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  const stats = useMemo(() => {
+    const completed = paymentsData.filter(p => p.status === 'completed')
+    const pending = paymentsData.filter(p => p.status === 'pending')
+    const failed = paymentsData.filter(p => p.status === 'failed')
+
+    return {
+      total: paymentsData.reduce((sum, p) => sum + p.amount, 0),
+      completed: completed.reduce((sum, p) => sum + p.amount, 0),
+      pending: pending.reduce((sum, p) => sum + p.amount, 0),
+      failed: failed.reduce((sum, p) => sum + p.amount, 0),
+      count: {
+        total: paymentsData.length,
+        completed: completed.length,
+        pending: pending.length,
+        failed: failed.length,
+      },
+    }
+  }, [paymentsData])
+
+  const filteredPayments = useMemo(() => {
+    if (statusFilter === 'all') {
+      return paymentsData
+    }
+    return paymentsData.filter((p) => p.status === statusFilter)
+  }, [paymentsData, statusFilter])
 
   const handleExport = () => {
-    alert('Export payments data to CSV/Excel')
+    const rows = [
+      ['Payment ID', 'Order Number', 'User', 'Type', 'Status', 'Amount', 'Mode', 'Created At'],
+      ...filteredPayments.map((payment) => [
+        payment.id,
+        payment.orderId,
+        payment.userName || payment.userId,
+        payment.type,
+        payment.status,
+        String(payment.amount),
+        payment.paymentMode,
+        payment.createdAt,
+      ]),
+    ]
+
+    const csv = rows
+      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      .join('\n')
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'payments-export.csv'
+    link.click()
+    URL.revokeObjectURL(url)
   }
 
   return (
@@ -45,6 +156,8 @@ export default function PaymentsPage() {
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Payment Management</h2>
           <p className="text-muted-foreground">Process and track payments to sellers and agents</p>
+          {isLoading && <p className="text-sm text-muted-foreground mt-1">Loading payment data...</p>}
+          {loadError && <p className="text-sm text-red-600 mt-1">{loadError}</p>}
         </div>
         <Button onClick={handleExport} variant="outline" size="lg">
           <Download className="mr-2 h-4 w-4" />
@@ -160,7 +273,7 @@ export default function PaymentsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-700">
-              ₹{Math.round(stats.total / stats.count.total).toLocaleString()}
+              ₹{Math.round(stats.total / Math.max(stats.count.total, 1)).toLocaleString()}
             </div>
             <p className="text-xs text-blue-600">Per transaction</p>
           </CardContent>
@@ -173,7 +286,7 @@ export default function PaymentsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-700">
-              {((stats.count.completed / stats.count.total) * 100).toFixed(1)}%
+              {((stats.count.completed / Math.max(stats.count.total, 1)) * 100).toFixed(1)}%
             </div>
             <p className="text-xs text-green-600">Completion rate</p>
           </CardContent>

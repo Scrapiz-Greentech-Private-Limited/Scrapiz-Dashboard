@@ -30,10 +30,13 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import type { AgentListItem, AgentStatus, KycStatus } from "@/types/agent"
 import AgentDetailsDialog from "./agent-details-dialog"
+import { AgentService } from "@/services/agent"
 
 interface AgentsTableClientProps {
   agents: AgentListItem[]
   onRefresh: () => void
+  selectedAgentIds: number[]
+  onSelectedAgentIdsChange: (ids: number[]) => void
 }
 
 // Status badge variants
@@ -50,7 +53,12 @@ const kycStatusVariant: Record<KycStatus, "default" | "secondary" | "destructive
   'rejected': "destructive",
 }
 
-export default function AgentsTableClient({ agents, onRefresh }: AgentsTableClientProps) {
+export default function AgentsTableClient({
+  agents,
+  onRefresh,
+  selectedAgentIds,
+  onSelectedAgentIdsChange,
+}: AgentsTableClientProps) {
   const [selectedAgent, setSelectedAgent] = React.useState<AgentListItem | null>(null)
   const [isDetailsOpen, setIsDetailsOpen] = React.useState(false)
   const [searchValue, setSearchValue] = React.useState('')
@@ -96,6 +104,29 @@ export default function AgentsTableClient({ agents, onRefresh }: AgentsTableClie
     setSelectedAgent(agent)
     setDefaultTab('documents')
     setIsDetailsOpen(true)
+  }
+
+  const handleToggleVendorImport = async (agent: AgentListItem) => {
+    await AgentService.setVendorImportEnabled(agent.id, !agent.can_be_vendor)
+    onRefresh()
+  }
+
+  const allSelected = filteredAgents.length > 0 && filteredAgents.every((agent) => selectedAgentIds.includes(agent.id))
+
+  const toggleSelectedAgent = (agentId: number, checked: boolean) => {
+    if (checked) {
+      onSelectedAgentIdsChange(Array.from(new Set([...selectedAgentIds, agentId])))
+      return
+    }
+    onSelectedAgentIdsChange(selectedAgentIds.filter((id) => id !== agentId))
+  }
+
+  const toggleSelectAll = (checked: boolean) => {
+    if (checked) {
+      onSelectedAgentIdsChange(Array.from(new Set([...selectedAgentIds, ...filteredAgents.map((agent) => agent.id)])))
+      return
+    }
+    onSelectedAgentIdsChange(selectedAgentIds.filter((id) => !filteredAgents.some((agent) => agent.id === id)))
   }
 
   // Get initials for avatar fallback
@@ -158,6 +189,14 @@ export default function AgentsTableClient({ agents, onRefresh }: AgentsTableClie
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-10">
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  onChange={(event) => toggleSelectAll(event.target.checked)}
+                  aria-label="Select all agents"
+                />
+              </TableHead>
               <TableHead>Agent</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="hidden sm:table-cell">KYC</TableHead>
@@ -173,13 +212,21 @@ export default function AgentsTableClient({ agents, onRefresh }: AgentsTableClie
           <TableBody>
             {filteredAgents.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                   No agents found
                 </TableCell>
               </TableRow>
             ) : (
               filteredAgents.map((agent) => (
                 <TableRow key={agent.id}>
+                  <TableCell>
+                    <input
+                      type="checkbox"
+                      checked={selectedAgentIds.includes(agent.id)}
+                      onChange={(event) => toggleSelectedAgent(agent.id, event.target.checked)}
+                      aria-label={`Select ${agent.name}`}
+                    />
+                  </TableCell>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2 sm:gap-3">
                       <Avatar className="h-8 w-8 sm:h-9 sm:w-9">
@@ -236,6 +283,9 @@ export default function AgentsTableClient({ agents, onRefresh }: AgentsTableClie
                         <DropdownMenuItem onClick={() => handleManageDocuments(agent)}>
                           Manage Documents
                         </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => void handleToggleVendorImport(agent)}>
+                          {agent.can_be_vendor ? 'Disable Vendor Import' : 'Enable Vendor Import'}
+                        </DropdownMenuItem>
                         <DropdownMenuItem>Track Location</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -249,7 +299,7 @@ export default function AgentsTableClient({ agents, onRefresh }: AgentsTableClie
 
       {/* Show count */}
       <p className="text-sm text-muted-foreground">
-        Showing {filteredAgents.length} of {agents.length} agents
+        Showing {filteredAgents.length} of {agents.length} agents. Selected {selectedAgentIds.length}.
       </p>
 
       {/* Agent Details Dialog */}

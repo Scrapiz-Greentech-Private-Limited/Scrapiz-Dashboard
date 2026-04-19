@@ -38,6 +38,10 @@ export default function PaymentsTableClient({ payments: initialPayments }: Payme
     const [payments, setPayments] = React.useState(initialPayments);
     const { toast } = useToast();
 
+    React.useEffect(() => {
+        setPayments(initialPayments);
+    }, [initialPayments]);
+
     const handlePayout = (paymentId: string) => {
         setPayments(payments.map(p => p.id === paymentId ? {...p, status: 'completed'} : p));
         toast({
@@ -64,10 +68,11 @@ export default function PaymentsTableClient({ payments: initialPayments }: Payme
             <TableBody>
                 {payments.map((payment) => {
                     const user = users.find(u => u.id === payment.userId);
+                    const userName = payment.userName || user?.name || 'N/A';
                     return (
                         <TableRow key={payment.id}>
                             <TableCell className="font-medium">{payment.id}</TableCell>
-                            <TableCell>{user?.name || 'N/A'}</TableCell>
+                            <TableCell>{userName}</TableCell>
                             <TableCell>{paymentTypeCopy[payment.type]}</TableCell>
                             <TableCell>
                                 <Badge variant={paymentStatusVariant[payment.status]} className="capitalize">

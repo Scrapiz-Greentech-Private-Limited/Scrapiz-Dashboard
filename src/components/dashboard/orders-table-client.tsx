@@ -16,7 +16,8 @@ import {
     Bell,
     UserPlus,
     UserMinus,
-    Mail
+    Mail,
+    Send
 } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -74,7 +75,7 @@ import {
     PaginationPrevious,
 } from "@/components/ui/pagination"
 
-import { OrderService } from "@/components/backend/apiService"
+import { OrderService, type AvailableVendorSummary } from "@/components/backend/apiService"
 import { AgentService, type AgentListItem } from "@/services/agent"
 import { SortableTableHeader } from "./sortable-table-header"
 import { SortConfig } from "@/hooks/useSearchAndFilter"
@@ -131,6 +132,19 @@ export default function OrdersTableClient({
     const [selectedAgentId, setSelectedAgentId] = React.useState<string>("");
     const [loadingAgents, setLoadingAgents] = React.useState(false);
     const [assigningAgent, setAssigningAgent] = React.useState(false);
+
+    // Vendor dispatch state
+    const [assignVendorDialogOpen, setAssignVendorDialogOpen] = React.useState(false);
+    const [assignVendorOrder, setAssignVendorOrder] = React.useState<Order | null>(null);
+    const [availableVendors, setAvailableVendors] = React.useState<AvailableVendorSummary[]>([]);
+    const [selectedVendorId, setSelectedVendorId] = React.useState<string>("");
+    const [loadingVendors, setLoadingVendors] = React.useState(false);
+    const [assigningVendor, setAssigningVendor] = React.useState(false);
+    const [dispatchSuccessBanner, setDispatchSuccessBanner] = React.useState<{
+        orderId: string;
+        vendorName: string;
+        leadId?: string;
+    } | null>(null);
     
     // Send notification state
     const [notificationDialogOpen, setNotificationDialogOpen] = React.useState(false);
@@ -161,6 +175,13 @@ export default function OrdersTableClient({
                 description: "Customer phone number is not available for this order.",
             });
         }
+    };
+
+    const requireOrderDbId = (order: Order) => {
+        if (typeof order.dbId === 'number' && Number.isFinite(order.dbId) && order.dbId > 0) {
+            return order.dbId;
+        }
+        throw new Error(`Missing database order ID for ${order.id}. Refresh orders and retry.`);
     };
     
     const handleCopyPhone = () => {
@@ -238,6 +259,70 @@ export default function OrdersTableClient({
             });
         } finally {
             setAssigningAgent(false);
+        }
+    };
+
+    // Open send to vendor dialog
+    const handleOpenAssignVendor = async (order: Order) => {
+        setAssignVendorOrder(order);
+        setSelectedVendorId("");
+        setAssignVendorDialogOpen(true);
+
+        setLoadingVendors(true);
+        try {
+            const dbId = requireOrderDbId(order);
+            const vendors = await OrderService.getAvailableVendors(dbId);
+            setAvailableVendors(vendors);
+        } catch (error: any) {
+            console.error('Failed to fetch available vendors:', error);
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: error.message || "Failed to load available vendors",
+            });
+        } finally {
+            setLoadingVendors(false);
+        }
+    };
+
+    // Dispatch order to selected vendor
+    const handleAssignVendor = async () => {
+        if (!assignVendorOrder || !selectedVendorId) return;
+
+        setAssigningVendor(true);
+        try {
+            const dbId = requireOrderDbId(assignVendorOrder);
+            const response = await OrderService.assignVendor(dbId, parseInt(selectedVendorId));
+
+            const selectedVendor = availableVendors.find(v => v.id.toString() === selectedVendorId);
+            const vendorName = response?.vendor?.name || selectedVendor?.name || 'Vendor';
+            const leadId = typeof response?.lead?.id === 'string' ? response.lead.id : undefined;
+
+            setDispatchSuccessBanner({
+                orderId: assignVendorOrder.id,
+                vendorName,
+                leadId,
+            });
+
+            toast({
+                title: "✅ Sent To Vendor",
+                description: `${vendorName} has been notified for order #${assignVendorOrder.id}`,
+            });
+
+            setAssignVendorDialogOpen(false);
+
+            if (onRefresh) {
+                setTimeout(() => onRefresh(), 500);
+            }
+        } catch (error: any) {
+            console.error('Failed to assign vendor:', error);
+            toast({
+                variant: "destructive",
+                title: "❌ Send Failed",
+                description: error.message || "Could not send order to vendor.",
+            });
+        } finally {
+            setAssigningVendor(false);
         }
     };
     
@@ -364,6 +449,18 @@ export default function OrdersTableClient({
     React.useEffect(() => {
         setSelectedOrders(new Set());
     }, [orders.length]);
+
+    React.useEffect(() => {
+        if (!dispatchSuccessBanner) {
+            return;
+        }
+
+        const timer = setTimeout(() => {
+            setDispatchSuccessBanner(null);
+        }, 12000);
+
+        return () => clearTimeout(timer);
+    }, [dispatchSuccessBanner]);
 
     const totalPages = Math.ceil(orders.length / ITEMS_PER_PAGE);
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -657,6 +754,27 @@ export default function OrdersTableClient({
             </Button>
         </div>
 
+        {dispatchSuccessBanner && (
+            <div className="px-3 sm:px-4 pt-3">
+                <Alert className="border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-100">
+                    <AlertDescription className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <span>
+                            Order #{dispatchSuccessBanner.orderId} dispatched to {dispatchSuccessBanner.vendorName}
+                            {dispatchSuccessBanner.leadId ? ` (Lead ID: ${dispatchSuccessBanner.leadId})` : ''}.
+                        </span>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setDispatchSuccessBanner(null)}
+                            className="h-7 px-2 text-emerald-800 hover:bg-emerald-100 hover:text-emerald-900 dark:text-emerald-200 dark:hover:bg-emerald-900"
+                        >
+                            Dismiss
+                        </Button>
+                    </AlertDescription>
+                </Alert>
+            </div>
+        )}
+
         <div className="overflow-x-auto -mx-4 sm:mx-0">
         <Table className="min-w-[600px] sm:min-w-0">
             <TableHeader>
@@ -806,6 +924,13 @@ export default function OrdersTableClient({
                                         >
                                             <UserPlus className="mr-2 h-4 w-4"/>
                                             {order.agentId ? 'Reassign Agent' : 'Assign Agent'}
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            onClick={() => handleOpenAssignVendor(order)}
+                                            disabled={isUpdating}
+                                        >
+                                            <Send className="mr-2 h-4 w-4"/>
+                                            Send To Vendor
                                         </DropdownMenuItem>
                                         {order.agentId && (
                                             <DropdownMenuItem 
@@ -1063,6 +1188,88 @@ export default function OrdersTableClient({
                             <>
                                 <UserPlus className="mr-2 h-4 w-4" />
                                 Assign Agent
+                            </>
+                        )}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+
+        {/* Send To Vendor Dialog */}
+        <Dialog open={assignVendorDialogOpen} onOpenChange={setAssignVendorDialogOpen}>
+            <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                        <Send className="h-5 w-5 text-emerald-600" />
+                        Send To Vendor
+                    </DialogTitle>
+                    <DialogDescription>
+                        {assignVendorOrder && `Order #${assignVendorOrder.id}`}
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="py-4">
+                    {loadingVendors ? (
+                        <div className="flex items-center justify-center py-4">
+                            <RefreshCw className="h-5 w-5 animate-spin text-muted-foreground" />
+                            <span className="ml-2 text-muted-foreground">Loading vendors...</span>
+                        </div>
+                    ) : availableVendors.length === 0 ? (
+                        <div className="text-center py-4 text-muted-foreground">
+                            No online eligible vendors available for this order
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="vendor-select">Select Vendor</Label>
+                                <Select value={selectedVendorId} onValueChange={setSelectedVendorId}>
+                                    <SelectTrigger id="vendor-select">
+                                        <SelectValue placeholder="Choose an online vendor..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {availableVendors.map((vendor) => (
+                                            <SelectItem key={vendor.id} value={vendor.id.toString()}>
+                                                <div className="flex flex-col">
+                                                    <span>{vendor.name}</span>
+                                                    <span className="text-xs text-muted-foreground">
+                                                        {vendor.phone || 'No phone'} • {vendor.service_city || 'Unknown city'}
+                                                        {typeof vendor.distance_km === 'number' ? ` • ${vendor.distance_km.toFixed(1)} km` : ''}
+                                                    </span>
+                                                </div>
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <Alert>
+                                <AlertDescription>
+                                    The selected vendor receives an immediate push notification and a live lead card in the vendor app.
+                                </AlertDescription>
+                            </Alert>
+                        </div>
+                    )}
+                </div>
+                <DialogFooter>
+                    <Button
+                        variant="outline"
+                        onClick={() => setAssignVendorDialogOpen(false)}
+                        disabled={assigningVendor}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={handleAssignVendor}
+                        disabled={!selectedVendorId || assigningVendor || loadingVendors}
+                        className="bg-emerald-600 hover:bg-emerald-700"
+                    >
+                        {assigningVendor ? (
+                            <>
+                                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                                Sending...
+                            </>
+                        ) : (
+                            <>
+                                <Send className="mr-2 h-4 w-4" />
+                                Send To Vendor
                             </>
                         )}
                     </Button>

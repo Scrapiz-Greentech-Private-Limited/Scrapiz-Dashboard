@@ -16,6 +16,7 @@ import type { AgentListItem, AgentStats } from "@/types/agent"
 import { showError, showSuccess } from "@/lib/toast-helpers"
 import AgentsTableClient from "@/components/dashboard/agents-table-client"
 import AddAgentDialog from "@/components/dashboard/add-agent-dialog"
+import { VendorService } from "@/services/vendor"
 
 export default function AgentsPage() {
   // State for agents data
@@ -31,6 +32,8 @@ export default function AgentsPage() {
   
   // Add agent dialog state
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [selectedAgentIds, setSelectedAgentIds] = useState<number[]>([])
+  const [isImportingVendors, setIsImportingVendors] = useState(false)
   
   // Refs to prevent duplicate calls
   const hasFetchedInitially = useRef(false)
@@ -97,6 +100,24 @@ export default function AgentsPage() {
     fetchAgents()
     fetchStats()
   }, [fetchAgents, fetchStats])
+
+  const handleImportSelectedAgents = useCallback(async () => {
+    if (selectedAgentIds.length === 0) {
+      showError('Select at least one agent to import')
+      return
+    }
+    setIsImportingVendors(true)
+    try {
+      const result = await VendorService.importAgents(selectedAgentIds)
+      showSuccess(`Imported ${result.imported.length} agent(s) to vendors`)
+      setSelectedAgentIds([])
+      fetchAgents()
+    } catch (error: any) {
+      showError(error.message || 'Failed to import agents to vendors')
+    } finally {
+      setIsImportingVendors(false)
+    }
+  }, [fetchAgents, selectedAgentIds])
 
   // Render statistics skeleton
   const renderStatsSkeleton = () => (
@@ -252,6 +273,18 @@ export default function AgentsPage() {
           <p className="text-sm sm:text-base text-muted-foreground">View, manage, and track your pickup agents</p>
         </div>
         <div className="flex gap-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            className="sm:size-default"
+            onClick={handleImportSelectedAgents}
+            disabled={isImportingVendors || selectedAgentIds.length === 0}
+          >
+            <span className="hidden sm:inline">
+              {isImportingVendors ? 'Importing...' : `Import to Vendors (${selectedAgentIds.length})`}
+            </span>
+            <span className="sm:hidden">Import</span>
+          </Button>
           <Button variant="outline" size="sm" className="sm:size-default" onClick={handleRefresh} disabled={isLoadingAgents || isLoadingStats}>
             <RefreshCw className={`h-4 w-4 sm:mr-2 ${(isLoadingAgents || isLoadingStats) ? 'animate-spin' : ''}`} />
             <span className="hidden sm:inline">Refresh</span>
@@ -284,6 +317,8 @@ export default function AgentsPage() {
             <AgentsTableClient 
               agents={agents}
               onRefresh={fetchAgents}
+              selectedAgentIds={selectedAgentIds}
+              onSelectedAgentIdsChange={setSelectedAgentIds}
             />
           )}
         </CardContent>
