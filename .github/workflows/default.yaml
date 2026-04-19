@@ -1,5 +1,5 @@
   name: Deploy Next.js Admin
-  #Changes done
+  #Changes done..
 
   on:
     push:
