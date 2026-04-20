@@ -11,8 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
-import type { Order, User } from "@/lib/types"
-import { users } from "@/lib/data"
+import type { Order } from "@/lib/types"
 import { format } from "date-fns"
 import { MapPin, User as UserIcon, Phone, Truck, Calendar, Hash, Box, Weight, DollarSign, StickyNote, Image as ImageIcon, Camera, Mail, Star, CheckCircle2, Clock, Navigation, Package } from "lucide-react"
 
@@ -56,10 +55,17 @@ const getStatusColor = (status: string) => {
   return colors[status as keyof typeof colors] || colors.pending
 }
 
+const formatOptionalDate = (value?: string | null) => {
+  if (!value) return 'Not available'
+  return format(new Date(value), "MMM dd, yyyy 'at' h:mm a")
+}
+
 export default function OrderDetailsDialog({ order, isOpen, onOpenChange }: OrderDetailsDialogProps) {
   const customerName = getCustomerName(order);
   const sellerName = order.sellerId;
   const agentName = order.agentId;
+  const assignedVendor = order.assignedVendor;
+  const arrivalVerification = order.arrivalVerification;
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -241,6 +247,138 @@ export default function OrderDetailsDialog({ order, isOpen, onOpenChange }: Orde
               </CardContent>
             </Card>
           </div>
+
+          {(assignedVendor || arrivalVerification) && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              {assignedVendor && (
+                <Card className="border-0 shadow-lg bg-white dark:bg-gray-900 hover:shadow-xl transition-all duration-300">
+                  <CardHeader className="pb-3 bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-950 dark:to-green-950 border-b">
+                    <CardTitle className="text-sm flex items-center gap-2 text-emerald-700 dark:text-emerald-300 font-semibold uppercase tracking-wide">
+                      <div className="p-2 bg-emerald-100 dark:bg-emerald-900 rounded-xl">
+                        <Truck className="h-5 w-5 text-emerald-600" />
+                      </div>
+                      Assigned Vendor
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-5 space-y-4">
+                    <div className="flex items-center gap-4">
+                      <Avatar className="h-16 w-16 border-4 border-emerald-100 dark:border-emerald-900 shadow-md">
+                        <AvatarImage src={assignedVendor.profileImage || undefined} alt={assignedVendor.name} />
+                        <AvatarFallback className="bg-gradient-to-br from-emerald-400 to-green-500 text-white font-bold text-xl">
+                          {assignedVendor.name.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-bold text-lg text-gray-900 dark:text-gray-100 truncate">{assignedVendor.name}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 truncate mt-0.5">
+                          {[assignedVendor.serviceArea, assignedVendor.serviceCity].filter(Boolean).join(', ') || 'Service area unavailable'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div className="rounded-lg bg-emerald-50 dark:bg-emerald-900/20 p-3">
+                        <div className="text-gray-500 dark:text-gray-400">Status</div>
+                        <div className="mt-1 font-semibold text-gray-900 dark:text-gray-100 capitalize">
+                          {(assignedVendor.status || 'unknown').replace(/_/g, ' ')}
+                        </div>
+                      </div>
+                      <div className="rounded-lg bg-emerald-50 dark:bg-emerald-900/20 p-3">
+                        <div className="text-gray-500 dark:text-gray-400">Live state</div>
+                        <div className="mt-1 font-semibold text-gray-900 dark:text-gray-100">
+                          {assignedVendor.isOnline ? 'Online' : 'Offline'}
+                        </div>
+                      </div>
+                    </div>
+
+                    {assignedVendor.phone && (
+                      <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <Phone className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{assignedVendor.phone}</span>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {arrivalVerification && (
+                <Card className="border-0 shadow-lg bg-white dark:bg-gray-900 hover:shadow-xl transition-all duration-300">
+                  <CardHeader className="pb-3 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950 dark:to-orange-950 border-b">
+                    <CardTitle className="text-sm flex items-center gap-2 text-amber-700 dark:text-amber-300 font-semibold uppercase tracking-wide">
+                      <div className="p-2 bg-amber-100 dark:bg-amber-900 rounded-xl">
+                        <CheckCircle2 className="h-5 w-5 text-amber-600" />
+                      </div>
+                      Arrival Verification
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-5 space-y-4">
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div className="rounded-lg bg-amber-50 dark:bg-amber-900/20 p-3">
+                        <div className="text-gray-500 dark:text-gray-400">Booking status</div>
+                        <div className="mt-1 font-semibold text-gray-900 dark:text-gray-100 capitalize">
+                          {(arrivalVerification.bookingStatus || 'unknown').replace(/_/g, ' ')}
+                        </div>
+                      </div>
+                      <div className="rounded-lg bg-amber-50 dark:bg-amber-900/20 p-3">
+                        <div className="text-gray-500 dark:text-gray-400">Face check</div>
+                        <div className="mt-1 font-semibold text-gray-900 dark:text-gray-100">
+                          {arrivalVerification.faceVerified === true
+                            ? 'Verified'
+                            : arrivalVerification.faceVerified === false
+                              ? 'Not verified'
+                              : 'Pending'}
+                        </div>
+                      </div>
+                      <div className="rounded-lg bg-amber-50 dark:bg-amber-900/20 p-3">
+                        <div className="text-gray-500 dark:text-gray-400">Attempt status</div>
+                        <div className="mt-1 font-semibold text-gray-900 dark:text-gray-100 capitalize">
+                          {(arrivalVerification.status || 'not started').replace(/_/g, ' ')}
+                        </div>
+                      </div>
+                      <div className="rounded-lg bg-amber-50 dark:bg-amber-900/20 p-3">
+                        <div className="text-gray-500 dark:text-gray-400">Face score</div>
+                        <div className="mt-1 font-semibold text-gray-900 dark:text-gray-100">
+                          {typeof arrivalVerification.faceScore === 'number' ? arrivalVerification.faceScore.toFixed(3) : 'Unavailable'}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                      <div><span className="font-medium">Face outcome:</span> {(arrivalVerification.faceOutcome || 'Unavailable').replace(/_/g, ' ')}</div>
+                      <div><span className="font-medium">Vendor distance:</span> {typeof arrivalVerification.vendorDistanceMeters === 'number' ? `${arrivalVerification.vendorDistanceMeters.toFixed(2)} m` : 'Unavailable'}</div>
+                      <div><span className="font-medium">OTP sent:</span> {formatOptionalDate(arrivalVerification.otpSentAt)}</div>
+                      <div><span className="font-medium">OTP verified:</span> {formatOptionalDate(arrivalVerification.otpVerifiedAt)}</div>
+                      <div><span className="font-medium">Contact unlocked:</span> {formatOptionalDate(arrivalVerification.contactUnlockedAt)}</div>
+                    </div>
+
+                    {arrivalVerification.lastError ? (
+                      <div className="rounded-lg border border-rose-200 bg-rose-50 dark:bg-rose-950/30 p-3 text-sm text-rose-700 dark:text-rose-300">
+                        {arrivalVerification.lastError}
+                      </div>
+                    ) : null}
+
+                    {arrivalVerification.selfieUrl && (
+                      <a
+                        href={arrivalVerification.selfieUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="relative block aspect-video rounded-xl overflow-hidden border-2 border-amber-200 dark:border-amber-800"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={arrivalVerification.selfieUrl}
+                          alt="Arrival verification selfie"
+                          className="w-full h-full object-cover"
+                        />
+                      </a>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
 
           {/* Middle Section - Order Details & Pricing */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">

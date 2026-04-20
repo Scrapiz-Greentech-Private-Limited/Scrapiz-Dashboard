@@ -140,6 +140,7 @@ export default function VendorDetailsDialog({
   const vendorAuditLogs = vendor?.audit_logs || []
   const biometricMetrics = vendor?.biometric_metrics
   const verificationReplay = biometricMetrics?.verification_replay || []
+  const effectiveProfileImage = vendor?.effective_profile_image || vendor?.profile_image || vendor?.biometric?.source_image_url || null
 
   const handleVendorAction = async (action: 'approve' | 'reject' | 'suspend' | 'reinstate') => {
     if (!vendorId) return
@@ -293,7 +294,22 @@ export default function VendorDetailsDialog({
                         <div><span className="text-slate-500">City:</span> {vendor.service_city}</div>
                         <div><span className="text-slate-500">Area:</span> {vendor.service_area}</div>
                         <div><span className="text-slate-500">Live status:</span> {vendor.is_online ? 'Online' : 'Offline'}</div>
-                        <div><span className="text-slate-500">Profile image:</span> {vendor.profile_image ? 'Uploaded' : 'Pending'}</div>
+                        <div><span className="text-slate-500">Profile image:</span> {effectiveProfileImage ? 'Available' : 'Pending'}</div>
+                        {vendor.requires_profile_image_upload ? (
+                          <div className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-amber-800">
+                            Current vendor photo is required for pending or approved access.
+                          </div>
+                        ) : null}
+                        {effectiveProfileImage ? (
+                          <a href={effectiveProfileImage} target="_blank" rel="noreferrer" className="block">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={effectiveProfileImage}
+                              alt={`${vendor.full_name} profile`}
+                              className="mt-2 h-28 w-28 rounded-xl border object-cover"
+                            />
+                          </a>
+                        ) : null}
                       </div>
                     </div>
                     <div className="rounded-2xl border bg-white p-4">
@@ -599,9 +615,19 @@ export default function VendorDetailsDialog({
                       </CardHeader>
                       <CardContent className="text-sm text-muted-foreground">
                         {vendor.biometric ? (
-                          <div className="space-y-1">
+                          <div className="space-y-3">
                             <div>{vendor.biometric.is_verified ? 'Face verification ready' : 'Face verification pending'}</div>
                             <div>Model {vendor.biometric.model_version}</div>
+                            {vendor.biometric.source_image_url ? (
+                              <a href={vendor.biometric.source_image_url} target="_blank" rel="noreferrer" className="block">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={vendor.biometric.source_image_url}
+                                  alt="Vendor biometric source"
+                                  className="h-28 w-28 rounded-xl border object-cover"
+                                />
+                              </a>
+                            ) : null}
                           </div>
                         ) : (
                           'Face data not uploaded yet.'

@@ -112,6 +112,9 @@ const mapOrderSummaryToOrder = (orderSummary: OrderSummary & {
   has_push_token?: boolean;
 }): Order => {
   const totalValue = calculateTotalValue(orderSummary);
+  const booking = orderSummary.booking;
+  const bookingVendor = booking?.vendor;
+  const arrivalAttempt = booking?.arrival_attempt;
   
   return {
     id: orderSummary.order_number,
@@ -133,6 +136,38 @@ const mapOrderSummaryToOrder = (orderSummary: OrderSummary & {
     photos: orderSummary.images || undefined,
     type: 'scrap',
     hasPushToken: orderSummary.has_push_token || false,
+    assignedVendor: bookingVendor
+      ? {
+          id: bookingVendor.id,
+          name: bookingVendor.full_name,
+          phone: bookingVendor.phone,
+          profileImage:
+            bookingVendor.effective_profile_image ||
+            bookingVendor.profile_image ||
+            bookingVendor.biometric_source_image_url ||
+            null,
+          status: bookingVendor.status,
+          isOnline: bookingVendor.is_online,
+          serviceCity: bookingVendor.service_city,
+          serviceArea: bookingVendor.service_area,
+        }
+      : undefined,
+    arrivalVerification: booking
+      ? {
+          bookingId: booking.id,
+          bookingStatus: booking.status,
+          faceVerified: booking.face_verified,
+          faceScore: booking.face_score,
+          contactUnlockedAt: booking.contact_unlocked_at,
+          status: arrivalAttempt?.status,
+          faceOutcome: arrivalAttempt?.face_outcome,
+          selfieUrl: arrivalAttempt?.selfie_url,
+          vendorDistanceMeters: arrivalAttempt?.vendor_distance_meters,
+          otpSentAt: arrivalAttempt?.otp_sent_at,
+          otpVerifiedAt: arrivalAttempt?.otp_verified_at,
+          lastError: arrivalAttempt?.last_error,
+        }
+      : undefined,
   };
 };
 

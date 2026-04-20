@@ -75,6 +75,30 @@ export interface Order {
   photos?: string[];  // Multiple photos from mobile app
   type?: 'scrap' | 'service';  // Order type
   hasPushToken?: boolean;  // Whether user has active push token for notifications
+  assignedVendor?: {
+    id: number;
+    name: string;
+    phone?: string | null;
+    profileImage?: string | null;
+    status?: string | null;
+    isOnline?: boolean;
+    serviceCity?: string | null;
+    serviceArea?: string | null;
+  };
+  arrivalVerification?: {
+    bookingId?: string;
+    bookingStatus?: string;
+    faceVerified?: boolean | null;
+    faceScore?: number | null;
+    contactUnlockedAt?: string | null;
+    status?: string | null;
+    faceOutcome?: string | null;
+    selfieUrl?: string | null;
+    vendorDistanceMeters?: number | null;
+    otpSentAt?: string | null;
+    otpVerifiedAt?: string | null;
+    lastError?: string | null;
+  };
 }
 
 export interface ScrapCategory {

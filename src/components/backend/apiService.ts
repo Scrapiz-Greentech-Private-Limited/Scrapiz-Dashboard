@@ -72,6 +72,40 @@ export interface OrderSummary {
   quote_status?: string | null;
   quote_total_amount?: number | string | null;
   quote_payment_method?: string | null;
+  booking?: {
+    id: string;
+    status: string;
+    face_verified?: boolean | null;
+    face_score?: number | null;
+    contact_unlocked_at?: string | null;
+    started_at?: string | null;
+    arrived_at?: string | null;
+    completed_at?: string | null;
+    vendor?: {
+      id: number;
+      full_name: string;
+      phone?: string | null;
+      profile_image?: string | null;
+      biometric_source_image_url?: string | null;
+      effective_profile_image?: string | null;
+      status?: string | null;
+      is_online?: boolean;
+      service_city?: string | null;
+      service_area?: string | null;
+    } | null;
+    arrival_attempt?: {
+      status: string;
+      selfie_url?: string | null;
+      face_score?: number | null;
+      face_outcome?: string | null;
+      vendor_distance_meters?: number | null;
+      otp_sent_at?: string | null;
+      otp_verified_at?: string | null;
+      last_error?: string | null;
+      created_at?: string | null;
+      updated_at?: string | null;
+    } | null;
+  } | null;
 }
 
 export interface AvailableVendorSummary {

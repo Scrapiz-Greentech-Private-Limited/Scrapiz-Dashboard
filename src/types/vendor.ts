@@ -90,6 +90,7 @@ export interface Vendor {
   user_phone: string;
   age: number | null;
   profile_image: string | null;
+  effective_profile_image?: string | null;
   service_city: string;
   service_area: string;
   status: VendorStatus;
@@ -115,6 +116,8 @@ export interface Vendor {
   wallet_balance?: string;
   imported_from_agent_id?: number | null;
   missing_fields: string[];
+  profile_image_missing?: boolean;
+  requires_profile_image_upload?: boolean;
   created_at: string;
   updated_at: string;
   vehicle: VendorVehicle | null;
