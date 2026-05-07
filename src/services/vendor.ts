@@ -95,6 +95,15 @@ export class VendorService {
     }
   }
 
+  static async deleteVendor(vendorId: number) {
+    try {
+      const response = await apiClient.delete(`/vendor/admin/${vendorId}/`);
+      return unwrapEnvelope<{ vendor_id: number; full_name: string; phone_number?: string | null; status: string }>(response);
+    } catch (error: any) {
+      throw new Error(getErrorMessage(error));
+    }
+  }
+
   static async approveVendor(vendorId: number) {
     try {
       const response = await apiClient.post(`/vendor/admin/${vendorId}/approve/`);
@@ -137,6 +146,17 @@ export class VendorService {
         allow_app_access_while_pending: allow,
       });
       return unwrapEnvelope<{ allow_app_access_while_pending: boolean; status: string }>(response);
+    } catch (error: any) {
+      throw new Error(getErrorMessage(error));
+    }
+  }
+
+  static async requestFaceReupload(vendorId: number, message?: string) {
+    try {
+      const response = await apiClient.post(`/vendor/admin/${vendorId}/request-face-reupload/`, {
+        ...(message?.trim() ? { message: message.trim() } : {}),
+      });
+      return unwrapEnvelope<{ vendor_id: number; message: string }>(response);
     } catch (error: any) {
       throw new Error(getErrorMessage(error));
     }

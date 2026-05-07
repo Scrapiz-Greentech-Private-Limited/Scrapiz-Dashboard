@@ -27,12 +27,14 @@ import {
   FileText,
   Image,
   Star,
+  Recycle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 
 const navItems = [
   { href: '/dashboard', icon: Home, label: 'Dashboard', pageKey: 'dashboard' },
+  { href: '/dashboard/services', icon: Recycle, label: 'Services Hub', pageKey: null },
   { href: '/dashboard/authentication', icon: Shield, label: 'Auth', pageKey: 'authentication' },
   { href: '/dashboard/orders', icon: ShoppingCart, label: 'Orders', pageKey: 'orders' },
   { href: '/dashboard/service-orders', icon: Wrench, label: 'Services', pageKey: 'service-orders' },
@@ -79,6 +81,14 @@ export default function Navigation({ isMobile = false }: NavigationProps) {
         >
           <span className="text-2xl font-bold" aria-hidden="true">S</span>
           <span className="text-lg font-semibold">Scrapiz Admin</span>
+        </Link>
+        <Link
+          href="/dashboard/services"
+          className="flex items-center gap-3 rounded-lg px-3 py-2 mb-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-900 transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+          aria-label="Open Services Hub"
+        >
+          <Recycle className="h-5 w-5" aria-hidden="true" />
+          <span className="text-sm font-semibold">Services Hub</span>
         </Link>
         {filteredNavItems.map((item) => {
           const isActive = item.href === '/dashboard' ? pathname === '/dashboard' : pathname.startsWith(item.href);
@@ -128,6 +138,24 @@ export default function Navigation({ isMobile = false }: NavigationProps) {
           <span className="text-xl font-bold text-white transition-all group-hover:scale-110" aria-hidden="true">S</span>
           <span className="sr-only">Scrapiz Admin</span>
         </Link>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link
+                href="/dashboard/services"
+                className={cn(
+                  'flex h-9 w-9 items-center justify-center rounded-lg text-emerald-700 transition-colors hover:bg-emerald-100 hover:text-emerald-800 md:h-8 md:w-8 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2',
+                  pathname.startsWith('/dashboard/services') ? 'bg-emerald-100 text-emerald-800' : ''
+                )}
+                aria-label="Services Hub"
+                aria-current={pathname.startsWith('/dashboard/services') ? 'page' : undefined}
+              >
+                <Recycle className="h-5 w-5" aria-hidden="true" />
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent side="right">Services Hub</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
         <TooltipProvider>
           {filteredNavItems.map((item) => {
             const isActive = item.href === '/dashboard' ? pathname === '/dashboard' : pathname.startsWith(item.href);

@@ -84,6 +84,7 @@ export const API_CONFIG = {
     // Feedback & Ratings endpoints
     FEEDBACK_RATINGS_ALL: '/feedback/ratings/all/',
     FEEDBACK_RATINGS_STATS: '/feedback/ratings/stats/',
+    FEEDBACK_VENDOR_REVIEWS: '/feedback/vendor-reviews/admin/',
   },
   HEADERS: {
     'Content-Type': 'application/json',

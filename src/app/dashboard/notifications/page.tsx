@@ -64,10 +64,29 @@ import {
 } from '@/components/ui/dialog';
 import { NotificationService, type PushNotificationPayload, type NotificationHistoryItem, type UserWithPushToken } from '@/components/backend/apiService';
 
+const APP_TARGET_OPTIONS = [
+  {
+    value: 'client' as const,
+    label: 'Scrapiz: sell Scrap online',
+    description: 'Client application',
+  },
+  {
+    value: 'vendor' as const,
+    label: 'Scrapiz partner',
+    description: 'Vendor application',
+  },
+] as const;
+
+const APP_TARGET_LABELS: Record<'client' | 'vendor', string> = {
+  client: 'Scrapiz: sell Scrap online',
+  vendor: 'Scrapiz partner',
+};
+
 export default function NotificationsPage() {
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
   const [category, setCategory] = useState('general');
+  const [appTarget, setAppTarget] = useState<'client' | 'vendor'>('client');
   const [imageUrl, setImageUrl] = useState('');
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -176,11 +195,12 @@ export default function NotificationsPage() {
         title: title.trim(), 
         message: message.trim(), 
         category,
+        app_target: appTarget,
         ...(imageUrl.trim() && { image_url: imageUrl.trim() })
       };
       const response = await NotificationService.sendPushNotification(payload);
       toast({ title: '🚀 Notification Sent!', description: response.message || 'Your push notification has been queued.' });
-      setTitle(''); setMessage(''); setCategory('general'); setImageUrl(''); setTitleError(''); setMessageError(''); setImageUrlError('');
+      setTitle(''); setMessage(''); setCategory('general'); setAppTarget('client'); setImageUrl(''); setTitleError(''); setMessageError(''); setImageUrlError('');
       setTimeout(() => loadHistory(), 2000);
     } catch (error: any) {
       toast({ variant: 'destructive', title: 'Error', description: error.message || 'Failed to send push notification' });
@@ -226,6 +246,7 @@ export default function NotificationsPage() {
         title: dialogTitle.trim(),
         message: dialogMessage.trim(),
         category: dialogCategory,
+        app_target: appTarget,
         ...(dialogImageUrl.trim() && { image_url: dialogImageUrl.trim() })
       });
       toast({ title: '🚀 Notification Sent!', description: `Notification sent to ${selectedUser.email}` });
@@ -292,10 +313,31 @@ export default function NotificationsPage() {
             {/* Broadcast Tab */}
             <TabsContent value="send">
               <div className="grid gap-4 sm:gap-6 pt-4">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {APP_TARGET_OPTIONS.map((option) => {
+                    const active = appTarget === option.value;
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => setAppTarget(option.value)}
+                        className={`rounded-xl border p-4 text-left transition-all ${active ? 'border-green-500 bg-green-50 shadow-sm ring-2 ring-green-500/20' : 'border-border bg-background hover:border-green-300 hover:bg-muted/40'}`}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <p className="font-semibold text-sm sm:text-base">{option.label}</p>
+                            <p className="mt-1 text-xs sm:text-sm text-muted-foreground">{option.description}</p>
+                          </div>
+                          <div className={`mt-0.5 h-3.5 w-3.5 rounded-full border ${active ? 'border-green-600 bg-green-600' : 'border-muted-foreground/40 bg-transparent'}`} />
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
                 <Alert className="text-xs sm:text-sm">
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
-                    Notifications will be sent to all users who have enabled push notifications and opted in to the selected category.
+                    Notifications will be sent only to {APP_TARGET_LABELS[appTarget]}.
                   </AlertDescription>
                 </Alert>
                 <div className="grid gap-2 sm:gap-3">
@@ -357,7 +399,7 @@ export default function NotificationsPage() {
                   )}
                 </div>
                 <Button onClick={handleSendNotification} className="w-full" disabled={sending || !title.trim() || !message.trim() || titleError !== '' || messageError !== '' || imageUrlError !== ''}>
-                  {sending ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Sending...</> : <><Send className="mr-2 h-4 w-4" />Send to All Users</>}
+                  {sending ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Sending...</> : <><Send className="mr-2 h-4 w-4" />Send to {APP_TARGET_LABELS[appTarget]}</>}
                 </Button>
               </div>
             </TabsContent>
@@ -487,6 +529,7 @@ export default function NotificationsPage() {
                             <TableHead className="min-w-[120px]">Title</TableHead>
                             <TableHead className="hidden md:table-cell min-w-[150px]">Message</TableHead>
                             <TableHead className="hidden lg:table-cell">Category</TableHead>
+                            <TableHead className="hidden xl:table-cell">App</TableHead>
                             <TableHead className="hidden xl:table-cell text-center">Image</TableHead>
                             <TableHead className="hidden sm:table-cell text-center">Recipients</TableHead>
                             <TableHead className="min-w-[90px]">Status</TableHead>
@@ -518,6 +561,11 @@ export default function NotificationsPage() {
                                 </TooltipProvider>
                               </TableCell>
                               <TableCell className="hidden lg:table-cell"><Badge variant="secondary" className="capitalize text-xs">{getCategoryLabel(notif.category || 'general')}</Badge></TableCell>
+                              <TableCell className="hidden xl:table-cell">
+                                <Badge variant="outline" className="text-xs">
+                                  {notif.target_app ? APP_TARGET_LABELS[notif.target_app] : 'All apps'}
+                                </Badge>
+                              </TableCell>
                               <TableCell className="hidden xl:table-cell text-center">
                                 {notif.image_url ? (
                                   <TooltipProvider>
@@ -617,6 +665,25 @@ export default function NotificationsPage() {
                   <SelectItem value="announcements">Announcements</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+            <div className="grid gap-2">
+              <Label className="text-sm">Target App</Label>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {APP_TARGET_OPTIONS.map((option) => {
+                  const active = appTarget === option.value;
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setAppTarget(option.value)}
+                      className={`rounded-lg border p-3 text-left transition-all ${active ? 'border-green-500 bg-green-50 ring-2 ring-green-500/20' : 'border-border bg-background hover:border-green-300 hover:bg-muted/40'}`}
+                    >
+                      <p className="text-sm font-medium">{option.label}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">{option.description}</p>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="dialog-image-url" className="flex items-center gap-2 text-sm">

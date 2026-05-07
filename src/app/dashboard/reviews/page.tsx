@@ -18,7 +18,8 @@ import {
   Clock,
   ThumbsUp,
   ThumbsDown,
-  Filter
+  Filter,
+  Building2
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -39,7 +40,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { RatingService } from "@/services/rating"
-import type { OrderRating, RatingStats, RatingTag } from "@/types/rating"
+import type { OrderRating, RatingStats, RatingTag, VendorReviewDirection, VendorReviewRecord, VendorReviewStats } from "@/types/rating"
 import { RATING_TAG_LABELS } from "@/types/rating"
 import { showError } from "@/lib/toast-helpers"
 import { format } from "date-fns"
@@ -84,20 +85,27 @@ export default function AgentReviewsPage() {
   const [ratings, setRatings] = useState<OrderRating[]>([])
   const [stats, setStats] = useState<RatingStats | null>(null)
   const [totalCount, setTotalCount] = useState(0)
+  const [vendorReviews, setVendorReviews] = useState<VendorReviewRecord[]>([])
+  const [vendorStats, setVendorStats] = useState<VendorReviewStats | null>(null)
+  const [vendorTotalCount, setVendorTotalCount] = useState(0)
   
   // Filter state
   const [ratingFilter, setRatingFilter] = useState<string>('all')
+  const [vendorDirectionFilter, setVendorDirectionFilter] = useState<'all' | VendorReviewDirection>('all')
   
   // Loading and error states
   const [isLoadingRatings, setIsLoadingRatings] = useState(true)
   const [isLoadingStats, setIsLoadingStats] = useState(true)
+  const [isLoadingVendorReviews, setIsLoadingVendorReviews] = useState(true)
   const [ratingsError, setRatingsError] = useState<string | null>(null)
   const [statsError, setStatsError] = useState<string | null>(null)
+  const [vendorReviewsError, setVendorReviewsError] = useState<string | null>(null)
   
   // Refs to prevent duplicate calls
   const hasFetchedInitially = useRef(false)
   const isFetchingRatings = useRef(false)
   const isFetchingStats = useRef(false)
+  const isFetchingVendorReviews = useRef(false)
 
   // Fetch all ratings from API
   const fetchRatings = useCallback(async () => {
@@ -148,6 +156,27 @@ export default function AgentReviewsPage() {
     }
   }, [])
 
+  const fetchVendorReviews = useCallback(async () => {
+    if (isFetchingVendorReviews.current) return
+
+    isFetchingVendorReviews.current = true
+    setIsLoadingVendorReviews(true)
+    setVendorReviewsError(null)
+    try {
+      const response = await RatingService.getVendorReviews({
+        direction: vendorDirectionFilter,
+      })
+      setVendorReviews(response.reviews)
+      setVendorStats(response.stats)
+      setVendorTotalCount(response.count)
+    } catch (error: any) {
+      setVendorReviewsError(error.message || 'Failed to load vendor reviews')
+    } finally {
+      setIsLoadingVendorReviews(false)
+      isFetchingVendorReviews.current = false
+    }
+  }, [vendorDirectionFilter])
+
   // Initial data fetch
   useEffect(() => {
     if (hasFetchedInitially.current) return
@@ -155,7 +184,8 @@ export default function AgentReviewsPage() {
     
     fetchRatings()
     fetchStats()
-  }, [fetchRatings, fetchStats])
+    fetchVendorReviews()
+  }, [fetchRatings, fetchStats, fetchVendorReviews])
 
   // Refetch when filter changes
   useEffect(() => {
@@ -164,11 +194,18 @@ export default function AgentReviewsPage() {
     }
   }, [ratingFilter, fetchRatings])
 
+  useEffect(() => {
+    if (hasFetchedInitially.current) {
+      fetchVendorReviews()
+    }
+  }, [vendorDirectionFilter, fetchVendorReviews])
+
   // Handle refresh
   const handleRefresh = useCallback(() => {
     fetchRatings()
     fetchStats()
-  }, [fetchRatings, fetchStats])
+    fetchVendorReviews()
+  }, [fetchRatings, fetchStats, fetchVendorReviews])
 
   // Format date
   const formatDate = (dateString: string) => {
@@ -177,6 +214,93 @@ export default function AgentReviewsPage() {
     } catch {
       return dateString
     }
+  }
+
+  const renderVendorReviewsError = () => (
+    <div className="flex flex-col items-center justify-center py-8 sm:py-12 gap-3 sm:gap-4">
+      <AlertCircle className="h-10 w-10 sm:h-12 sm:w-12 text-muted-foreground" />
+      <p className="text-muted-foreground text-sm sm:text-base text-center">{vendorReviewsError}</p>
+      <Button variant="outline" size="sm" onClick={fetchVendorReviews}>
+        <RefreshCw className="h-4 w-4 mr-2" />
+        Try Again
+      </Button>
+    </div>
+  )
+
+  const renderVendorEmptyState = () => (
+    <div className="flex flex-col items-center justify-center py-8 sm:py-12 gap-3 sm:gap-4">
+      <Building2 className="h-10 w-10 sm:h-12 sm:w-12 text-muted-foreground" />
+      <p className="text-muted-foreground text-sm sm:text-base">No vendor reviews found</p>
+      <p className="text-xs sm:text-sm text-muted-foreground text-center px-4">
+        Vendor to customer and customer to vendor review records will appear here as the new flow is used.
+      </p>
+    </div>
+  )
+
+  const renderVendorReviewsTable = () => {
+    if (vendorReviews.length === 0) return renderVendorEmptyState()
+
+    return (
+      <div className="rounded-md border overflow-x-auto">
+        <Table className="min-w-[760px] sm:min-w-0">
+          <TableHeader>
+            <TableRow className="bg-muted/50">
+              <TableHead className="font-semibold text-xs sm:text-sm">Direction</TableHead>
+              <TableHead className="font-semibold text-xs sm:text-sm">Order</TableHead>
+              <TableHead className="font-semibold text-xs sm:text-sm">Vendor</TableHead>
+              <TableHead className="font-semibold text-xs sm:text-sm">Customer</TableHead>
+              <TableHead className="font-semibold text-xs sm:text-sm">Rating</TableHead>
+              <TableHead className="font-semibold text-xs sm:text-sm">Summary</TableHead>
+              <TableHead className="font-semibold text-xs sm:text-sm hidden xl:table-cell">Date</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {vendorReviews.map((review) => (
+              <TableRow key={review.id} className="hover:bg-muted/30">
+                <TableCell className="p-2 sm:p-4">
+                  <Badge variant={review.direction === 'customer_to_vendor' ? 'secondary' : 'outline'}>
+                    {review.direction === 'customer_to_vendor' ? 'Customer -> Vendor' : 'Vendor -> Customer'}
+                  </Badge>
+                </TableCell>
+                <TableCell className="p-2 sm:p-4">
+                  <div className="font-medium text-primary text-xs sm:text-sm">#{review.order_number}</div>
+                </TableCell>
+                <TableCell className="p-2 sm:p-4">
+                  <div className="flex flex-col">
+                    <span className="font-medium text-sm">{review.vendor_name || 'Vendor'}</span>
+                    <span className="text-xs text-muted-foreground">Reviewer: {review.reviewer_name}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="p-2 sm:p-4">
+                  <div className="flex flex-col">
+                    <span className="font-medium text-sm">{review.customer_name}</span>
+                    <span className="text-xs text-muted-foreground truncate max-w-[180px]">{review.customer_email}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="p-2 sm:p-4">
+                  <StarRating rating={review.overall_rating} />
+                </TableCell>
+                <TableCell className="p-2 sm:p-4">
+                  <div className="max-w-[220px]">
+                    <p className="text-xs sm:text-sm font-medium">
+                      {review.summary_title || 'No summary provided'}
+                    </p>
+                    <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
+                      {review.review_text || 'No written review.'}
+                    </p>
+                  </div>
+                </TableCell>
+                <TableCell className="hidden xl:table-cell p-2 sm:p-4">
+                  <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
+                    {formatDate(review.created_at)}
+                  </span>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    )
   }
 
 
@@ -439,8 +563,8 @@ export default function AgentReviewsPage() {
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Agent Reviews</h2>
-          <p className="text-sm text-muted-foreground hidden sm:block">View and analyze customer feedback for pickup agents</p>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Reviews</h2>
+          <p className="text-sm text-muted-foreground hidden sm:block">Track both legacy agent ratings and the new vendor review flow from one place</p>
         </div>
         <Button 
           variant="outline" 
@@ -572,6 +696,97 @@ export default function AgentReviewsPage() {
           </CardContent>
         </Card>
       )}
+
+      <Card>
+        <CardHeader className="p-4 sm:p-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <CardTitle className="text-base sm:text-lg">Vendor Review Flow</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">
+                {isLoadingVendorReviews ? 'Loading...' : `${vendorTotalCount} vendor review records`}
+              </CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <Filter className="h-4 w-4 text-muted-foreground hidden sm:block" />
+              <Select value={vendorDirectionFilter} onValueChange={(value) => setVendorDirectionFilter(value as 'all' | VendorReviewDirection)}>
+                <SelectTrigger className="w-full sm:w-[220px] h-8 sm:h-9 text-xs sm:text-sm">
+                  <SelectValue placeholder="Filter by review direction" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Directions</SelectItem>
+                  <SelectItem value="customer_to_vendor">Customer to Vendor</SelectItem>
+                  <SelectItem value="vendor_to_customer">Vendor to Customer</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="p-4 sm:p-6 pt-0 space-y-4">
+          {vendorStats ? (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <Card className="border-dashed">
+                <CardContent className="p-4">
+                  <div className="text-xs text-muted-foreground">Total Records</div>
+                  <div className="mt-2 text-2xl font-bold">{vendorStats.total_reviews}</div>
+                </CardContent>
+              </Card>
+              <Card className="border-dashed">
+                <CardContent className="p-4">
+                  <div className="text-xs text-muted-foreground">Average Rating</div>
+                  <div className="mt-2 text-2xl font-bold">{vendorStats.average_rating.toFixed(1)}</div>
+                </CardContent>
+              </Card>
+              <Card className="border-dashed">
+                <CardContent className="p-4">
+                  <div className="text-xs text-muted-foreground">Recommendation Rate</div>
+                  <div className="mt-2 text-2xl font-bold">{vendorStats.recommendation_rate.toFixed(0)}%</div>
+                </CardContent>
+              </Card>
+              <Card className="border-dashed">
+                <CardContent className="p-4">
+                  <div className="text-xs text-muted-foreground">Latest Review</div>
+                  <div className="mt-2 text-sm font-semibold">
+                    {vendorStats.latest_review_at ? formatDate(vendorStats.latest_review_at) : 'No reviews yet'}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          ) : null}
+
+          {vendorStats && Object.keys(vendorStats.distribution).length > 0 ? (
+            <div className="space-y-2">
+              {[5, 4, 3, 2, 1].map((star) => {
+                const count = vendorStats.distribution[String(star)] || 0
+                const percentage = vendorStats.total_reviews > 0
+                  ? Math.round((count / vendorStats.total_reviews) * 100)
+                  : 0
+                return (
+                  <div key={star} className="flex items-center gap-3">
+                    <div className="flex items-center gap-1 w-16">
+                      <span className="text-sm font-medium">{star}</span>
+                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    </div>
+                    <div className="flex-1 h-3 bg-gray-100 rounded-full overflow-hidden">
+                      <div className="h-full rounded-full bg-emerald-500" style={{ width: `${percentage}%` }} />
+                    </div>
+                    <div className="w-20 text-right text-xs text-muted-foreground">
+                      {count} ({percentage}%)
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          ) : null}
+
+          {isLoadingVendorReviews ? (
+            renderTableSkeleton()
+          ) : vendorReviewsError ? (
+            renderVendorReviewsError()
+          ) : (
+            renderVendorReviewsTable()
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

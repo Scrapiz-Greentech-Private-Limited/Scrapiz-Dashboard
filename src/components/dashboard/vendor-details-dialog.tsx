@@ -13,6 +13,7 @@ import {
   MapPin,
   ShieldAlert,
   ShieldCheck,
+  Trash2,
   Truck,
   UserRound,
 } from 'lucide-react'
@@ -98,6 +99,9 @@ export default function VendorDetailsDialog({
   const [paymentSummary, setPaymentSummary] = useState<VendorPaymentSummary | null>(null)
   const [isLoadingSummary, setIsLoadingSummary] = useState(false)
   const [isUpdatingTrial, setIsUpdatingTrial] = useState(false)
+  const [faceReuploadMessage, setFaceReuploadMessage] = useState('')
+  const [isRequestingFaceReupload, setIsRequestingFaceReupload] = useState(false)
+  const [isDeletingVendor, setIsDeletingVendor] = useState(false)
   const [trialDaysInput, setTrialDaysInput] = useState('15')
 
   const loadVendor = async () => {
@@ -236,6 +240,44 @@ export default function VendorDetailsDialog({
       showError(error.message || 'Failed to reject document')
     } finally {
       setIsSubmitting(false)
+    }
+  }
+
+  const handleRequestFaceReupload = async () => {
+    if (!vendorId) return
+
+    setIsRequestingFaceReupload(true)
+    try {
+      await VendorService.requestFaceReupload(vendorId, faceReuploadMessage)
+      showSuccess('Face re-upload request sent to vendor')
+      setFaceReuploadMessage('')
+      await loadVendor()
+      onVendorUpdated?.()
+    } catch (error: any) {
+      showError(error.message || 'Failed to send face re-upload request')
+    } finally {
+      setIsRequestingFaceReupload(false)
+    }
+  }
+
+  const handleDeleteVendor = async () => {
+    if (!vendorId || !vendor) return
+
+    const shouldDelete = window.confirm(
+      `Delete vendor "${vendor.full_name}"? This will remove the vendor profile and related vendor records.`,
+    )
+    if (!shouldDelete) return
+
+    setIsDeletingVendor(true)
+    try {
+      await VendorService.deleteVendor(vendorId)
+      showSuccess('Vendor deleted successfully')
+      onOpenChange(false)
+      onVendorUpdated?.()
+    } catch (error: any) {
+      showError(error.message || 'Failed to delete vendor')
+    } finally {
+      setIsDeletingVendor(false)
     }
   }
 
@@ -433,11 +475,32 @@ export default function VendorDetailsDialog({
                         >
                           Apply
                         </Button>
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                      <div className="text-sm font-semibold text-white">Wallet and Subscription Mapping</div>
+                      <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                        <div className="text-sm font-semibold text-white">Face Photo Refresh</div>
+                        <p className="mt-2 text-sm text-slate-300">
+                          Send a real-time apology and request to the vendor app asking for a fresh face image. The next upload will continue through the existing embedding pipeline.
+                        </p>
+                        <Textarea
+                          value={faceReuploadMessage}
+                          onChange={(event) => setFaceReuploadMessage(event.target.value)}
+                          placeholder="Optional custom message for the vendor"
+                          className="mt-3 min-h-24 border-white/10 bg-white/5 text-white placeholder:text-slate-400"
+                        />
+                        <Button
+                          disabled={isRequestingFaceReupload}
+                          className="mt-3 bg-white text-slate-950 hover:bg-slate-100"
+                          onClick={handleRequestFaceReupload}
+                        >
+                          {isRequestingFaceReupload ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Fingerprint className="mr-2 h-4 w-4" />}
+                          Request new face image
+                        </Button>
+                      </div>
+
+                      <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                        <div className="text-sm font-semibold text-white">Wallet and Subscription Mapping</div>
                       {isLoadingSummary || !paymentSummary ? (
                         <div className="mt-3 text-sm text-slate-300">Loading payment summary...</div>
                       ) : (
@@ -503,6 +566,16 @@ export default function VendorDetailsDialog({
                           Reinstate vendor
                         </Button>
                       )}
+
+                      <Button
+                        disabled={isDeletingVendor}
+                        variant="outline"
+                        className="border-rose-300 text-rose-600 hover:bg-rose-50"
+                        onClick={handleDeleteVendor}
+                      >
+                        {isDeletingVendor ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
+                        Delete vendor
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>

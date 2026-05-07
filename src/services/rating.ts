@@ -13,6 +13,12 @@ import type {
   RatingsResponse,
   RatingStatsResponse,
   RatingQueryParams,
+  RatingTag,
+  VendorReviewDirection,
+  VendorReviewQueryParams,
+  VendorReviewRecord,
+  VendorReviewsResponse,
+  VendorReviewStats,
 } from '@/types/rating';
 
 // Create axios instance with base configuration
@@ -132,6 +138,36 @@ export class RatingService {
       throw new Error(getErrorMessage(error));
     }
   }
+
+  static async getVendorReviews(params?: VendorReviewQueryParams): Promise<{
+    reviews: VendorReviewRecord[];
+    count: number;
+    stats: VendorReviewStats;
+  }> {
+    try {
+      const queryParams = new URLSearchParams();
+
+      if (params?.vendor_id) queryParams.append('vendor_id', params.vendor_id.toString());
+      if (params?.direction && params.direction !== 'all') queryParams.append('direction', params.direction);
+
+      const queryString = queryParams.toString();
+      const url = `${this.BASE_PATH}/vendor-reviews/admin/${queryString ? `?${queryString}` : ''}`;
+
+      const response = await apiClient.get<VendorReviewsResponse>(url);
+
+      if (!response.data.success) {
+        throw new Error(response.data.error || 'Failed to fetch vendor reviews');
+      }
+
+      return {
+        reviews: response.data.data.reviews,
+        count: response.data.data.count,
+        stats: response.data.data.stats,
+      };
+    } catch (error: any) {
+      throw new Error(getErrorMessage(error));
+    }
+  }
 }
 
 // Export types for convenience
@@ -141,6 +177,11 @@ export type {
   RatingsResponse,
   RatingStatsResponse,
   RatingQueryParams,
+  VendorReviewDirection,
+  VendorReviewQueryParams,
+  VendorReviewRecord,
+  VendorReviewsResponse,
+  VendorReviewStats,
   RatingTag,
 } from '@/types/rating';
 

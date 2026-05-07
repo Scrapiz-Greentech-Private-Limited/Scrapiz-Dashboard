@@ -1628,6 +1628,7 @@ export interface PushNotificationPayload {
   title: string;
   message: string;
   category?: string;
+  app_target?: 'client' | 'vendor';
   target_users?: number[];
   deep_link_data?: {
     type: string;
@@ -1643,6 +1644,7 @@ export interface NotificationHistoryItem {
   title: string;
   message: string;
   category?: string;
+  target_app?: 'client' | 'vendor';
   recipient_count: number;
   sent_count?: number;
   failed_count?: number;
@@ -1734,7 +1736,7 @@ export class NotificationService {
   }
 
   // Send notification to a specific user (admin only)
-  static async sendToUser(userId: number, payload: { title: string; message: string; category?: string; image_url?: string }): Promise<ApiResponse> {
+  static async sendToUser(userId: number, payload: { title: string; message: string; category?: string; image_url?: string; app_target?: 'client' | 'vendor' }): Promise<ApiResponse> {
     try {
       const response = await apiClient.post(`/notifications/admin/send-to-user/${userId}/`, payload);
       return response.data;

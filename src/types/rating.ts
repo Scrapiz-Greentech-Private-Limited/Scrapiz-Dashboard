@@ -63,3 +63,56 @@ export interface RatingQueryParams {
   min_rating?: number;
   max_rating?: number;
 }
+
+export type VendorReviewDirection = 'vendor_to_customer' | 'customer_to_vendor';
+
+export interface VendorReviewStats {
+  average_rating: number;
+  total_reviews: number;
+  recommendation_rate: number;
+  latest_review_at?: string | null;
+  distribution: Record<string, number>;
+}
+
+export interface VendorReviewRecord {
+  id: number;
+  booking_id: string;
+  order_id: number;
+  order_number: string;
+  vendor_id: number;
+  vendor_name: string;
+  customer_id: number;
+  customer_name: string;
+  customer_email: string;
+  customer_phone?: string | null;
+  reviewer_name: string;
+  direction: VendorReviewDirection;
+  status: string;
+  overall_rating: number;
+  recommendation: boolean;
+  ease_of_access_rating?: number | null;
+  punctuality_rating?: number | null;
+  communication_rating?: number | null;
+  material_readiness_rating?: number | null;
+  overall_experience_rating?: number | null;
+  review_text?: string | null;
+  summary_title?: string | null;
+  photo_urls: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface VendorReviewsResponse {
+  success: boolean;
+  data: {
+    reviews: VendorReviewRecord[];
+    stats: VendorReviewStats;
+    count: number;
+  };
+  error?: string;
+}
+
+export interface VendorReviewQueryParams {
+  vendor_id?: number;
+  direction?: VendorReviewDirection | 'all';
+}
