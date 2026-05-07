@@ -26,7 +26,7 @@ Located in `server/services/models.py`:
 
 4. **ServiceOrderAudit** - Immutable audit trail for all order changes
    - Records status changes, quantity updates, notes
-   - Performed by tracking
+   - Performed by tracking the user/actor responsible for each change
    - Timestamps for every change
 
 5. **Certificate** - Professional certificate generation

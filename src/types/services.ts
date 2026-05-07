@@ -126,7 +126,7 @@ export interface ServiceOrderAudit {
   service_order_id: number;
   action: string;
   status_changed_to?: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
   notes?: string;
   performed_by?: number;
   created_at: string;
@@ -143,7 +143,7 @@ export interface Certificate {
   generated_by?: number;
   
   // Content
-  certificate_data: Record<string, any>;
+  certificate_data: Record<string, unknown>;
   certificate_html?: string;
   certificate_pdf_url?: string;
   
@@ -190,16 +190,16 @@ export interface OrganizationDashboard {
 }
 
 export interface ServicePageStats {
-  totalOrganizations: number;
-  activeOrganizations: number;
-  totalOrders: number;
-  completedOrders: number;
-  pendingOrders: number;
-  inProgressOrders: number;
-  totalQuantityProcessed: number;
-  totalValueProcessed: number;
-  totalCertificatesGenerated: number;
-  totalEnvironmentalImpact: EnvironmentalImpact;
+  total_organizations: number;
+  active_organizations: number;
+  total_orders: number;
+  completed_orders: number;
+  pending_orders: number;
+  in_progress_orders: number;
+  total_quantity_processed: number;
+  total_value_processed: number;
+  total_certificates_generated: number;
+  total_environmental_impact: EnvironmentalImpact;
 }
 
 export interface OrderWorkflowState {
@@ -244,7 +244,7 @@ export interface AuditReport {
   service_order_id?: number;
   audit_type: string;
   description: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
   performed_by?: number;
   created_at: string;
 }

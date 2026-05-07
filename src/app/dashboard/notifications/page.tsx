@@ -107,6 +107,7 @@ export default function NotificationsPage() {
   const [dialogMessage, setDialogMessage] = useState('');
   const [dialogCategory, setDialogCategory] = useState('general');
   const [dialogImageUrl, setDialogImageUrl] = useState('');
+  const [dialogAppTarget, setDialogAppTarget] = useState<'client' | 'vendor'>('client');
   const [sendingToUser, setSendingToUser] = useState(false);
   
   const { toast } = useToast();
@@ -228,6 +229,7 @@ export default function NotificationsPage() {
     setDialogMessage('');
     setDialogCategory('general');
     setDialogImageUrl('');
+    setDialogAppTarget('client');
     setDialogOpen(true);
   };
 
@@ -246,7 +248,7 @@ export default function NotificationsPage() {
         title: dialogTitle.trim(),
         message: dialogMessage.trim(),
         category: dialogCategory,
-        app_target: appTarget,
+        app_target: dialogAppTarget,
         ...(dialogImageUrl.trim() && { image_url: dialogImageUrl.trim() })
       });
       toast({ title: '🚀 Notification Sent!', description: `Notification sent to ${selectedUser.email}` });
@@ -670,12 +672,12 @@ export default function NotificationsPage() {
               <Label className="text-sm">Target App</Label>
               <div className="grid gap-2 sm:grid-cols-2">
                 {APP_TARGET_OPTIONS.map((option) => {
-                  const active = appTarget === option.value;
+                  const active = dialogAppTarget === option.value;
                   return (
                     <button
                       key={option.value}
                       type="button"
-                      onClick={() => setAppTarget(option.value)}
+                      onClick={() => setDialogAppTarget(option.value)}
                       className={`rounded-lg border p-3 text-left transition-all ${active ? 'border-green-500 bg-green-50 ring-2 ring-green-500/20' : 'border-border bg-background hover:border-green-300 hover:bg-muted/40'}`}
                     >
                       <p className="text-sm font-medium">{option.label}</p>

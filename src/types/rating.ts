@@ -104,7 +104,7 @@ export interface VendorReviewRecord {
 
 export interface VendorReviewsResponse {
   success: boolean;
-  data: {
+  data?: {
     reviews: VendorReviewRecord[];
     stats: VendorReviewStats;
     count: number;
