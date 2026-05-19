@@ -3,6 +3,9 @@ import { API_CONFIG } from '@/components/backend/config';
 
 export interface AppConfig {
   enforce_sell_screen_gate: boolean;
+  sell_screen_gate_mode: 'none' | 'pincode' | 'city';
+  pincode_gate_enabled?: boolean;
+  city_gate_enabled?: boolean;
   maintenance_mode: boolean;
   min_app_version: string;
   enable_location_skip: boolean;
@@ -134,5 +137,10 @@ export const appConfigService = {
   async toggleSellScreenEnforcement(enforce: boolean): Promise<AppConfig> {
     console.log('🔄 Toggling sell screen enforcement to:', enforce);
     return this.updateConfig({ enforce_sell_screen_gate: enforce });
+  },
+
+  async setSellScreenGateMode(mode: AppConfig['sell_screen_gate_mode']): Promise<AppConfig> {
+    console.log('🔄 Setting sell screen gate mode to:', mode);
+    return this.updateConfig({ sell_screen_gate_mode: mode });
   },
 };
