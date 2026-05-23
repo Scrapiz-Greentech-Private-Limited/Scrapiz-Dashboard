@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from "react"
 import {
   Dialog,
   DialogContent,
@@ -8,10 +9,13 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import type { Order } from "@/lib/types"
+import { OrderService } from "@/components/backend/apiService"
+import { useToast } from "@/hooks/use-toast"
 import { format } from "date-fns"
 import { MapPin, User as UserIcon, Phone, Truck, Calendar, Hash, Box, Weight, DollarSign, StickyNote, Image as ImageIcon, Camera, Mail, Star, CheckCircle2, Clock, Navigation, Package } from "lucide-react"
 
@@ -19,6 +23,7 @@ interface OrderDetailsDialogProps {
   order: Order
   isOpen: boolean
   onOpenChange: (isOpen: boolean) => void
+  onAssignmentExpired?: () => void
 }
 
 // Extract customer name from email or phone
@@ -60,12 +65,48 @@ const formatOptionalDate = (value?: string | null) => {
   return format(new Date(value), "MMM dd, yyyy 'at' h:mm a")
 }
 
-export default function OrderDetailsDialog({ order, isOpen, onOpenChange }: OrderDetailsDialogProps) {
+const formatStateAge = (value?: number | null) => {
+  if (typeof value !== "number" || value < 0) return "Not available"
+  const hours = Math.floor(value / 3600)
+  const minutes = Math.floor((value % 3600) / 60)
+  if (hours > 0) return `${hours}h ${minutes}m`
+  return `${minutes}m`
+}
+
+export default function OrderDetailsDialog({ order, isOpen, onOpenChange, onAssignmentExpired }: OrderDetailsDialogProps) {
   const customerName = getCustomerName(order);
   const sellerName = order.sellerId;
   const agentName = order.agentId;
   const assignedVendor = order.assignedVendor;
   const arrivalVerification = order.arrivalVerification;
+  const assignmentLifecycle = order.assignmentLifecycle;
+  const { toast } = useToast();
+  const [isExpiringAssignment, setIsExpiringAssignment] = useState(false);
+
+  const handleExpireAssignment = async () => {
+    if (!order.dbId || !assignmentLifecycle?.canExpireAssignment || isExpiringAssignment) {
+      return;
+    }
+
+    try {
+      setIsExpiringAssignment(true);
+      await OrderService.expireAssignment(order.dbId);
+      toast({
+        title: "Assignment expired",
+        description: `Order ${order.id} was returned to no vendor state.`,
+      });
+      onOpenChange(false);
+      onAssignmentExpired?.();
+    } catch (error: any) {
+      toast({
+        title: "Unable to expire assignment",
+        description: error?.message || "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsExpiringAssignment(false);
+    }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -292,6 +333,39 @@ export default function OrderDetailsDialog({ order, isOpen, onOpenChange }: Orde
                         </div>
                       </div>
                     </div>
+
+                    {assignmentLifecycle ? (
+                      <div className="rounded-xl border border-emerald-100 bg-emerald-50/70 p-4 dark:border-emerald-900 dark:bg-emerald-950/30">
+                        <div className="grid grid-cols-2 gap-3 text-sm">
+                          <div>
+                            <div className="text-gray-500 dark:text-gray-400">Lead status</div>
+                            <div className="mt-1 font-semibold capitalize text-gray-900 dark:text-gray-100">
+                              {(assignmentLifecycle.leadStatus || 'not available').replace(/_/g, ' ')}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-gray-500 dark:text-gray-400">Time in state</div>
+                            <div className="mt-1 font-semibold text-gray-900 dark:text-gray-100">
+                              {formatStateAge(assignmentLifecycle.stateAgeSeconds)}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="mt-3 space-y-1 text-sm text-gray-700 dark:text-gray-300">
+                          <div><span className="font-medium">Lead created:</span> {formatOptionalDate(assignmentLifecycle.leadCreatedAt)}</div>
+                          <div><span className="font-medium">Lead accepted:</span> {formatOptionalDate(assignmentLifecycle.leadAcceptedAt)}</div>
+                          <div><span className="font-medium">Booking updated:</span> {formatOptionalDate(assignmentLifecycle.bookingUpdatedAt)}</div>
+                        </div>
+                        {assignmentLifecycle.canExpireAssignment ? (
+                          <Button
+                            className="mt-4 w-full bg-rose-600 hover:bg-rose-700 text-white"
+                            onClick={handleExpireAssignment}
+                            disabled={isExpiringAssignment}
+                          >
+                            {isExpiringAssignment ? 'Expiring assignment...' : 'Expire Lead Assignment'}
+                          </Button>
+                        ) : null}
+                      </div>
+                    ) : null}
 
                     {assignedVendor.phone && (
                       <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">

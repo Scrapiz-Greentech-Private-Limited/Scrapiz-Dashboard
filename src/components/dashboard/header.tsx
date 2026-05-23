@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Bell,
   Home,
@@ -41,13 +41,50 @@ import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { usePathname, useRouter } from "next/navigation";
 import Navigation from "./navigation";
+import { AdminAlertItem, AdminAlertService } from "@/components/backend/apiService";
 
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const { logout, user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
+  const [alerts, setAlerts] = useState<AdminAlertItem[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const lastAlertIdRef = useRef(0);
   const pageTitle = pathname.split("/").pop()?.replace(/-/g, ' ') || 'dashboard';
+
+  useEffect(() => {
+    let source: EventSource | null = null;
+    let cancelled = false;
+
+    const connect = async () => {
+      try {
+        const initial = await AdminAlertService.getAlerts();
+        if (cancelled) return;
+        setAlerts(initial.alerts);
+        setUnreadCount(initial.unread_count);
+        lastAlertIdRef.current = initial.alerts[0]?.id || 0;
+
+        const streamUrl = AdminAlertService.getStreamUrl(lastAlertIdRef.current);
+        if (!streamUrl) return;
+        source = new EventSource(streamUrl);
+        source.addEventListener("admin_alert", (event) => {
+          const nextAlert = JSON.parse((event as MessageEvent).data) as AdminAlertItem;
+          lastAlertIdRef.current = Math.max(lastAlertIdRef.current, nextAlert.id);
+          setAlerts((current) => [nextAlert, ...current].slice(0, 10));
+          setUnreadCount((current) => current + (nextAlert.is_read ? 0 : 1));
+        });
+      } catch (error) {
+        console.warn("Admin alert stream unavailable", error);
+      }
+    };
+
+    void connect();
+    return () => {
+      cancelled = true;
+      source?.close();
+    };
+  }, []);
 
   const handleSettings = () => {
     router.push('/dashboard/authentication');
@@ -117,6 +154,53 @@ export default function Header() {
           aria-label="Search input"
         />
       </form>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="outline"
+            size="icon"
+            className="relative rounded-full focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
+            aria-label={`Admin alerts${unreadCount ? `, ${unreadCount} unread` : ''}`}
+          >
+            <Bell className="h-5 w-5" aria-hidden="true" />
+            {unreadCount > 0 && (
+              <span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-red-600 px-1 text-[10px] font-bold leading-5 text-white">
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
+            )}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-80">
+          <DropdownMenuLabel className="flex items-center justify-between">
+            Alerts
+            <button
+              className="text-xs font-normal text-muted-foreground hover:text-foreground"
+              onClick={async () => {
+                await AdminAlertService.markRead();
+                setUnreadCount(0);
+                setAlerts((current) => current.map((alert) => ({ ...alert, is_read: true })));
+              }}
+            >
+              Mark read
+            </button>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {alerts.length ? alerts.slice(0, 6).map((alert) => (
+            <DropdownMenuItem key={alert.id} className="block cursor-pointer whitespace-normal" onClick={() => {
+              if (alert.category === 'booking_transfer') router.push('/dashboard/booking-audits');
+              else if (alert.category === 'order') router.push('/dashboard/orders');
+              else if (alert.category === 'service_order') router.push('/dashboard/service-orders');
+              else if (alert.category === 'product') router.push('/dashboard/pricing');
+              else router.push('/dashboard/categories');
+            }}>
+              <div className="text-sm font-medium">{alert.title}</div>
+              {alert.message && <div className="mt-1 text-xs text-muted-foreground">{alert.message}</div>}
+            </DropdownMenuItem>
+          )) : (
+            <DropdownMenuItem disabled>No alerts yet</DropdownMenuItem>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button

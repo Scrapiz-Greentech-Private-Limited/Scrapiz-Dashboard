@@ -37,6 +37,7 @@ const navItems = [
   { href: '/dashboard/services', icon: Recycle, label: 'Services Hub', pageKey: null },
   { href: '/dashboard/authentication', icon: Shield, label: 'Auth', pageKey: 'authentication' },
   { href: '/dashboard/orders', icon: ShoppingCart, label: 'Orders', pageKey: 'orders' },
+  { href: '/dashboard/booking-audits', icon: FileText, label: 'Booking Audits', pageKey: null },
   { href: '/dashboard/service-orders', icon: Wrench, label: 'Services', pageKey: 'service-orders' },
   { href: '/dashboard/catalog', icon: Package, label: 'Catalog', pageKey: 'catalog' },
   { href: '/dashboard/carousel', icon: Image, label: 'Carousel', pageKey: 'carousel' },

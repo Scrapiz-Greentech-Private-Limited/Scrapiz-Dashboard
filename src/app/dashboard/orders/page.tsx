@@ -115,6 +115,7 @@ const mapOrderSummaryToOrder = (orderSummary: OrderSummary & {
   const booking = orderSummary.booking;
   const bookingVendor = booking?.vendor;
   const arrivalAttempt = booking?.arrival_attempt;
+  const lead = orderSummary.lead;
   
   return {
     id: orderSummary.order_number,
@@ -168,6 +169,21 @@ const mapOrderSummaryToOrder = (orderSummary: OrderSummary & {
           lastError: arrivalAttempt?.last_error,
         }
       : undefined,
+    assignmentLifecycle: {
+      leadStatus: lead?.status || undefined,
+      leadCreatedAt: lead?.created_at || undefined,
+      leadAcceptedAt: lead?.accepted_at || undefined,
+      bookingStatus: booking?.status || undefined,
+      bookingUpdatedAt: booking?.updated_at || undefined,
+      bookingInvalidatedAt: booking?.invalidated_at || undefined,
+      bookingInvalidationReason: booking?.invalidation_reason || undefined,
+      stateAgeSeconds: orderSummary.state_age_seconds ?? undefined,
+      canExpireAssignment: Boolean(
+        booking?.status === 'confirmed' &&
+        lead?.status &&
+        ['accepted', 'pending'].includes(lead.status)
+      ),
+    },
   };
 };
 

@@ -138,6 +138,16 @@ export interface UpdateCityRequest {
   status?: CityStatus;
 }
 
+export interface CityAutocompleteSuggestion {
+  place_id: string;
+  name: string;
+  state: string;
+  latitude: number;
+  longitude: number;
+  display_name: string;
+  source: 'krutrim';
+}
+
 /**
  * Request payload for creating a new pincode
  * 

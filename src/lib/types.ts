@@ -99,6 +99,17 @@ export interface Order {
     otpVerifiedAt?: string | null;
     lastError?: string | null;
   };
+  assignmentLifecycle?: {
+    leadStatus?: string | null;
+    leadCreatedAt?: string | null;
+    leadAcceptedAt?: string | null;
+    bookingStatus?: string | null;
+    bookingUpdatedAt?: string | null;
+    bookingInvalidatedAt?: string | null;
+    bookingInvalidationReason?: string | null;
+    stateAgeSeconds?: number | null;
+    canExpireAssignment?: boolean;
+  };
 }
 
 export interface ScrapCategory {

@@ -22,6 +22,7 @@ import type {
   UpdatePincodeRequest,
   CreateAreaRequest,
   UpdateAreaRequest,
+  CityAutocompleteSuggestion,
   CityQueryParams,
   PincodeQueryParams,
   AreaQueryParams,
@@ -239,6 +240,23 @@ export class ServiceabilityService {
     }
   }
 
+  static async searchCitySuggestions(query: string): Promise<CityAutocompleteSuggestion[]> {
+    try {
+      const normalizedQuery = query.trim();
+      if (normalizedQuery.length < 2) {
+        return [];
+      }
+
+      const response = await apiClient.get(
+        `${this.CITIES_PATH}/autocomplete/?query=${encodeURIComponent(normalizedQuery)}`
+      );
+
+      return (response.data?.results || []) as CityAutocompleteSuggestion[];
+    } catch (error: any) {
+      throw new Error(getErrorMessage(error));
+    }
+  }
+
   // ==========================================================================
   // Pincode Operations
   // ==========================================================================
@@ -450,6 +468,7 @@ export type {
   CityQueryParams,
   PincodeQueryParams,
   AreaQueryParams,
+  CityAutocompleteSuggestion,
   CityStatus,
   ServiceAreaStats,
   ServiceabilityApiError,

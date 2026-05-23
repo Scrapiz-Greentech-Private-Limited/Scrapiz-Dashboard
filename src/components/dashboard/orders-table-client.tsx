@@ -1067,6 +1067,11 @@ export default function OrdersTableClient({
                 order={selectedOrder}
                 isOpen={isDetailsOpen}
                 onOpenChange={setIsDetailsOpen}
+                onAssignmentExpired={() => {
+                    if (onRefresh) {
+                        onRefresh();
+                    }
+                }}
              />
         )}
         

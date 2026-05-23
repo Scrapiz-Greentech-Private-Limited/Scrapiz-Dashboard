@@ -72,6 +72,12 @@ export interface OrderSummary {
   quote_status?: string | null;
   quote_total_amount?: number | string | null;
   quote_payment_method?: string | null;
+  lead?: {
+    status?: string | null;
+    created_at?: string | null;
+    accepted_at?: string | null;
+  } | null;
+  state_age_seconds?: number | null;
   booking?: {
     id: string;
     status: string;
@@ -81,6 +87,9 @@ export interface OrderSummary {
     started_at?: string | null;
     arrived_at?: string | null;
     completed_at?: string | null;
+    updated_at?: string | null;
+    invalidated_at?: string | null;
+    invalidation_reason?: string | null;
     vendor?: {
       id: number;
       full_name: string;
@@ -132,6 +141,33 @@ export interface AssignVendorResponse {
   } | null;
   push_queued?: boolean;
   order?: OrderSummary | null;
+}
+
+export interface AdminAlertItem {
+  id: number;
+  category: 'order' | 'product' | 'category' | 'service_order' | 'booking_transfer';
+  title: string;
+  message: string;
+  payload: Record<string, any>;
+  is_read: boolean;
+  created_at: string;
+}
+
+export interface BookingTransferAudit {
+  id: number;
+  booking_id: string;
+  order_id: number;
+  order_number: string;
+  reason_code: string;
+  reason: string;
+  status: 'open' | 'acknowledged' | 'reassigned' | 'expired' | 'closed';
+  warning_sent_at?: string | null;
+  cancelled_at?: string | null;
+  reassigned_at?: string | null;
+  created_at: string;
+  from_vendor?: { id: number; name: string; rating: number; phone?: string | null } | null;
+  to_vendor?: { id: number; name: string; rating: number; phone?: string | null } | null;
+  metadata?: Record<string, any>;
 }
 
 export interface AddressSummary {
@@ -1355,6 +1391,15 @@ export class OrderService {
     }
   }
 
+  static async expireAssignment(orderId: number): Promise<any> {
+    try {
+      const response = await apiClient.post(`${API_CONFIG.ENDPOINTS.ADMIN_ORDERS}${orderId}/expire-assignment/`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.error || 'Failed to expire order assignment');
+    }
+  }
+
   // Send notification to order's user (admin only)
   static async sendOrderNotification(orderId: number, title: string, message: string): Promise<any> {
     try {
@@ -1876,5 +1921,46 @@ export class AuditService {
     } catch (error: any) {
       throw new Error(error.response?.data?.error || 'Failed to fetch user audit logs');
     }
+  }
+}
+
+export class AdminAlertService {
+  static async getAlerts(): Promise<{ alerts: AdminAlertItem[]; unread_count: number }> {
+    const response = await apiClient.get('/notifications/admin/alerts/');
+    return response.data;
+  }
+
+  static getStreamUrl(lastId = 0): string | null {
+    if (typeof window === 'undefined') return null;
+    const token = localStorage.getItem('adminAuthToken');
+    if (!token) return null;
+    const frontendKey = API_CONFIG.HEADERS['x-auth-app'] as string | undefined;
+    const params = new URLSearchParams({
+      token: token.replace(/^Bearer\s+/i, ''),
+      last_id: String(lastId),
+    });
+    if (frontendKey) params.set('frontend_key', frontendKey);
+    return `${API_CONFIG.BASE_URL}/notifications/admin/alerts/stream/?${params.toString()}`;
+  }
+
+  static async markRead(alertId?: number): Promise<{ updated: number }> {
+    const url = alertId
+      ? `/notifications/admin/alerts/${alertId}/mark-read/`
+      : '/notifications/admin/alerts/mark-read/';
+    const response = await apiClient.post(url);
+    return response.data;
+  }
+}
+
+export class BookingTransferAuditService {
+  static async getAudits(status?: string): Promise<{ audits: BookingTransferAudit[]; count: number }> {
+    const suffix = status ? `?status=${encodeURIComponent(status)}` : '';
+    const response = await apiClient.get(`/booking/admin/transfer-audits/${suffix}`);
+    return response.data.data;
+  }
+
+  static async action(auditId: number, payload: { action: 'expire' | 'mark_reassigned'; vendor_id?: number }) {
+    const response = await apiClient.post(`/booking/admin/transfer-audits/${auditId}/action/`, payload);
+    return response.data.data;
   }
 }

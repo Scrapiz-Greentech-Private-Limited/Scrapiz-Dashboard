@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -29,12 +29,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Building2, AlertTriangle } from "lucide-react";
-import type { ServiceableCity, CityStatus, CreateCityRequest, UpdateCityRequest } from "@/types/serviceability";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Loader2, Building2, AlertTriangle, Search, MapPin } from "lucide-react";
+import { ServiceabilityService } from "@/services/serviceability";
+import type {
+  ServiceableCity,
+  CityStatus,
+  CreateCityRequest,
+  UpdateCityRequest,
+  CityAutocompleteSuggestion,
+} from "@/types/serviceability";
 
-/**
- * Form data interface for city form
- */
 interface CityFormData {
   name: string;
   state: string;
@@ -44,9 +53,6 @@ interface CityFormData {
   status: CityStatus;
 }
 
-/**
- * Form validation errors
- */
 interface FormErrors {
   name?: string;
   state?: string;
@@ -56,9 +62,6 @@ interface FormErrors {
   status?: string;
 }
 
-/**
- * Props for CityFormDialog component
- */
 interface CityFormDialogProps {
   open: boolean;
   mode: 'create' | 'edit';
@@ -68,23 +71,17 @@ interface CityFormDialogProps {
   isSubmitting?: boolean;
 }
 
-/**
- * Initial form data for create mode
- */
+const MAHARASHTRA_STATE = 'Maharashtra';
+
 const initialFormData: CityFormData = {
   name: '',
-  state: '',
+  state: MAHARASHTRA_STATE,
   latitude: '',
   longitude: '',
   radius_km: '',
   status: 'available',
 };
 
-/**
- * CityFormDialog - Dialog component for creating and editing cities
- * 
- * Requirements: 2.1, 2.3, 2.4, 2.5, 3.1
- */
 export function CityFormDialog({
   open,
   mode,
@@ -93,51 +90,101 @@ export function CityFormDialog({
   onSubmit,
   isSubmitting = false,
 }: CityFormDialogProps) {
-  // Form state
   const [formData, setFormData] = useState<CityFormData>(initialFormData);
   const [errors, setErrors] = useState<FormErrors>({});
   const [showStatusWarning, setShowStatusWarning] = useState(false);
   const [pendingSubmit, setPendingSubmit] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [suggestions, setSuggestions] = useState<CityAutocompleteSuggestion[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState('');
+  const [suggestionOpen, setSuggestionOpen] = useState(false);
 
-  // Pre-populate form when editing - Requirements: 3.1
   useEffect(() => {
     if (open) {
       if (mode === 'edit' && city) {
         setFormData({
           name: city.name,
-          state: city.state,
+          state: MAHARASHTRA_STATE,
           latitude: city.latitude,
           longitude: city.longitude,
           radius_km: city.radius_km,
           status: city.status,
         });
+        setSearchQuery(city.name);
       } else {
         setFormData(initialFormData);
+        setSearchQuery('');
       }
+
       setErrors({});
       setShowStatusWarning(false);
       setPendingSubmit(false);
+      setSuggestions([]);
+      setSearchError('');
+      setSuggestionOpen(false);
     }
   }, [open, mode, city]);
 
-  /**
-   * Validate form data
-   * Requirements: 2.3, 2.4, 2.5
-   */
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const normalizedQuery = searchQuery.trim();
+    if (normalizedQuery.length < 2) {
+      setSuggestions([]);
+      setSearchError('');
+      setIsSearching(false);
+      return;
+    }
+
+    let cancelled = false;
+    setIsSearching(true);
+    setSearchError('');
+
+    const timer = window.setTimeout(async () => {
+      try {
+        const results = await ServiceabilityService.searchCitySuggestions(normalizedQuery);
+        if (cancelled) {
+          return;
+        }
+
+        setSuggestions(results);
+        setSuggestionOpen(true);
+      } catch (error: any) {
+        if (cancelled) {
+          return;
+        }
+
+        setSuggestions([]);
+        setSearchError(error.message || 'Unable to load Maharashtra city suggestions.');
+      } finally {
+        if (!cancelled) {
+          setIsSearching(false);
+        }
+      }
+    }, 300);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [open, searchQuery]);
+
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
-    // Name validation
     if (!formData.name.trim()) {
       newErrors.name = 'City name is required';
     }
 
-    // State validation
     if (!formData.state.trim()) {
       newErrors.state = 'State is required';
+    } else if (formData.state.trim().toLowerCase() !== MAHARASHTRA_STATE.toLowerCase()) {
+      newErrors.state = 'Only Maharashtra cities can be added here';
     }
 
-    // Latitude validation - Requirements: 2.3
     const lat = parseFloat(formData.latitude);
     if (formData.latitude === '' || isNaN(lat)) {
       newErrors.latitude = 'Latitude is required';
@@ -145,7 +192,6 @@ export function CityFormDialog({
       newErrors.latitude = 'Latitude must be between -90 and 90';
     }
 
-    // Longitude validation - Requirements: 2.4
     const lng = parseFloat(formData.longitude);
     if (formData.longitude === '' || isNaN(lng)) {
       newErrors.longitude = 'Longitude is required';
@@ -153,7 +199,6 @@ export function CityFormDialog({
       newErrors.longitude = 'Longitude must be between -180 and 180';
     }
 
-    // Radius validation - Requirements: 2.5
     const radius = parseFloat(formData.radius_km);
     if (formData.radius_km === '' || isNaN(radius)) {
       newErrors.radius_km = 'Service radius is required';
@@ -165,24 +210,38 @@ export function CityFormDialog({
     return Object.keys(newErrors).length === 0;
   };
 
-  /**
-   * Handle form field change
-   */
   const handleChange = (field: keyof CityFormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
+    setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
   };
 
-  /**
-   * Handle form submission
-   */
+  const handleSuggestionSelect = (suggestion: CityAutocompleteSuggestion) => {
+    setFormData((prev) => ({
+      ...prev,
+      name: suggestion.name,
+      state: MAHARASHTRA_STATE,
+      latitude: suggestion.latitude.toFixed(6),
+      longitude: suggestion.longitude.toFixed(6),
+      radius_km: prev.radius_km || '15',
+    }));
+    setSearchQuery(suggestion.name);
+    setSuggestions([]);
+    setSuggestionOpen(false);
+    setSearchError('');
+    setErrors((prev) => ({
+      ...prev,
+      name: undefined,
+      state: undefined,
+      latitude: undefined,
+      longitude: undefined,
+    }));
+  };
+
   const handleSubmit = async () => {
     if (!validateForm()) return;
 
-    // Check for status change warning - Requirements: 3.4
     if (mode === 'edit' && city && city.status === 'available' && formData.status === 'coming_soon') {
       setShowStatusWarning(true);
       setPendingSubmit(true);
@@ -192,13 +251,10 @@ export function CityFormDialog({
     await submitForm();
   };
 
-  /**
-   * Submit form data to API
-   */
   const submitForm = async () => {
     const data: CreateCityRequest | UpdateCityRequest = {
       name: formData.name.trim(),
-      state: formData.state.trim(),
+      state: MAHARASHTRA_STATE,
       latitude: parseFloat(formData.latitude),
       longitude: parseFloat(formData.longitude),
       radius_km: parseFloat(formData.radius_km),
@@ -208,9 +264,6 @@ export function CityFormDialog({
     await onSubmit(data, mode);
   };
 
-  /**
-   * Handle status warning confirmation
-   */
   const handleStatusWarningConfirm = async () => {
     setShowStatusWarning(false);
     if (pendingSubmit) {
@@ -219,9 +272,6 @@ export function CityFormDialog({
     }
   };
 
-  /**
-   * Handle status warning cancel
-   */
   const handleStatusWarningCancel = () => {
     setShowStatusWarning(false);
     setPendingSubmit(false);
@@ -230,22 +280,82 @@ export function CityFormDialog({
   return (
     <>
       <Dialog open={open && !showStatusWarning} onOpenChange={(isOpen) => !isOpen && onClose()}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[560px]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Building2 className="h-5 w-5 text-green-600" />
               {mode === 'create' ? 'Add New City' : 'Edit City'}
             </DialogTitle>
             <DialogDescription>
-              {mode === 'create' 
-                ? 'Add a new serviceable city to expand Scrapiz coverage.'
-                : 'Update the city details and service parameters.'
-              }
+              {mode === 'create'
+                ? 'Add a Maharashtra service city using Krutrim-powered autocomplete and coverage coordinates.'
+                : 'Update the city details and service parameters.'}
             </DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-4 py-4">
-            {/* City Name */}
+            <div className="rounded-xl border border-green-200 bg-green-50/70 p-4">
+              <div className="flex items-start gap-3">
+                <div className="rounded-full bg-white p-2 shadow-sm">
+                  <MapPin className="h-4 w-4 text-green-600" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-semibold text-green-900">Maharashtra-only city onboarding</p>
+                  <p className="text-sm text-green-800/80">
+                    Search a city from Krutrim suggestions and we&apos;ll auto-fill the city name, state,
+                    and map coordinates.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="city-search">Search Maharashtra City *</Label>
+              <Popover open={suggestionOpen} onOpenChange={setSuggestionOpen}>
+                <PopoverTrigger asChild>
+                  <div className="relative">
+                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      id="city-search"
+                      value={searchQuery}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        setSuggestionOpen(true);
+                      }}
+                      placeholder="Start typing Mumbai, Pune, Thane..."
+                      className="pl-9"
+                    />
+                    {isSearching && <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" />}
+                  </div>
+                </PopoverTrigger>
+                <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-2">
+                  <div className="space-y-1">
+                    {suggestions.length > 0 ? (
+                      suggestions.map((suggestion) => (
+                        <button
+                          key={`${suggestion.place_id}-${suggestion.name}`}
+                          type="button"
+                          className="flex w-full flex-col rounded-md px-3 py-2 text-left transition hover:bg-muted"
+                          onClick={() => handleSuggestionSelect(suggestion)}
+                        >
+                          <span className="text-sm font-medium">{suggestion.name}</span>
+                          <span className="text-xs text-muted-foreground">{suggestion.display_name}</span>
+                        </button>
+                      ))
+                    ) : (
+                      <div className="px-3 py-2 text-sm text-muted-foreground">
+                        {isSearching ? 'Looking up Maharashtra cities...' : 'No Maharashtra city suggestions yet.'}
+                      </div>
+                    )}
+                  </div>
+                </PopoverContent>
+              </Popover>
+              <p className="text-xs text-muted-foreground">
+                Suggestions are filtered to `{MAHARASHTRA_STATE}` before they reach this dialog.
+              </p>
+              {searchError && <p className="text-sm text-destructive">{searchError}</p>}
+            </div>
+
             <div className="grid gap-2">
               <Label htmlFor="name">City Name *</Label>
               <Input
@@ -260,14 +370,12 @@ export function CityFormDialog({
               )}
             </div>
 
-            {/* State */}
             <div className="grid gap-2">
               <Label htmlFor="state">State *</Label>
               <Input
                 id="state"
                 value={formData.state}
-                onChange={(e) => handleChange('state', e.target.value)}
-                placeholder="e.g., Maharashtra"
+                readOnly
                 className={errors.state ? 'border-destructive' : ''}
               />
               {errors.state && (
@@ -275,9 +383,7 @@ export function CityFormDialog({
               )}
             </div>
 
-            {/* Coordinates Row */}
             <div className="grid grid-cols-2 gap-4">
-              {/* Latitude */}
               <div className="grid gap-2">
                 <Label htmlFor="latitude">Latitude *</Label>
                 <Input
@@ -294,7 +400,6 @@ export function CityFormDialog({
                 )}
               </div>
 
-              {/* Longitude */}
               <div className="grid gap-2">
                 <Label htmlFor="longitude">Longitude *</Label>
                 <Input
@@ -312,9 +417,7 @@ export function CityFormDialog({
               </div>
             </div>
 
-            {/* Radius and Status Row */}
             <div className="grid grid-cols-2 gap-4">
-              {/* Service Radius */}
               <div className="grid gap-2">
                 <Label htmlFor="radius_km">Service Radius (km) *</Label>
                 <Input
@@ -323,7 +426,7 @@ export function CityFormDialog({
                   step="any"
                   value={formData.radius_km}
                   onChange={(e) => handleChange('radius_km', e.target.value)}
-                  placeholder="e.g., 50"
+                  placeholder="e.g., 15"
                   className={errors.radius_km ? 'border-destructive' : ''}
                 />
                 {errors.radius_km && (
@@ -331,7 +434,6 @@ export function CityFormDialog({
                 )}
               </div>
 
-              {/* Status */}
               <div className="grid gap-2">
                 <Label htmlFor="status">Status *</Label>
                 <Select
@@ -357,8 +459,8 @@ export function CityFormDialog({
             <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
               Cancel
             </Button>
-            <Button 
-              onClick={handleSubmit} 
+            <Button
+              onClick={handleSubmit}
               disabled={isSubmitting}
               className="bg-green-600 hover:bg-green-700"
             >
@@ -369,7 +471,6 @@ export function CityFormDialog({
         </DialogContent>
       </Dialog>
 
-      {/* Status Change Warning Dialog - Requirements: 3.4 */}
       <AlertDialog open={showStatusWarning} onOpenChange={setShowStatusWarning}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -378,7 +479,7 @@ export function CityFormDialog({
               Confirm Status Change
             </AlertDialogTitle>
             <AlertDialogDescription>
-              You are changing the city status from &quot;Available&quot; to &quot;Coming Soon&quot;. 
+              You are changing the city status from &quot;Available&quot; to &quot;Coming Soon&quot;.
               This may impact service availability for customers in this area.
               <br /><br />
               Are you sure you want to proceed?
@@ -388,7 +489,7 @@ export function CityFormDialog({
             <AlertDialogCancel onClick={handleStatusWarningCancel}>
               Cancel
             </AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={handleStatusWarningConfirm}
               className="bg-yellow-600 hover:bg-yellow-700"
             >
