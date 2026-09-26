@@ -27,6 +27,8 @@ import {
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { showError } from '@/lib/toast-helpers'
+import { showSuccess } from '@/lib/toast-helpers'
+import { appConfigService, type AppConfig } from '@/services/appConfigService'
 import { VendorService } from '@/services/vendor'
 import type { Vendor, VendorStatus } from '@/types/vendor'
 
@@ -65,6 +67,12 @@ export default function VendorsPage() {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false)
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [isCreatingVendor, setIsCreatingVendor] = useState(false)
+  const [leadExpiryEnabled, setLeadExpiryEnabled] = useState(true)
+  const [leadExpiryMode, setLeadExpiryMode] = useState<AppConfig['vendor_lead_expiration_mode']>('1h')
+  const [customExpiryValue, setCustomExpiryValue] = useState('60')
+  const [customExpiryUnit, setCustomExpiryUnit] = useState<'minutes' | 'hours' | 'days'>('minutes')
+  const [customExpiryDate, setCustomExpiryDate] = useState('')
+  const [isSavingLeadExpiry, setIsSavingLeadExpiry] = useState(false)
   const [createVendorForm, setCreateVendorForm] = useState({
     phone_number: '',
     email: '',
@@ -100,6 +108,52 @@ export default function VendorsPage() {
   useEffect(() => {
     fetchVendors()
   }, [fetchVendors])
+
+  useEffect(() => {
+    void appConfigService.getConfig().then((config) => {
+      setLeadExpiryEnabled(config.vendor_lead_expiration_enabled ?? true)
+      setLeadExpiryMode(config.vendor_lead_expiration_mode || '1h')
+      if (config.vendor_lead_expiration_custom_seconds) {
+        const seconds = config.vendor_lead_expiration_custom_seconds
+        const dateValue = new Date(Date.now() + seconds * 1000)
+        setCustomExpiryDate(new Date(dateValue.getTime() - dateValue.getTimezoneOffset() * 60000).toISOString().slice(0, 16))
+        if (seconds % 86400 === 0) {
+          setCustomExpiryValue(String(seconds / 86400))
+          setCustomExpiryUnit('days')
+        } else if (seconds % 3600 === 0) {
+          setCustomExpiryValue(String(seconds / 3600))
+          setCustomExpiryUnit('hours')
+        } else {
+          setCustomExpiryValue(String(Math.round(seconds / 60)))
+          setCustomExpiryUnit('minutes')
+        }
+      }
+    }).catch((error: any) => showError(error.message || 'Failed to load lead expiration settings'))
+  }, [])
+
+  const saveLeadExpiry = async () => {
+    const customValue = Number(customExpiryValue)
+    const unitSeconds = customExpiryUnit === 'days' ? 86400 : customExpiryUnit === 'hours' ? 3600 : 60
+    const dateSeconds = customExpiryDate ? Math.round((new Date(customExpiryDate).getTime() - Date.now()) / 1000) : 0
+    const resolvedCustomSeconds = dateSeconds > 0 ? dateSeconds : Math.round(customValue * unitSeconds)
+    if (leadExpiryMode === 'custom' && (!Number.isFinite(resolvedCustomSeconds) || resolvedCustomSeconds <= 0)) {
+      showError('Enter a valid custom expiration time.')
+      return
+    }
+    setIsSavingLeadExpiry(true)
+    try {
+      await appConfigService.updateConfig({
+        vendor_lead_expiration_enabled: leadExpiryEnabled,
+        vendor_lead_expiration_mode: leadExpiryMode,
+        vendor_lead_expiration_custom_seconds: leadExpiryMode === 'custom' ? resolvedCustomSeconds : null,
+      })
+      showSuccess('Vendor lead expiration settings updated.')
+    } catch (error: any) {
+      showError(error.message || 'Failed to update lead expiration settings')
+    } finally {
+      setIsSavingLeadExpiry(false)
+    }
+  }
 
   const filteredVendors = useMemo(() => {
     const query = search.trim().toLowerCase()
@@ -192,6 +246,69 @@ export default function VendorsPage() {
         </Button>
         <Button onClick={() => setIsCreateOpen(true)}>Create Vendor</Button>
       </div>
+
+      <Card className="border-emerald-200 bg-emerald-50/50">
+        <CardHeader>
+          <CardTitle>Vendor lead expiration</CardTitle>
+          <CardDescription>Control how long a new lead remains available to vendors before it expires.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
+            <label className="flex items-center gap-3 rounded-xl border bg-white px-4 py-3">
+              <input
+                type="checkbox"
+                checked={leadExpiryEnabled}
+                onChange={(event) => setLeadExpiryEnabled(event.target.checked)}
+                className="h-4 w-4 accent-emerald-600"
+              />
+              <span>
+                <span className="block text-sm font-semibold text-slate-900">Set the Vendor Expiration Time</span>
+                <span className="block text-xs text-slate-500">Turn off to keep vendor leads available indefinitely.</span>
+              </span>
+            </label>
+            <div className="grid flex-1 gap-2">
+              <Label htmlFor="vendor-lead-expiry">Expiration window</Label>
+              <Select value={leadExpiryMode} onValueChange={(value) => setLeadExpiryMode(value as AppConfig['vendor_lead_expiration_mode'])} disabled={!leadExpiryEnabled}>
+                <SelectTrigger id="vendor-lead-expiry"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="never">Never</SelectItem>
+                  <SelectItem value="3m">3 minutes</SelectItem>
+                  <SelectItem value="5m">5 minutes</SelectItem>
+                  <SelectItem value="10m">10 minutes</SelectItem>
+                  <SelectItem value="1h">1 hour</SelectItem>
+                  <SelectItem value="12h">12 hours</SelectItem>
+                  <SelectItem value="1d">A day</SelectItem>
+                  <SelectItem value="custom">Custom time or date</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {leadExpiryMode === 'custom' ? (
+              <div className="flex flex-wrap gap-2">
+                <div className="grid gap-2">
+                  <Label htmlFor="custom-expiry-value">Custom value</Label>
+                  <Input id="custom-expiry-value" type="number" min="1" value={customExpiryValue} onChange={(event) => setCustomExpiryValue(event.target.value)} disabled={!leadExpiryEnabled} className="w-28 bg-white" />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="custom-expiry-unit">Unit</Label>
+                  <select id="custom-expiry-unit" value={customExpiryUnit} onChange={(event) => setCustomExpiryUnit(event.target.value as typeof customExpiryUnit)} disabled={!leadExpiryEnabled} className="h-10 rounded-md border bg-white px-3 text-sm">
+                    <option value="minutes">Minutes</option>
+                    <option value="hours">Hours</option>
+                    <option value="days">Days</option>
+                  </select>
+                </div>
+                <div className="grid min-w-[220px] gap-2">
+                  <Label htmlFor="custom-expiry-date">Or custom date/time</Label>
+                  <Input id="custom-expiry-date" type="datetime-local" value={customExpiryDate} onChange={(event) => setCustomExpiryDate(event.target.value)} disabled={!leadExpiryEnabled} className="bg-white" />
+                </div>
+              </div>
+            ) : null}
+            <Button onClick={() => void saveLeadExpiry()} disabled={isSavingLeadExpiry}>
+              {isSavingLeadExpiry ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Save setting
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[

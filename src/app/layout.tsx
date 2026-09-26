@@ -6,6 +6,8 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { ErrorBoundary, SessionExpiredDialog, OfflineIndicator } from '@/components/error';
 import { SkipNav } from '@/components/ui/skip-nav';
 
+import { TRPCReactProvider } from '@/trpc/client';
+
 export const metadata: Metadata = {
   title: 'Scrapiz Admin',
   description: 'Admin Dashboard for Scrapiz',
@@ -35,9 +37,11 @@ export default function RootLayout({
         <SkipNav />
         <ErrorBoundary>
           <AuthProvider>
-            <OfflineIndicator />
-            <SessionExpiredDialog />
-            {children}
+            <TRPCReactProvider>
+              <OfflineIndicator />
+              <SessionExpiredDialog />
+              {children}
+            </TRPCReactProvider>
           </AuthProvider>
           <Toaster />
         </ErrorBoundary>

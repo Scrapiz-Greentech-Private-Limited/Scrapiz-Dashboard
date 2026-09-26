@@ -35,7 +35,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { showError, showSuccess } from '@/lib/toast-helpers'
 import { VendorService } from '@/services/vendor'
-import type { Vendor, VendorAuditLog, VendorDocument, VendorPaymentSummary, VendorStatus } from '@/types/vendor'
+import type {
+  Vendor,
+  VendorAssignedOrderItem,
+  VendorAssignedOrdersResponse,
+  VendorAuditLog,
+  VendorDocument,
+  VendorPaymentSummary,
+  VendorStatus,
+} from '@/types/vendor'
 
 interface VendorDetailsDialogProps {
   vendorId: number | null
@@ -84,6 +92,27 @@ const formatAuditValue = (value?: Record<string, unknown> | null) => {
   }
 }
 
+const formatStatusLabel = (value?: string | null) =>
+  (value || 'unknown').replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())
+
+const formatStateAge = (value?: number | null) => {
+  if (typeof value !== 'number' || value < 0) return 'Not available'
+  const hours = Math.floor(value / 3600)
+  const minutes = Math.floor((value % 3600) / 60)
+  if (hours > 0) return `${hours}h ${minutes}m`
+  return `${minutes}m`
+}
+
+const getCountdownLabel = (deadline?: string | null, nowMs?: number) => {
+  if (!deadline) return 'No deadline'
+  const remainingMs = new Date(deadline).getTime() - (nowMs || Date.now())
+  if (remainingMs <= 0) return 'Due now'
+  const totalMinutes = Math.ceil(remainingMs / 60000)
+  const hours = Math.floor(totalMinutes / 60)
+  const minutes = totalMinutes % 60
+  return hours > 0 ? `${hours}h ${minutes}m left` : `${minutes}m left`
+}
+
 export default function VendorDetailsDialog({
   vendorId,
   isOpen,
@@ -103,18 +132,30 @@ export default function VendorDetailsDialog({
   const [isRequestingFaceReupload, setIsRequestingFaceReupload] = useState(false)
   const [isDeletingVendor, setIsDeletingVendor] = useState(false)
   const [trialDaysInput, setTrialDaysInput] = useState('15')
+  const [assignmentData, setAssignmentData] = useState<VendorAssignedOrdersResponse | null>(null)
+  const [isLoadingAssignments, setIsLoadingAssignments] = useState(false)
+  const [selectedAssignment, setSelectedAssignment] = useState<VendorAssignedOrderItem | null>(null)
+  const [isCountdownDialogOpen, setIsCountdownDialogOpen] = useState(false)
+  const [countdownMinutesInput, setCountdownMinutesInput] = useState('20')
+  const [countdownResolution, setCountdownResolution] = useState<'expire' | 'transfer'>('expire')
+  const [countdownNote, setCountdownNote] = useState('')
+  const [isAssignmentActionPending, setIsAssignmentActionPending] = useState(false)
+  const [nowTick, setNowTick] = useState(() => Date.now())
 
   const loadVendor = async () => {
     if (!vendorId) return
     setIsLoading(true)
     setIsLoadingSummary(true)
+    setIsLoadingAssignments(true)
     try {
-      const [detail, summary] = await Promise.all([
+      const [detail, summary, assignments] = await Promise.all([
         VendorService.getVendor(vendorId),
         VendorService.getPaymentSummary(vendorId),
+        VendorService.getAssignedOrders(vendorId),
       ])
       setVendor(detail)
       setPaymentSummary(summary)
+      setAssignmentData(assignments)
       if (detail.trial_duration_days !== undefined && detail.trial_duration_days !== null) {
         setTrialDaysInput(String(detail.trial_duration_days))
       }
@@ -123,6 +164,7 @@ export default function VendorDetailsDialog({
     } finally {
       setIsLoading(false)
       setIsLoadingSummary(false)
+      setIsLoadingAssignments(false)
     }
   }
 
@@ -131,6 +173,12 @@ export default function VendorDetailsDialog({
       loadVendor()
     }
   }, [isOpen, vendorId])
+
+  useEffect(() => {
+    if (!isOpen) return
+    const intervalId = window.setInterval(() => setNowTick(Date.now()), 30000)
+    return () => window.clearInterval(intervalId)
+  }, [isOpen])
 
   const documentSummary = useMemo(() => {
     const documents = vendor?.documents || []
@@ -281,9 +329,68 @@ export default function VendorDetailsDialog({
     }
   }
 
+  const openCountdownDialog = (assignment: VendorAssignedOrderItem) => {
+    setSelectedAssignment(assignment)
+    setCountdownMinutesInput(String(assignment.active_countdown?.countdown_minutes || 20))
+    setCountdownResolution(
+      assignment.active_countdown?.resolution_action === 'transfer' ? 'transfer' : 'expire',
+    )
+    setCountdownNote('')
+    setIsCountdownDialogOpen(true)
+  }
+
+  const handleExpireAssignedOrder = async (assignment: VendorAssignedOrderItem) => {
+    if (!vendorId) return
+    const shouldExpire = window.confirm(
+      `Expire assignment for order ${assignment.order_number}? This will return the order to the operations queue.`,
+    )
+    if (!shouldExpire) return
+
+    setIsAssignmentActionPending(true)
+    try {
+      await VendorService.expireAssignedOrder(vendorId, assignment.order_id, reason || undefined)
+      showSuccess(`Assignment for ${assignment.order_number} expired successfully`)
+      await loadVendor()
+      onVendorUpdated?.()
+    } catch (error: any) {
+      showError(error.message || 'Failed to expire assignment')
+    } finally {
+      setIsAssignmentActionPending(false)
+    }
+  }
+
+  const handleArmCountdown = async () => {
+    if (!vendorId || !selectedAssignment) return
+
+    const countdownMinutes = Number(countdownMinutesInput)
+    if (!Number.isFinite(countdownMinutes) || countdownMinutes <= 0) {
+      showError('Please enter a valid countdown in minutes.')
+      return
+    }
+
+    setIsAssignmentActionPending(true)
+    try {
+      await VendorService.scheduleAssignedOrderCountdown(vendorId, selectedAssignment.order_id, {
+        countdown_minutes: countdownMinutes,
+        resolution_action: countdownResolution,
+        note: countdownNote,
+      })
+      showSuccess(`Countdown armed for ${selectedAssignment.order_number}`)
+      setIsCountdownDialogOpen(false)
+      setSelectedAssignment(null)
+      setCountdownNote('')
+      await loadVendor()
+    } catch (error: any) {
+      showError(error.message || 'Failed to arm countdown')
+    } finally {
+      setIsAssignmentActionPending(false)
+    }
+  }
+
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl overflow-hidden p-0">
+    <>
+      <Dialog open={isOpen} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-5xl overflow-hidden p-0">
         <DialogHeader className="border-b bg-slate-50 px-6 py-5">
           <DialogTitle className="text-2xl">
             {vendor?.full_name || 'Vendor details'}
@@ -582,9 +689,10 @@ export default function VendorDetailsDialog({
               </div>
 
               <Tabs defaultValue="documents" className="space-y-4">
-                <TabsList className="grid w-full grid-cols-3">
+                <TabsList className="grid w-full grid-cols-4">
                   <TabsTrigger value="documents">Documents</TabsTrigger>
                   <TabsTrigger value="activity">Operational Snapshot</TabsTrigger>
+                  <TabsTrigger value="assignments">Assigned Orders</TabsTrigger>
                   <TabsTrigger value="audit">Audit Trail</TabsTrigger>
                 </TabsList>
 
@@ -722,6 +830,205 @@ export default function VendorDetailsDialog({
                   </div>
                 </TabsContent>
 
+                <TabsContent value="assignments" className="space-y-4">
+                  <div className="grid gap-4 md:grid-cols-4">
+                    <Card className="border-slate-200 bg-[linear-gradient(135deg,#0f172a,#1e293b)] text-white">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm text-white/80">Tracked bookings</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-3xl font-semibold">
+                          {assignmentData?.summary.total_bookings ?? 0}
+                        </div>
+                        <div className="mt-1 text-xs text-white/65">Recent and active vendor-owned bookings</div>
+                      </CardContent>
+                    </Card>
+                    <Card className="border-emerald-200 bg-emerald-50">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm text-emerald-900">Active now</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-3xl font-semibold text-emerald-950">
+                          {assignmentData?.summary.active_bookings ?? 0}
+                        </div>
+                        <div className="mt-1 text-xs text-emerald-700">Confirmed, en route, arrived, and live jobs</div>
+                      </CardContent>
+                    </Card>
+                    <Card className="border-amber-200 bg-amber-50">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm text-amber-900">Countdowns armed</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-3xl font-semibold text-amber-950">
+                          {assignmentData?.summary.countdowns_armed ?? 0}
+                        </div>
+                        <div className="mt-1 text-xs text-amber-700">Orders with a pending escalation timer</div>
+                      </CardContent>
+                    </Card>
+                    <Card className="border-rose-200 bg-rose-50">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm text-rose-900">Needs follow-up</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-3xl font-semibold text-rose-950">
+                          {assignmentData?.summary.flagged_for_followup ?? 0}
+                        </div>
+                        <div className="mt-1 text-xs text-rose-700">Stuck in pre-pickup flow for 15+ minutes</div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  <Card className="border-slate-200">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base">Assigned Orders Command Desk</CardTitle>
+                      <CardDescription>
+                        Review live assignment health, trace transfer audits, expire a stale booking immediately, or arm a timed escalation with either expiry or transfer preparation.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {isLoadingAssignments ? (
+                        <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Loading assignment activity...
+                        </div>
+                      ) : !assignmentData || assignmentData.items.length === 0 ? (
+                        <div className="rounded-2xl border border-dashed px-6 py-14 text-center text-muted-foreground">
+                          This vendor does not have any tracked bookings yet.
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {assignmentData.items.map((assignment) => (
+                            <div key={assignment.booking_id} className="rounded-3xl border border-slate-200 bg-white shadow-sm">
+                              <div className="border-b border-slate-100 bg-[radial-gradient(circle_at_top_left,#f8fafc,white_55%,#eef2ff)] px-5 py-4">
+                                <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+                                  <div className="space-y-2">
+                                    <div className="flex flex-wrap items-center gap-2">
+                                      <div className="text-lg font-semibold text-slate-950">{assignment.order_number}</div>
+                                      <Badge className="border-slate-200 bg-slate-100 text-slate-800">
+                                        {formatStatusLabel(assignment.booking_status)}
+                                      </Badge>
+                                      {assignment.lead_status ? (
+                                        <Badge className="border-blue-200 bg-blue-50 text-blue-700">
+                                          Lead {formatStatusLabel(assignment.lead_status)}
+                                        </Badge>
+                                      ) : null}
+                                      {assignment.active_countdown ? (
+                                        <Badge className="border-amber-200 bg-amber-50 text-amber-700">
+                                          Countdown: {getCountdownLabel(assignment.active_countdown.deadline_at, nowTick)}
+                                        </Badge>
+                                      ) : null}
+                                    </div>
+                                    <div className="text-sm text-slate-600">
+                                      {assignment.customer_name} • {assignment.customer_phone || 'Phone unavailable'}
+                                    </div>
+                                    <div className="max-w-3xl text-sm text-slate-500">
+                                      {assignment.customer_address}
+                                    </div>
+                                  </div>
+
+                                  <div className="grid gap-2 sm:grid-cols-2 xl:min-w-[320px]">
+                                    <Button
+                                      disabled={!assignment.can_expire_now || isAssignmentActionPending}
+                                      className="bg-rose-600 hover:bg-rose-700"
+                                      onClick={() => handleExpireAssignedOrder(assignment)}
+                                    >
+                                      {isAssignmentActionPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                                      Expire Lead
+                                    </Button>
+                                    <Button
+                                      disabled={!assignment.can_schedule_countdown || isAssignmentActionPending}
+                                      variant="outline"
+                                      className="border-slate-300 bg-white hover:bg-slate-50"
+                                      onClick={() => openCountdownDialog(assignment)}
+                                    >
+                                      Arm Countdown
+                                    </Button>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="grid gap-4 px-5 py-5 lg:grid-cols-[1.1fr_0.9fr]">
+                                <div className="grid gap-4 md:grid-cols-3">
+                                  <div className="rounded-2xl border bg-slate-50 p-4">
+                                    <div className="text-xs font-medium uppercase tracking-wide text-slate-500">Time in current stage</div>
+                                    <div className="mt-2 text-xl font-semibold text-slate-950">
+                                      {formatStateAge(assignment.state_age_seconds)}
+                                    </div>
+                                    <div className="mt-1 text-sm text-slate-500">
+                                      Last progress {formatDate(assignment.updated_at)}
+                                    </div>
+                                  </div>
+                                  <div className="rounded-2xl border bg-slate-50 p-4">
+                                    <div className="text-xs font-medium uppercase tracking-wide text-slate-500">Lead window</div>
+                                    <div className="mt-2 text-sm font-semibold text-slate-950">
+                                      {formatDate(assignment.lead_expires_at)}
+                                    </div>
+                                    <div className="mt-1 text-sm text-slate-500">
+                                      Accepted {formatDate(assignment.lead_accepted_at)}
+                                    </div>
+                                  </div>
+                                  <div className="rounded-2xl border bg-slate-50 p-4">
+                                    <div className="text-xs font-medium uppercase tracking-wide text-slate-500">Distance snapshot</div>
+                                    <div className="mt-2 text-xl font-semibold text-slate-950">
+                                      {typeof assignment.distance_km === 'number' ? `${assignment.distance_km.toFixed(1)} km` : 'Unavailable'}
+                                    </div>
+                                    <div className="mt-1 text-sm text-slate-500">
+                                      Warning sent {formatDate(assignment.inactivity_warning_sent_at)}
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
+                                  <div className="flex items-center justify-between gap-3">
+                                    <div>
+                                      <div className="text-sm font-semibold text-slate-950">Transfer and escalation audit</div>
+                                      <div className="text-xs text-slate-500">Latest automation and admin actions for this booking</div>
+                                    </div>
+                                    {assignment.latest_audit ? (
+                                      <Badge className="border-slate-200 bg-white text-slate-700">
+                                        {formatStatusLabel(assignment.latest_audit.status)}
+                                      </Badge>
+                                    ) : null}
+                                  </div>
+
+                                  {!assignment.latest_audit ? (
+                                    <div className="mt-4 text-sm text-slate-500">No transfer audit has been recorded for this order yet.</div>
+                                  ) : (
+                                    <div className="mt-4 space-y-3">
+                                      <div className="rounded-2xl bg-white p-4">
+                                        <div className="text-sm font-medium text-slate-900">{assignment.latest_audit.reason}</div>
+                                        <div className="mt-2 grid gap-2 text-xs text-slate-500 sm:grid-cols-2">
+                                          <div>Created {formatDate(assignment.latest_audit.created_at)}</div>
+                                          <div>Outcome {formatStatusLabel(assignment.latest_audit.outcome || assignment.latest_audit.status)}</div>
+                                          <div>Resolution {formatStatusLabel(assignment.latest_audit.resolution_action || 'manual')}</div>
+                                          <div>Dispatch {formatStatusLabel(assignment.latest_audit.dispatch_status || 'not set')}</div>
+                                        </div>
+                                      </div>
+                                      {assignment.recent_audits.length > 1 ? (
+                                        <div className="space-y-2">
+                                          {assignment.recent_audits.slice(1).map((audit) => (
+                                            <div key={audit.id} className="rounded-2xl border border-white bg-white/80 px-4 py-3 text-sm text-slate-600">
+                                              <div className="flex items-center justify-between gap-2">
+                                                <span className="font-medium text-slate-900">{formatStatusLabel(audit.status)}</span>
+                                                <span className="text-xs text-slate-500">{formatDate(audit.created_at)}</span>
+                                              </div>
+                                              <div className="mt-1">{audit.reason}</div>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      ) : null}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
                 <TabsContent value="audit" className="space-y-4">
                   <div className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
                     <Card className="border-slate-200">
@@ -850,7 +1157,107 @@ export default function VendorDetailsDialog({
             </div>
           )}
         </ScrollArea>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isCountdownDialogOpen} onOpenChange={setIsCountdownDialogOpen}>
+        <DialogContent className="max-w-2xl border-slate-200 p-0">
+          <DialogHeader className="border-b bg-[linear-gradient(135deg,#0f172a,#1e293b)] px-6 py-5 text-white">
+            <DialogTitle className="text-2xl">
+              {selectedAssignment ? `Countdown for ${selectedAssignment.order_number}` : 'Assignment countdown'}
+            </DialogTitle>
+            <DialogDescription className="text-slate-300">
+              If the booking does not move forward from this stage, choose whether the system should expire it or move it into transfer preparation.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6 px-6 py-6">
+            {selectedAssignment ? (
+              <div className="rounded-3xl border bg-slate-50 p-4">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge className="border-slate-200 bg-white text-slate-700">
+                    {formatStatusLabel(selectedAssignment.booking_status)}
+                  </Badge>
+                  {selectedAssignment.lead_status ? (
+                    <Badge className="border-blue-200 bg-blue-50 text-blue-700">
+                      Lead {formatStatusLabel(selectedAssignment.lead_status)}
+                    </Badge>
+                  ) : null}
+                </div>
+                <div className="mt-3 text-sm text-slate-700">
+                  {selectedAssignment.customer_name} • {selectedAssignment.customer_phone || 'Phone unavailable'}
+                </div>
+                <div className="mt-1 text-sm text-slate-500">
+                  Current stage age: {formatStateAge(selectedAssignment.state_age_seconds)}
+                </div>
+              </div>
+            ) : null}
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => setCountdownResolution('expire')}
+                className={`rounded-3xl border p-5 text-left transition ${countdownResolution === 'expire' ? 'border-rose-300 bg-rose-50 shadow-sm' : 'border-slate-200 bg-white hover:border-slate-300'}`}
+              >
+                <div className="text-sm font-semibold text-slate-950">Expire if still stuck</div>
+                <div className="mt-2 text-sm text-slate-500">
+                  The assignment is invalidated and the order returns to the queue with a clean audit trail.
+                </div>
+              </button>
+              <button
+                type="button"
+                onClick={() => setCountdownResolution('transfer')}
+                className={`rounded-3xl border p-5 text-left transition ${countdownResolution === 'transfer' ? 'border-amber-300 bg-amber-50 shadow-sm' : 'border-slate-200 bg-white hover:border-slate-300'}`}
+              >
+                <div className="text-sm font-semibold text-slate-950">Prepare transfer to another vendor</div>
+                <div className="mt-2 text-sm text-slate-500">
+                  The current assignment is invalidated and the audit records the next replacement candidate for operations follow-up.
+                </div>
+              </button>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-[180px_1fr]">
+              <div className="space-y-2">
+                <Label htmlFor="countdown-minutes">Countdown minutes</Label>
+                <Input
+                  id="countdown-minutes"
+                  value={countdownMinutesInput}
+                  onChange={(event) => setCountdownMinutesInput(event.target.value)}
+                  placeholder="20"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="countdown-note">Admin note</Label>
+                <Textarea
+                  id="countdown-note"
+                  value={countdownNote}
+                  onChange={(event) => setCountdownNote(event.target.value)}
+                  placeholder="Explain what operations should watch for before the escalation runs."
+                  className="min-h-24"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-wrap justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setIsCountdownDialogOpen(false)}
+                disabled={isAssignmentActionPending}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleArmCountdown}
+                disabled={isAssignmentActionPending}
+                className="bg-slate-950 hover:bg-slate-800"
+              >
+                {isAssignmentActionPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                Start countdown
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }

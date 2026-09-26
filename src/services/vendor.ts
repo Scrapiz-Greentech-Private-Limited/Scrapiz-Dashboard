@@ -3,6 +3,7 @@ import { API_CONFIG } from '@/components/backend/config';
 import type {
   CreateVendorRequest,
   Vendor,
+  VendorAssignedOrdersResponse,
   VendorDocument,
   VendorListResponse,
   VendorPaymentSummary,
@@ -183,6 +184,45 @@ export class VendorService {
     try {
       const response = await apiClient.get(`/vendor/admin/${vendorId}/payment-summary/`);
       return unwrapEnvelope<VendorPaymentSummary>(response);
+    } catch (error: any) {
+      throw new Error(getErrorMessage(error));
+    }
+  }
+
+  static async getAssignedOrders(vendorId: number): Promise<VendorAssignedOrdersResponse> {
+    try {
+      const response = await apiClient.get(`/vendor/admin/${vendorId}/assigned-orders/`);
+      return unwrapEnvelope<VendorAssignedOrdersResponse>(response);
+    } catch (error: any) {
+      throw new Error(getErrorMessage(error));
+    }
+  }
+
+  static async expireAssignedOrder(vendorId: number, orderId: number, note?: string) {
+    try {
+      const response = await apiClient.post(`/vendor/admin/${vendorId}/assigned-orders/${orderId}/action/`, {
+        action: 'expire_now',
+        ...(note?.trim() ? { note: note.trim() } : {}),
+      });
+      return unwrapEnvelope<{ audit_id: number; status: string; resolved_at: string }>(response);
+    } catch (error: any) {
+      throw new Error(getErrorMessage(error));
+    }
+  }
+
+  static async scheduleAssignedOrderCountdown(
+    vendorId: number,
+    orderId: number,
+    payload: { countdown_minutes: number; resolution_action: 'expire' | 'transfer'; note?: string },
+  ) {
+    try {
+      const response = await apiClient.post(`/vendor/admin/${vendorId}/assigned-orders/${orderId}/action/`, {
+        action: 'schedule_countdown',
+        countdown_minutes: payload.countdown_minutes,
+        resolution_action: payload.resolution_action,
+        ...(payload.note?.trim() ? { note: payload.note.trim() } : {}),
+      });
+      return unwrapEnvelope<{ audit_id: number; status: string; deadline_at?: string; resolution_action?: string }>(response);
     } catch (error: any) {
       throw new Error(getErrorMessage(error));
     }

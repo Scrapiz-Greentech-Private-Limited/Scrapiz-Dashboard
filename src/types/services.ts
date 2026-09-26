@@ -190,16 +190,28 @@ export interface OrganizationDashboard {
 }
 
 export interface ServicePageStats {
-  total_organizations: number;
-  active_organizations: number;
-  total_orders: number;
-  completed_orders: number;
-  pending_orders: number;
-  in_progress_orders: number;
-  total_quantity_processed: number;
-  total_value_processed: number;
-  total_certificates_generated: number;
-  total_environmental_impact: EnvironmentalImpact;
+  total_organizations?: number;
+  active_organizations?: number;
+  total_orders?: number;
+  completed_orders?: number;
+  pending_orders?: number;
+  in_progress_orders?: number;
+  total_quantity_processed?: number;
+  total_value_processed?: number;
+  total_certificates_generated?: number;
+  total_environmental_impact?: EnvironmentalImpact;
+
+  // camelCase fields
+  totalOrganizations?: number;
+  activeOrganizations?: number;
+  totalOrders?: number;
+  completedOrders?: number;
+  pendingOrders?: number;
+  inProgressOrders?: number;
+  totalQuantityProcessed?: number;
+  totalValueProcessed?: number;
+  totalCertificatesGenerated?: number;
+  totalEnvironmentalImpact?: EnvironmentalImpact;
 }
 
 export interface OrderWorkflowState {

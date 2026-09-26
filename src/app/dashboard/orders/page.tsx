@@ -106,6 +106,18 @@ const calculateTotalValue = (orderSummary: OrderSummary): number => {
   }, 0) || 0;
 };
 
+const calculateTotalWeight = (orderSummary: OrderSummary): number => {
+  const serverWeight =
+    orderSummary.total_weight !== undefined && orderSummary.total_weight !== null
+      ? parseFloat(String(orderSummary.total_weight))
+      : NaN;
+  if (Number.isFinite(serverWeight)) {
+    return serverWeight;
+  }
+
+  return orderSummary.orders?.reduce((sum, item) => sum + (parseFloat(String(item.quantity)) || 0), 0) || 0;
+};
+
 // Map backend OrderSummary to frontend Order type
 const mapOrderSummaryToOrder = (orderSummary: OrderSummary & { 
   assigned_agent_details?: { id: number; agent_code: string; name: string; phone: string; availability: string } | null;
@@ -125,7 +137,7 @@ const mapOrderSummaryToOrder = (orderSummary: OrderSummary & {
     agentId: orderSummary.assigned_agent_details?.name || undefined,
     assignedAgent: orderSummary.assigned_agent_details || undefined,
     scrapCategory: getProductNames(orderSummary),
-    estimatedWeight: orderSummary.orders?.reduce((sum, item) => sum + (parseFloat(item.quantity) || 0), 0) || 0,
+    estimatedWeight: calculateTotalWeight(orderSummary),
     finalWeight: undefined,
     pricePerKg: orderSummary.orders?.[0]?.product?.max_rate || 0,
     totalAmount: totalValue,
@@ -240,7 +252,7 @@ function MobileOrderCard({ order, onViewDetails }: { order: Order; onViewDetails
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1 min-w-0">
             <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Order ID</p>
-            <p className="font-semibold text-sm">{order.id}</p>
+            <p className="font-semibold text-sm break-all">{order.id}</p>
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="outline" className={`text-[10px] px-2 py-0.5 ${statusBadge.className}`}>

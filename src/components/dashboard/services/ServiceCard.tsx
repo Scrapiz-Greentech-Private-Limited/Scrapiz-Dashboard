@@ -10,6 +10,13 @@ import { Users, TrendingUp, Award, Zap, FileText, BarChart3 } from 'lucide-react
 import { ServiceType, Organization } from '@/types/services';
 import ServiceManagementAPI from '@/services/services';
 
+const SERVICE_FALLBACK_IMAGES: Record<string, string> = {
+  society_tieup: '/services/societyTieup.webp',
+  corporate_tieup: '/services/corporateTieup.webp',
+  debris_removal: '/services/debris_removal.webp',
+  demolition_removal: '/services/demolition_removal.webp',
+};
+
 interface ServiceCardProps {
   service: ServiceType;
   organizations: Organization[];
@@ -17,6 +24,11 @@ interface ServiceCardProps {
 
 export default function ServiceCard({ service, organizations }: ServiceCardProps) {
   const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null);
+
+  const fallbackImage = SERVICE_FALLBACK_IMAGES[service.service_name] || null;
+  const initialImage = service.image_url || fallbackImage;
+  const [currentSrc, setCurrentSrc] = useState<any>(initialImage);
+  const [imageFailed, setImageFailed] = useState(false);
 
   const getServiceIcon = (serviceName: string) => {
     const icons: Record<string, string> = {
@@ -44,25 +56,33 @@ export default function ServiceCard({ service, organizations }: ServiceCardProps
     <Card className={`${color.bg} border ${color.border} overflow-hidden hover:shadow-xl transition-shadow`}>
       {/* Image Section */}
       <div className="relative h-48 w-full bg-gradient-to-b from-gray-200 to-gray-100 overflow-hidden">
-        {service.image_url ? (
+        {currentSrc && !imageFailed ? (
           <Image
-            src={service.image_url}
+            src={currentSrc}
             alt={service.description}
             fill
-            className="object-cover"
-            onError={(e) => {
-              // Fallback if image fails to load
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
+            unoptimized
+            className="object-cover transition-transform duration-300 hover:scale-105"
+            onError={() => {
+              if (currentSrc !== fallbackImage && fallbackImage) {
+                setCurrentSrc(fallbackImage);
+              } else {
+                setImageFailed(true);
+              }
             }}
           />
         ) : (
-          <div className="flex items-center justify-center h-full text-6xl">
-            {getServiceIcon(service.service_name)}
+          <div className="flex flex-col items-center justify-center h-full gap-2 bg-gradient-to-br from-gray-100 to-gray-200">
+            <span className="text-5xl">{getServiceIcon(service.service_name)}</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+              {service.service_name.replace(/_/g, ' ')}
+            </span>
           </div>
         )}
-        <div className="absolute top-0 right-0 m-4">
-          <Badge className={color.text + ' bg-white'}>{service.is_active ? 'Active' : 'Inactive'}</Badge>
+        <div className="absolute top-0 right-0 m-4 z-10">
+          <Badge className={color.text + ' bg-white/95 backdrop-blur-sm shadow-sm'}>
+            {service.is_active ? 'Active' : 'Inactive'}
+          </Badge>
         </div>
       </div>
 

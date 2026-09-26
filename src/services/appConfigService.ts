@@ -11,6 +11,9 @@ export interface AppConfig {
   enable_location_skip: boolean;
   force_update_url_android: string;
   force_update_url_ios: string;
+  vendor_lead_expiration_enabled: boolean;
+  vendor_lead_expiration_mode: 'never' | '3m' | '5m' | '10m' | '1h' | '12h' | '1d' | 'custom';
+  vendor_lead_expiration_custom_seconds?: number | null;
 }
 
 // Create axios instance with base configuration

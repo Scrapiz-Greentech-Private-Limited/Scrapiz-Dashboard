@@ -131,7 +131,7 @@ const MOCK_SERVICE_TYPES: ServiceType[] = [
     service_code: 'DEMO_001',
     service_name: 'demolition_removal',
     description: 'Complete demolition and removal services with environmental compliance',
-    image_url: '/services/debris_removal.webp',
+    image_url: '/services/demolition_removal.webp',
     icon_url: '🏗️',
     is_active: true,
     created_at: new Date().toISOString(),

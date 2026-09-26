@@ -6,6 +6,7 @@ import {
   AvailableVendorSummary,
   BookingTransferAudit,
   BookingTransferAuditService,
+  SupportFeedbackItem,
   OrderService,
 } from "@/components/backend/apiService";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +36,7 @@ export default function BookingAuditsPage() {
   const [vendors, setVendors] = useState<AvailableVendorSummary[]>([]);
   const [selectedAudit, setSelectedAudit] = useState<BookingTransferAudit | null>(null);
   const [assigningVendorId, setAssigningVendorId] = useState<number | null>(null);
+  const [supportFeedback, setSupportFeedback] = useState<SupportFeedbackItem[]>([]);
 
   const loadAudits = async () => {
     setLoading(true);
@@ -51,6 +53,26 @@ export default function BookingAuditsPage() {
   useEffect(() => {
     void loadAudits();
   }, []);
+
+  useEffect(() => {
+    const loadSupportFeedback = async () => {
+      try {
+        const response = await BookingTransferAuditService.getSupportFeedback();
+        setSupportFeedback(response.support_feedback || []);
+        const highPriorityCount = (response.support_feedback || []).filter((item) => item.priority === 'high').length;
+        if (highPriorityCount > 0) {
+          toast({
+            title: "Support help needed",
+            description: `${highPriorityCount} high-priority vendor cancellation report${highPriorityCount > 1 ? 's' : ''} just arrived.`,
+          });
+        }
+      } catch {
+        setSupportFeedback([]);
+      }
+    };
+
+    void loadSupportFeedback();
+  }, [toast]);
 
   const openAssignDialog = async (audit: BookingTransferAudit) => {
     setSelectedAudit(audit);
@@ -154,6 +176,32 @@ export default function BookingAuditsPage() {
         </CardContent>
       </Card>
 
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <AlertTriangle className="h-4 w-4 text-amber-600" />
+            Support Feedback
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {supportFeedback.slice(0, 6).map((item) => (
+            <div key={item.id} className="flex items-start justify-between gap-4 rounded-lg border p-3">
+              <div>
+                <div className="font-medium">{item.user_name || "Vendor"}</div>
+                <div className="text-sm text-muted-foreground">{item.choice_value || "Support feedback"}</div>
+                {item.text_value ? <div className="mt-1 text-sm text-muted-foreground">{item.text_value}</div> : null}
+              </div>
+              <Badge variant={item.priority === "high" ? "destructive" : "secondary"}>{item.priority}</Badge>
+            </div>
+          ))}
+          {!supportFeedback.length ? (
+            <div className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
+              No support feedback has arrived yet.
+            </div>
+          ) : null}
+        </CardContent>
+      </Card>
+
       <Dialog open={Boolean(selectedAudit)} onOpenChange={(open) => !open && setSelectedAudit(null)}>
         <DialogContent>
           <DialogHeader>
@@ -171,7 +219,7 @@ export default function BookingAuditsPage() {
                   <span className="block font-medium">{vendor.name}</span>
                   <span className="text-xs text-muted-foreground">
                     {vendor.service_area || vendor.service_city || "Service area unavailable"}
-                    {vendor.distance_km != null ? ` • ${vendor.distance_km} km` : ""}
+                    {vendor.distance_km != null ? " • " + vendor.distance_km + " km" : ""}
                   </span>
                 </span>
                 <Badge variant={vendor.is_online ? "secondary" : "outline"}>{vendor.is_online ? "Online" : "Offline"}</Badge>

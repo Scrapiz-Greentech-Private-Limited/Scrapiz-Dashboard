@@ -85,6 +85,10 @@ export const API_CONFIG = {
     FEEDBACK_RATINGS_ALL: '/feedback/ratings/all/',
     FEEDBACK_RATINGS_STATS: '/feedback/ratings/stats/',
     FEEDBACK_VENDOR_REVIEWS: '/feedback/vendor-reviews/admin/',
+
+    // Support Chat endpoints (Phase 5)
+    SUPPORT_ADMIN_THREADS: '/support/admin/threads/',
+    SUPPORT_ADMIN_STATS:   '/support/admin/threads/stats/',
   },
   HEADERS: {
     'Content-Type': 'application/json',

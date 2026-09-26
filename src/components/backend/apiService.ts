@@ -65,6 +65,7 @@ export interface OrderSummary {
   address: number | null;
   address_details?: OrderAddressDetails | null;
   orders: OrderItemSummary[];
+  total_weight?: number | string | null;
   images?: string[];
   // Django DecimalField returns string
   estimated_order_value?: number | string;
@@ -168,6 +169,15 @@ export interface BookingTransferAudit {
   from_vendor?: { id: number; name: string; rating: number; phone?: string | null } | null;
   to_vendor?: { id: number; name: string; rating: number; phone?: string | null } | null;
   metadata?: Record<string, any>;
+}
+
+export interface SupportFeedbackItem {
+  id: number;
+  created_at: string;
+  priority: 'high' | 'normal';
+  user_name?: string | null;
+  choice_value?: string | null;
+  text_value?: string | null;
 }
 
 export interface AddressSummary {
@@ -1932,7 +1942,9 @@ export class AdminAlertService {
 
   static getStreamUrl(lastId = 0): string | null {
     if (typeof window === 'undefined') return null;
-    const token = localStorage.getItem('adminAuthToken');
+    const token =
+      localStorage.getItem('adminAuthToken') ||
+      localStorage.getItem('authToken');
     if (!token) return null;
     const frontendKey = API_CONFIG.HEADERS['x-auth-app'] as string | undefined;
     const params = new URLSearchParams({
@@ -1962,5 +1974,10 @@ export class BookingTransferAuditService {
   static async action(auditId: number, payload: { action: 'expire' | 'mark_reassigned'; vendor_id?: number }) {
     const response = await apiClient.post(`/booking/admin/transfer-audits/${auditId}/action/`, payload);
     return response.data.data;
+  }
+
+  static async getSupportFeedback(): Promise<{ support_feedback: SupportFeedbackItem[]; count: number }> {
+    const response = await apiClient.get('/feedback/support/admin/');
+    return response.data;
   }
 }

@@ -190,3 +190,69 @@ export interface VendorPaymentSummary {
     metadata?: Record<string, unknown>;
   }>;
 }
+
+export interface VendorAssignedOrderAudit {
+  id: number;
+  status: string;
+  reason_code: string;
+  reason: string;
+  warning_sent_at?: string | null;
+  cancelled_at?: string | null;
+  reassigned_at?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  monitor_status?: string | null;
+  deadline_at?: string | null;
+  countdown_minutes?: number | null;
+  resolution_action?: 'expire' | 'transfer' | string | null;
+  expected_booking_status?: string | null;
+  outcome?: string | null;
+  dispatch_status?: string | null;
+  to_vendor?: {
+    id: number;
+    name: string;
+    service_city?: string | null;
+    service_area?: string | null;
+  } | null;
+  metadata?: Record<string, unknown>;
+}
+
+export interface VendorAssignedOrderItem {
+  booking_id: string;
+  order_id: number;
+  order_number: string;
+  customer_name: string;
+  customer_phone?: string | null;
+  customer_address: string;
+  booking_status: string;
+  lead_status?: string | null;
+  lead_expires_at?: string | null;
+  lead_created_at?: string | null;
+  lead_accepted_at?: string | null;
+  started_at?: string | null;
+  arrived_at?: string | null;
+  completed_at?: string | null;
+  inactivity_warning_sent_at?: string | null;
+  invalidated_at?: string | null;
+  invalidation_reason?: string | null;
+  state_age_seconds?: number | null;
+  distance_km?: number | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  can_expire_now: boolean;
+  can_schedule_countdown: boolean;
+  latest_audit?: VendorAssignedOrderAudit | null;
+  active_countdown?: VendorAssignedOrderAudit | null;
+  recent_audits: VendorAssignedOrderAudit[];
+}
+
+export interface VendorAssignedOrdersResponse {
+  summary: {
+    total_bookings: number;
+    active_bookings: number;
+    countdowns_armed: number;
+    flagged_for_followup: number;
+    transfer_audits: number;
+  };
+  items: VendorAssignedOrderItem[];
+}
