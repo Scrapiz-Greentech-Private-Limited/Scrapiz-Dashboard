@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -31,6 +31,7 @@ export default function VerifyOTPPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [countdown, setCountdown] = useState(0);
+  const verificationStartedRef = useRef(false);
 
   // Redirect if no pending email (user didn't come from login)
   useEffect(() => {
@@ -53,6 +54,9 @@ export default function VerifyOTPPage() {
       return;
     }
 
+    if (verificationStartedRef.current || isLoading) return;
+    verificationStartedRef.current = true;
+
     setIsLoading(true);
     setError(null);
 
@@ -64,6 +68,7 @@ export default function VerifyOTPPage() {
       setError(err.message || "Invalid OTP. Please try again.");
       setOtp("");
     } finally {
+      verificationStartedRef.current = false;
       setIsLoading(false);
     }
   };

@@ -137,7 +137,10 @@ export class AdminAuthService {
 
       return data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.error || 'Login failed');
+      const authError: any = new Error(error.response?.data?.error || 'Login failed');
+      authError.code = error.response?.data?.code;
+      authError.status = error.response?.status;
+      throw authError;
     }
   }
 

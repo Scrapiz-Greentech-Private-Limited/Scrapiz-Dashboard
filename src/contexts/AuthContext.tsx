@@ -26,8 +26,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [user, setUser] = useState<AdminUser | null>(null);
   const [permissions, setPermissions] = useState<AdminPermissions | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [pendingEmail, setPendingEmail] = useState<string | null>(null);
-  const [requiresVerification, setRequiresVerification] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    return sessionStorage.getItem('adminPendingVerificationEmail');
+  });
+  const [requiresVerification, setRequiresVerification] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return sessionStorage.getItem('adminPendingVerificationEmail') !== null;
+  });
   const router = useRouter();
 
   // Load user on mount
@@ -98,16 +104,30 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setPermissions(response.permissions);
       setPendingEmail(null);
       setRequiresVerification(false);
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('adminPendingVerificationEmail');
+      }
       
       router.push('/dashboard');
     } catch (error: any) {
       console.error('Login error:', error);
       
       // Check if account needs email verification
-      if (error.message?.includes('not active') || error.message?.includes('verify')) {
+      if (
+        error.code === 'email_verification_required' ||
+        error.status === 403 ||
+        error.message?.includes('not active') ||
+        error.message?.includes('verify')
+      ) {
         setPendingEmail(email);
         setRequiresVerification(true);
-        throw new Error('Account not verified. Please check your email for the verification code.');
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('adminPendingVerificationEmail', email);
+        }
+        // The account creator sends the code, but the new admin verifies it
+        // from this browser after their first login attempt.
+        router.push('/verify-otp');
+        return;
       }
       
       throw error;
@@ -125,6 +145,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // After verification, user needs to login again
       setPendingEmail(null);
       setRequiresVerification(false);
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('adminPendingVerificationEmail');
+      }
       
       // Redirect to login with success message
       router.push('/login?verified=true');
